@@ -5,7 +5,7 @@ function App() {
   return (
     <>
      <Nav_bar/> 
-     <Main_page/>
+     {/* <Main_page/> */}
      </>
   )
 }
