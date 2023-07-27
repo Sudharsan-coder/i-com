@@ -1,11 +1,13 @@
 import React from 'react'
-import Main_post from "../Components/Main_post"
+import Main_post from "../Components/Post/Main_post"
 import { styled } from "styled-components"
+import Nav_bar from "../Nav_bar.jsx"
 
 const Main_page = () => {
   return (
     <>
     <Container>
+         <Nav_bar/> 
         <Main_post/>
     </Container>
     </>

@@ -1,3 +1,14 @@
 body{
   margin: 0px;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+@media (max-width:700px){
+  html{
+    font-size: 14px;
+  }
+}
+@media (max-width:500px){
+  html{
+    font-size: 12px;
+  }
 }

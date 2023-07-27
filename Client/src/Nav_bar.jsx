@@ -4,7 +4,6 @@ import Logo from "./assets/logo.png"
 import { styled } from 'styled-components'
 import {BsSearch} from "react-icons/Bs"
 const Nav_bar=()=>{
-
   return (
     <Container>
         <img src={Logo} alt='pic'/>
@@ -21,7 +20,6 @@ const Container=styled.div`
     background:red;
     position:fixed;
     top:0px;
-    left:0px;
     width:100vw;
     height:10vh;
     display:flex;
@@ -53,6 +51,5 @@ const S_Icon=styled.div`
     border-radius:5px;
     &:hover{
     background:rgb(235, 236, 252);
-    // width:20px;
     }
 `
