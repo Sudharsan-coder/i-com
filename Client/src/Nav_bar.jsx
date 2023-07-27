@@ -3,10 +3,11 @@ import Log_in from "./Components/Log_in_button.jsx"
 import Logo from "./assets/logo.png"
 import { styled } from 'styled-components'
 import {BsSearch} from "react-icons/Bs"
+import {Link} from 'react-router-dom'
 const Nav_bar=()=>{
   return (
     <Container>
-        <img src={Logo} alt='pic'/>
+        <Link to={"/"}><img src={Logo} alt='pic'/></Link>     
         <div className='search_bar'>
         <input type='search' ></input>
         <S_Icon><BsSearch size={20}/></S_Icon>

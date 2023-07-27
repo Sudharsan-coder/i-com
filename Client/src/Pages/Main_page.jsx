@@ -7,7 +7,6 @@ const Main_page = () => {
   return (
     <>
     <Container>
-         <Nav_bar/> 
         <Main_post/>
     </Container>
     </>
