@@ -1,5 +1,4 @@
-import Main_page from "./Pages/Main_page.jsx";
-import Nav_bar from "./Nav_bar.jsx";
+import Nav_bar from "./Components/Nav_bar.jsx";
 function App() {
   return (
     <>

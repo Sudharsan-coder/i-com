@@ -6,9 +6,9 @@ import {Link} from "react-router-dom"
 const User_detail = () => {
   return (
     <Container>
-      <div className="frame1">
+      <div className="frame">
         <Link to="/profile"><img src={user_pic} alt="pic" /></Link>
-        <div className="frame1_content">
+        <div className="frame_content">
         <div className="user_name">Sudharsan</div>
         <div className="date">Posted on 22 Jan</div>
         </div>
@@ -24,18 +24,18 @@ export default User_detail;
 
 
 const Container=styled.div`
-.frame1{
+.frame{
   display: flex;
   align-items: center;
   img{
       height: 50px;
       width:50px;
-      border-radius: 15px;
+      border-radius: 100%;
   }
   .user_name{
       font-size: 1.2em;
   }
-  .frame1_content{
+  .frame_content{
       margin-left:15px;
   }
   .date{

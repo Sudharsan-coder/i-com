@@ -15,5 +15,4 @@ const Container=styled.div`
     height:90vh;
     padding:3%;
     box-sizing:border-box;
-    background:rgb(245, 245, 245);
     `
