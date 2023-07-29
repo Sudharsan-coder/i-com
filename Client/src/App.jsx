@@ -1,12 +1,10 @@
-import Main_page from "./Pages/Main_page.jsx"
-import { styled } from "styled-components"
+import Nav_bar from "./Components/Nav_bar.jsx";
 function App() {
   return (
     <>
-     <Main_page/>
-     </>
-  )
+      <Nav_bar />
+    </>
+  );
 }
 
-export default App
-
+export default App;

@@ -1,6 +1,7 @@
 body{
   margin: 0px;
   font-family: 'Noto Sans TC', sans-serif;
+  background-color: rgb(245, 245, 245);
 }
 @media (max-width:700px){
   html{
