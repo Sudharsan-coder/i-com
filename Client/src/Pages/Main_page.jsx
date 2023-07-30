@@ -1,7 +1,6 @@
-import React from "react";
+
 import Main_post from "../Components/Post/Main_post";
 import { styled } from "styled-components";
-import Nav_bar from "../Components/Nav_bar.jsx";
 
 const Main_page = () => {
   return (

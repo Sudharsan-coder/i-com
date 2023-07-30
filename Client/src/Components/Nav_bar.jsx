@@ -1,4 +1,3 @@
-import React from "react";
 import Log_in from "./Log_in_button.jsx";
 import Logo from "../assets/I_com_Logo_no_background.png";
 import { styled } from "styled-components";

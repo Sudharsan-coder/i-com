@@ -1,43 +1,29 @@
-import React from 'react'
-import { styled } from 'styled-components'
+import { styled } from "styled-components";
+import { useDisclosure } from "@mantine/hooks";
+import { Modal, Group, Button } from "@mantine/core";
+import { useState } from "react";
+import Login from "./Login";
+import Register from "./Register";
 
 const Log_in_button = () => {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [dis, setdis] = useState(false);
   return (
-    <Container>
-    <input type='button' value="Log in"></input>
-    <input className="create" type='button' value="Create account"></input>
-    </Container>
-  )
-}
+    <>
+      <Modal opened={opened} onClose={close} withCloseButton={false} centered>
+        {dis ? <Login /> : <Register />}
+        <button onClick={() => setdis((prev) => (prev ? false : true))}>
+          {dis ? <label>Don&acute;t have an account? Register</label> : <label>Have an account? Login</label>}
+        </button>
+      </Modal>
 
-export default Log_in_button
+      <Group position="center">
+        <Button onClick={open} radius={"xl"} color="indigo">
+          Sign up/ Sign in
+        </Button>
+      </Group>
+    </>
+  );
+};
 
-const Container=styled.div`
-    /* display: flex;
-    justify-items: space-around;
-    width:200px;
-    background: black; */
-  input{
-    width:fit-content ;
-    padding:5px 7px;
-    background: transparent;
-    border:0px;
-    border-radius:5px;
-    margin-right: 20px;
-    font-size: large;
-    &:hover{
-      transform:scale(1.05);
-      background: rgb(235, 236, 252);
-      text-decoration: underline;
-      text-decoration-color:blue;
-    }
-  }
-  .create{
-    border: 2px solid rgb(178, 178, 178);
-    padding: 10px;
-    &:hover{
-      border: 2px solid blue;
-      text-decoration: none;
-    }
-  }
-`
+export default Log_in_button;
