@@ -1,12 +1,12 @@
 const User = require("../models/User");
 const router = require("express").Router();
 
-//follow
+//followService
 router.put("/:follower/:following", async (req, res) => {
   try {
-    const followerId = req.params["follower"];
-    const followingId = req.params["following"];
-    if (!followerId || !followingId) return res.sendStatus(401);
+    const followerId = req.params.follower;
+    const followingId = req.params.following;
+    if (!followerId || !followingId) return res.status(401).json("Wrong");
     else {
       await User.findByIdAndUpdate(
         { _id: followerId },
@@ -25,3 +25,5 @@ router.put("/:follower/:following", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+module.exports=router;

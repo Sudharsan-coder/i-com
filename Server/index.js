@@ -29,7 +29,7 @@ mongoose
 //Endpoint call
 app.use('/auth',authRoute);
 app.use('/post',postRoute);
-app.use('./follow',followRoute);
+app.use('/follow',followRoute);
 
 
 app.listen(5010, () => {

@@ -1,13 +1,12 @@
 import { Input, PasswordInput } from "@mantine/core";
 import { styled } from "styled-components";
-import { IconAt, IconLock } from "@tabler/icons-react";
+import { IconAt, IconLock, IconUserCircle } from "@tabler/icons-react";
 
 const Register = () => {
   return (
     <Container>
-      <h4>Register</h4>
       <Form>
-        <input type="type" value="" placeholder="Username" />
+        <Input icon={<IconUserCircle />} placeholder="Your UserName" radius="md" />
         <Input icon={<IconAt />} placeholder="Your email" radius="md" />
         <PasswordInput
           label="Your password"

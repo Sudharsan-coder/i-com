@@ -22,6 +22,17 @@ router.get("/PostFind/:username", async (req, res) => {
   }
 });
 
+//Get all post
+router.get('/AllPost',async(req,res)=>{
+  try{
+    const AllPost=await Post.find();
+      res.status(200).json(AllPost)
+  }
+  catch(err){
+    res.status.json(err);
+  }
+})
+
 //Add comment
 router.put("/AddComment/:id", async (req, res) => {
   try {

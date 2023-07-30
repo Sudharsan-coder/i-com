@@ -5,6 +5,7 @@ const Main_post = () => {
   return (
     <Container>
         <Post/>
+        <Post/>
     </Container>
   )
 }
@@ -15,4 +16,7 @@ const Container=styled.div`
     height:90vh;
     padding:3%;
     box-sizing:border-box;
-    `
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+`

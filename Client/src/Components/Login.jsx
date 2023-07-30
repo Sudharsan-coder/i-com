@@ -1,13 +1,12 @@
-import { PasswordInput } from "@mantine/core";
-import { IconLock } from "@tabler/icons-react";
+import { Input, PasswordInput } from "@mantine/core";
+import { IconLock, IconUserCircle } from "@tabler/icons-react";
 import { styled } from "styled-components";
 
 const Login = () => {
   return (
     <Container>
-      <h4>Login</h4>
       <Form action="">
-        <input type="type" value="" placeholder="Username" />
+      <Input icon={<IconUserCircle />} placeholder="Your UserName" radius="md" />
         <PasswordInput
           label="Your password"
           placeholder="Your password"

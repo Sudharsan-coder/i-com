@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
 import { Link } from "react-router-dom";
-import Like from "../Likes.jsx";
-import im1 from '../../assets/logo.png'
+import Like from "../Post/Likes.jsx";
+import im1 from "../../assets/logo.png";
 
 const Single_comment = () => {
   return (
@@ -23,7 +23,8 @@ const Single_comment = () => {
         </div>
       </div>
       <div className="likes">
-      <Like /></div>
+        <Like />
+      </div>
     </Container>
   );
 };
@@ -59,7 +60,7 @@ const Container = styled.div`
       margin-bottom: 10px;
     }
   }
-  .likes{
-    margin:20px 70px;
+  .likes {
+    margin: 20px 70px;
   }
 `;
