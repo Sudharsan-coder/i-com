@@ -1,4 +1,3 @@
-
 import Main_post from "../Components/Post/Main_post";
 import { styled } from "styled-components";
 

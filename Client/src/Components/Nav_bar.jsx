@@ -7,7 +7,7 @@ const Nav_bar = () => {
   return (
     <Container>
       <Link to={"/"}>
-        <img src={Logo} alt="pic" />
+        <img src={Logo} alt="logo" />
       </Link>
       <div className="search_bar">
         <input type="search" placeholder="Search..."></input>

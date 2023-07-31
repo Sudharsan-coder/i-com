@@ -1,10 +1,30 @@
 //containers all the posts
 import { styled } from 'styled-components';
-import Post from "./Single_post.jsx"
+import Single_post from "./Single_post.jsx"
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 const Main_post = () => {
+
+const [post,setPost]=useState([]);
+    useEffect(()=>{
+        axios.get('http://localhost:5010/post/AllPost')
+        .then((res)=>{
+            setPost(res.data);
+            console.log(res.data);
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    },[])
   return (
     <Container>
-        <Post/>
+    {
+      post.map((Post)=>
+        (
+          <Single_post {...Post} key={Post._id}/>
+         )
+        )
+      }
     </Container>
   )
 }
@@ -15,4 +35,7 @@ const Container=styled.div`
     height:90vh;
     padding:3%;
     box-sizing:border-box;
-    `
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+`
