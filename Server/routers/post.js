@@ -29,7 +29,7 @@ router.get('/AllPost',async(req,res)=>{
       res.status(200).json(AllPost)
   }
   catch(err){
-    res.status.json(err);
+    res.status(500).json(err);
   }
 })
 
