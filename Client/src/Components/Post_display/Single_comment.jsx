@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Like from "../Post/Likes.jsx";
 import im1 from "../../assets/logo.png";
 
-const Single_comment = () => {
+const Single_comment = (props) => {
   return (
     <Container>
       <div className="frame">
@@ -12,13 +12,11 @@ const Single_comment = () => {
         </Link>
         <div className="frame_content">
           <div className="title">
-            <div className="user_name">Sudharsan</div>
+            <div className="user_name">{props.Name}</div>
             <div className="date">Posted on 22 Jan</div>
           </div>
           <div className="body">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eum,
-            sapiente illo. Rerum, eveniet hic. Quisquam atque doloribus velit
-            eveniet nisi.
+            {props.comment}
           </div>
         </div>
       </div>
@@ -43,7 +41,7 @@ const Container = styled.div`
       background-color: black;
     }
     .frame_content {
-      border: 2px solid rgb(178, 178, 178);
+      /* border: 2px solid rgb(178, 178, 178); */
       margin-left: 15px;
       padding: 10px;
       box-sizing: border-box;

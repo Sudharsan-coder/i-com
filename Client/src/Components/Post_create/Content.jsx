@@ -1,5 +1,5 @@
-const Content = () => {
-  const val=localStorage.getItem("post_des")
+const Content = (props) => {
+  const val=props.content
   return (
     <div dangerouslySetInnerHTML={{ __html: val }}>
     </div>

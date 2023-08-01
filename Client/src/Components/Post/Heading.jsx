@@ -1,9 +1,14 @@
+import { useNavigate } from "react-router";
 import { styled } from "styled-components";
 const Heading = (props) => {
 const tag=props.tag;
+const navigate=useNavigate();
+const nav=()=>{
+  navigate(`/post/${props._id}`);
+}
   return (
     <div className="heading">
-      <div>{props.title}</div>
+      <Title onClick={nav}>{props.title}</Title>
       <Tag >
       {
         tag.map((data,index)=>(
@@ -25,3 +30,11 @@ const Tag = styled.div`
     font-size: 0.55em;
   }
 `;
+
+const Title=styled.div`
+  &:hover{
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+  }
+`

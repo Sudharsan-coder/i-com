@@ -16,7 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Routes>
         <Route exact path="/" element={<Main_page />}></Route>
         <Route exact path="/profile" element={<Profile />}></Route>
-        <Route exact path="/post" element={<Post_expand />}></Route>
+        <Route exact path="/post/:id" element={<Post_expand />}></Route>
         {/* <Route exact path="/post/upload" element={<Create_post />}></Route> */}
       </Routes>
     </BrowserRouter>

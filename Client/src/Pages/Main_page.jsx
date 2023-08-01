@@ -1,11 +1,25 @@
+import { useEffect, useState } from "react";
 import Main_post from "../Components/Post/Main_post";
 import { styled } from "styled-components";
+import axios from "axios";
 
 const Main_page = () => {
+  const [post,setPost]=useState([]);
+  useEffect(()=>{
+      axios.get('http://localhost:5010/post/AllPost')
+      .then((res)=>{
+          setPost(res.data);
+          console.log(res.data);
+      })
+      .catch((err)=>{
+          console.log(err);
+      })
+  },[])
   return (
     <>
       <Container>
-        <Main_post />
+          <Main_post Post={post} />
+      
       </Container>
     </>
   );
