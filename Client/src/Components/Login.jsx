@@ -1,25 +1,33 @@
+import React from "react";
 import { Input, PasswordInput } from "@mantine/core";
 import { IconLock, IconUserCircle } from "@tabler/icons-react";
 import { styled } from "styled-components";
 import { useAuth } from "../context/auth";
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { notifications } from "@mantine/notifications";
+import { AiFillExclamationCircle } from "react-icons/ai";
 
-const Login = () => {
+const Login = ({ close }) => {
   const auth = useAuth();
   const [log, setLog] = useState({ username: "", password: "" });
-  const navigate=useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
       .post("http://localhost:5010/auth/login", log)
       .then((res) => {
+        console.log(res.data);
         auth.login(res.data.userName);
-        setLog({ username: "", password: "" });
+        close(false);
       })
       .catch((err) => {
         console.log(err);
+        notifications.show({
+          title: "Login Failed",
+          message: "Please check your username and password",
+          color: "red",
+          icon: <AiFillExclamationCircle color="white" size="3rem" />,
+        });
       });
   };
   return (
@@ -30,17 +38,20 @@ const Login = () => {
           placeholder="Your UserName"
           radius="md"
           value={log.username}
-          onChange={(e)=>{setLog({...log,username:e.target.value})}}
+          onChange={(e) => {
+            setLog({ ...log, username: e.target.value });
+          }}
         />
         <PasswordInput
           label="Your password"
           placeholder="Your password"
           icon={<IconLock size="1rem" />}
           value={log.password}
-          onChange={(e)=>{setLog({...log,password:e.target.value})}}
+          onChange={(e) => {
+            setLog({ ...log, password: e.target.value });
+          }}
         />
         <LoginBtn type="submit">Login</LoginBtn>
-        {console.log(log)}
       </Form>
     </Container>
   );
@@ -61,6 +72,7 @@ const Form = styled.form`
     padding: 0.5rem;
   }
 `;
+
 const LoginBtn = styled.button`
   padding: 0.6rem;
   color: white;
