@@ -6,17 +6,17 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Login = ({close}) => {
   const auth = useAuth();
   const [log, setLog] = useState({ username: "", password: "" });
-  const navigate=useNavigate();
+  // const navigate=useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
       .post("http://localhost:5010/auth/login", log)
       .then((res) => {
         auth.login(res.data.userName);
-        navigate('/');
+        close(false);
       })
       .catch((err) => {
         console.log(err);
@@ -40,7 +40,6 @@ const Login = () => {
           onChange={(e)=>{setLog({...log,password:e.target.value})}}
         />
         <LoginBtn type="submit">Login</LoginBtn>
-        {console.log(log)}
       </Form>
     </Container>
   );
