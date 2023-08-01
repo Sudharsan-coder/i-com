@@ -14,7 +14,6 @@ export default Post_page_display
 const Container=styled.div`
   margin-top: 10vh;
   display: grid;
-  overflow: hidden;
   grid-template-columns: 0.3fr 3fr 1fr;
   background: rgb(245, 245, 245);
 `

@@ -22,7 +22,6 @@ const Log_in_button = () => {
           )}
         </Navbtn>
       </Modal>
-
       <Group position="center">
         {!auth.user ? (
           <Button onClick={open} radius={"xl"} color="indigo">

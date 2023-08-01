@@ -16,7 +16,7 @@ const Login = () => {
       .post("http://localhost:5010/auth/login", log)
       .then((res) => {
         auth.login(res.data.userName);
-        navigate('/');
+        setLog({ username: "", password: "" });
       })
       .catch((err) => {
         console.log(err);
