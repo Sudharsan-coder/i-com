@@ -13,7 +13,7 @@ router.post("/", async (req, res) => {
 });
 
 //Get Users Post
-router.get("/PostFind/:username", async (req, res) => {
+router.get("/UserPostFind/:username", async (req, res) => {
   try {
     const posts = await Post.find({ userName: req.params.username });
     res.status(200).json(posts);
@@ -22,7 +22,7 @@ router.get("/PostFind/:username", async (req, res) => {
   }
 });
 
-//Get all post
+//Get all post(Main page)
 router.get('/AllPost',async(req,res)=>{
   try{
     const AllPost=await Post.find();
@@ -30,6 +30,18 @@ router.get('/AllPost',async(req,res)=>{
   }
   catch(err){
     res.status(500).json(err);
+  }
+})
+
+//Particular Post
+router.get("/",async(req,res)=>{
+  const postid=req.query.postid;
+  try{
+  const postdetails=await Post.findById(postid);
+  res.status(200).send(postdetails);
+  }
+  catch(err){
+
   }
 })
 
@@ -70,7 +82,7 @@ router.put("/liked/:id", async (req, res) => {
   }
 });
 
-//Search Endpoint
+//Search post Endpoint
 router.get("/searching", async (req, res) => {
   const qsearch = req.query.search;
   try {
@@ -86,5 +98,7 @@ router.get("/searching", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+
 
 module.exports = router;

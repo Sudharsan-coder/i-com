@@ -1,25 +1,12 @@
 //containers all the posts
 import { styled } from 'styled-components';
 import Single_post from "./Single_post.jsx"
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-const Main_post = () => {
-
-const [post,setPost]=useState([]);
-    useEffect(()=>{
-        axios.get('http://localhost:5010/post/AllPost')
-        .then((res)=>{
-            setPost(res.data);
-            console.log(res.data);
-        })
-        .catch((err)=>{
-            console.log(err);
-        })
-    },[])
+const Main_post = (props) => {
+const PostArray=props.Post;
   return (
     <Container>
     {
-      post.map((Post)=>
+      PostArray.map((Post)=>
         (
           <Single_post {...Post} key={Post._id}/>
          )
