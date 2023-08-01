@@ -13,6 +13,7 @@ app.use(express.json());
 //Routers
 const authRoute=require("./routers/auth");
 const postRoute=require("./routers/post");
+const followRoute=require("./routers/follow");
 
 //connect the DB
 mongoose
@@ -28,6 +29,7 @@ mongoose
 //Endpoint call
 app.use('/auth',authRoute);
 app.use('/post',postRoute);
+app.use('/follow',followRoute);
 
 
 app.listen(5010, () => {

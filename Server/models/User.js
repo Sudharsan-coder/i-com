@@ -2,8 +2,11 @@ const mongoose=require('mongoose')
 
 const UserSchema=new mongoose.Schema(
     {
+        firstName:{type:String,require:true},
+        lastName:{type:String,require:true},
         userName:{ type:String, required:true,unique:true},
-        password:{type:String,required:true},
+        emailId:{type:String,require:true},
+        password:{type:String,required:true},   
         isAdmin:{
             type:Boolean,
             default:false,
@@ -11,7 +14,9 @@ const UserSchema=new mongoose.Schema(
         userBio:{type:String},
         profilePicUrl:{type:[String]}, //array of urls for multiple images
         followersCount:{type:Number,default:0},
+        followers:{type:Array},
         followingCount:{type:Number,default:0},
+        followings:{type:Array},
     }
 )
 

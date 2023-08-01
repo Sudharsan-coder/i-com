@@ -1,16 +1,29 @@
 import { Input, PasswordInput } from "@mantine/core";
 import { styled } from "styled-components";
-import { IconAt, IconLock } from "@tabler/icons-react";
+import { IconAt, IconLock, IconUserCircle } from "@tabler/icons-react";
 
 const Register = () => {
   return (
     <Container>
-      <h4>Register</h4>
       <Form>
-        <input type="type" value="" placeholder="Username" />
+        <Name>
+          <Input.Wrapper label="First Name" withAsterisk>
+            <Input placeholder="Your First Name" radius="md" />
+          </Input.Wrapper>
+          <Input.Wrapper label="Last Name" withAsterisk>
+            <Input
+              placeholder="Your Last Name"
+              radius="md"
+            />
+          </Input.Wrapper>
+        </Name>
+        <Input
+          icon={<IconUserCircle />}
+          placeholder="Your UserName"
+          radius="md"
+        />
         <Input icon={<IconAt />} placeholder="Your email" radius="md" />
         <PasswordInput
-          label="Your password"
           placeholder="Your password"
           icon={<IconLock size="1rem" />}
         />
@@ -42,4 +55,9 @@ const RegisterBtn = styled.button`
     cursor: pointer;
     opacity: 0.8;
   }
+`;
+
+const Name = styled.div`
+  display: flex;
+  gap: 20px;
 `;
