@@ -1,18 +1,46 @@
 import { Input, PasswordInput } from "@mantine/core";
 import { IconLock, IconUserCircle } from "@tabler/icons-react";
 import { styled } from "styled-components";
+import { useAuth } from "../context/auth";
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const auth = useAuth();
+  const [log, setLog] = useState({ username: "", password: "" });
+  const navigate=useNavigate();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post("http://localhost:5010/auth/login", log)
+      .then((res) => {
+        auth.login(res.data.userName);
+        navigate('/');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <Container>
-      <Form action="">
-      <Input icon={<IconUserCircle />} placeholder="Your UserName" radius="md" />
+      <Form onSubmit={handleSubmit}>
+        <Input
+          icon={<IconUserCircle />}
+          placeholder="Your UserName"
+          radius="md"
+          value={log.username}
+          onChange={(e)=>{setLog({...log,username:e.target.value})}}
+        />
         <PasswordInput
           label="Your password"
           placeholder="Your password"
           icon={<IconLock size="1rem" />}
+          value={log.password}
+          onChange={(e)=>{setLog({...log,password:e.target.value})}}
         />
         <LoginBtn type="submit">Login</LoginBtn>
+        {console.log(log)}
       </Form>
     </Container>
   );
