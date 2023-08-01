@@ -15,7 +15,7 @@ const Log_in_button = () => {
   return (
     <>
      {showModel && <Modal opened={opened} onClose={close} title="Authentication" centered>
-        {dis ? <Login close={setShowModel}/> : <Register />}
+        {dis ? <Login close={setShowModel}/> : <Register close={setShowModel}/>}
         <Navbtn onClick={() => setdis((prev) => (prev ? false : true))}>
           {dis ? (
             <label>Don&acute;t have an account? Register</label>
