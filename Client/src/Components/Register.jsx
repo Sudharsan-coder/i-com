@@ -1,31 +1,67 @@
 import { Input, PasswordInput } from "@mantine/core";
 import { styled } from "styled-components";
 import { IconAt, IconLock, IconUserCircle } from "@tabler/icons-react";
+import axios from "axios";
+import { useState } from "react";
 
 const Register = () => {
+  const [reg, setreg] = useState({
+    first: "",
+    Last: "",
+    emailid: "",
+    username: "",
+    password: "",
+  });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post("http://localhost:5010/auth/register", reg)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <Container>
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <Name>
           <Input.Wrapper label="First Name" withAsterisk>
-            <Input placeholder="Your First Name" radius="md" />
+            <Input
+              placeholder="Your First Name"
+              radius="md"
+              value={reg.first}
+              onChange={(e) => {
+                setreg({ ...reg, first: e.target.value });
+              }}
+            />
           </Input.Wrapper>
           <Input.Wrapper label="Last Name" withAsterisk>
-            <Input
-              placeholder="Your Last Name"
-              radius="md"
-            />
+            <Input placeholder="Your Last Name" radius="md" 
+             value={reg.last}
+             onChange={(e) => {
+               setreg({ ...reg, last: e.target.value });
+             }}/>
           </Input.Wrapper>
         </Name>
         <Input
           icon={<IconUserCircle />}
           placeholder="Your UserName"
           radius="md"
+          value={reg.username}
+          onChange={(e) => {
+            setreg({ ...reg, username: e.target.value });
+          }}
         />
         <Input icon={<IconAt />} placeholder="Your email" radius="md" />
         <PasswordInput
           placeholder="Your password"
           icon={<IconLock size="1rem" />}
+          value={reg.password}
+          onChange={(e) => {
+            setreg({ ...reg, password: e.target.value });
+          }}
         />
         <RegisterBtn type="submit">Register</RegisterBtn>
       </Form>
