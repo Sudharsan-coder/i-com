@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import Main_page from "./Pages/Main_page.jsx";
-// import Create_post from "./Pages/Post_create_box.jsx";
 import Post_expand from "./Pages/Post_page_display.jsx";
 import Profile from "./Pages/Profile_page.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
