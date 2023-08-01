@@ -16,7 +16,6 @@ const Log_in_button = () => {
           {dis ? <label>Don&acute;t have an account? Register</label> : <label>Have an account? Login</label>}
         </button>
       </Modal>
-
       <Group position="center">
         <Button onClick={open} radius={"xl"} color="indigo">
           Sign up/ Sign in
@@ -27,3 +26,4 @@ const Log_in_button = () => {
 };
 
 export default Log_in_button;
+

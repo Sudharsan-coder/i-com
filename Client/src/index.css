@@ -2,6 +2,24 @@ body{
   margin: 0px;
   font-family: 'Noto Sans TC', sans-serif;
   background-color: rgb(245, 245, 245);
+  box-sizing: border-box;
+}
+.mantine-16nrau2{
+  padding: 0%;
+}
+.fullscreen{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  z-index: 1;
+  backdrop-filter: blur(1px);
+}
+.center{
+  justify-content: center;
+  align-items: center;
 }
 @media (max-width:700px){
   html{

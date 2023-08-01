@@ -22,7 +22,8 @@ const Register = () => {
 
 export default Register;
 
-const Container = styled.div``;
+const Container = styled.div`
+`;
 const Form = styled.form`
   display: flex;
   flex-direction: column;
