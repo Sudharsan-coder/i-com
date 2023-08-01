@@ -8,6 +8,7 @@ import { styled } from "styled-components";
 import Post_create_box from "./Post_create/Post_create_box.jsx"
 const Log_in_button = () => {
   const [opened, { open, close }] = useDisclosure(false);
+  // const [show_post_create,setShow_post_create]=useState(true);
   const [dis, setdis] = useState(false);
   const auth = useAuth();
   const [show_post_box,setShow_post_box]=useState(false);

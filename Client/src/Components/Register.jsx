@@ -69,11 +69,13 @@ const Register = ({ close }) => {
                 />
                 <RegisterBtn
                     type="submit"
-                    onClick={() =>
+                    onClick={() =>{
                         notifications.show({
                             title: "Registered Successfully",
                             message: "Hey there, welcome to our community",
                         })
+                        close(false);
+                        }
                     }
                 >
                     Register

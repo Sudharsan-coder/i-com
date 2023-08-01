@@ -11,9 +11,7 @@ const Single_post = (props) => {
     <Container>
       <Block>
         <User_detail {...props} />
-        <StyledLink to="/post">
           <Heading {...props}/>
-        </StyledLink>
         <div className="icons">
           <Likes />
         </div>
