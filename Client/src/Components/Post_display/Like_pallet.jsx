@@ -1,10 +1,10 @@
 import React from "react";
 import Likes from "../Post/Likes.jsx";
 import { styled } from "styled-components";
-const Like_pallet = () => {
+const Like_pallet = (props) => {
   return (
     <Container>
-      <Likes />
+      <Likes {...props}/>
     </Container>
   );
 };

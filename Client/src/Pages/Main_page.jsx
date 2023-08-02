@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import Main_post from "../Components/Post/Main_post";
 import { styled } from "styled-components";
 import axios from "axios";
+import { useAuth } from "../context/auth";
 
 const Main_page = () => {
   const [post,setPost]=useState([]);
+  const auth=useAuth();
   useEffect(()=>{
-      axios.get('http://localhost:5010/post/AllPost')
+      axios.get(`http://localhost:5010/post/AllPost?search=${auth.search}`)
       .then((res)=>{
           setPost(res.data);
           console.log(res.data);
@@ -14,7 +16,7 @@ const Main_page = () => {
       .catch((err)=>{
           console.log(err);
       })
-  },[])
+  },[auth.search])
   return (
     <>
       <Container>
