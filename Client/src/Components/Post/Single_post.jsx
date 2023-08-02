@@ -13,7 +13,7 @@ const Single_post = (props) => {
         <User_detail {...props} />
           <Heading {...props}/>
         <div className="icons">
-          <Likes />
+          <Likes {...props} />
         </div>
       </Block>
     </Container>

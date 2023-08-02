@@ -1,11 +1,30 @@
 import { styled } from "styled-components"
 import Like_pallet from "../Components/Post_display/Like_pallet.jsx"
 import Post from "../Components/Post_display/Post.jsx"
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 const Post_page_display = () => {
+  const params = useParams();
+  const postid = params.id;
+  const [postdetails, setPostDetails] = useState(null);
+  console.log(postid);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5010/post?postid=${postid}`)
+      .then((res) => {
+        setPostDetails(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  console.log(postdetails);
   return (
     <Container>
-      <Like_pallet/>
-      <Post/>
+    <Like_pallet {...postdetails}/>
+     {postdetails &&
+      <Post {...postdetails}/>}
     </Container>
   )
 }

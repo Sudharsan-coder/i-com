@@ -22,11 +22,18 @@ router.get("/UserPostFind/:username", async (req, res) => {
   }
 });
 
-//Get all post(Main page)
+//Get all post(Main page) && Search post Endpoint
 router.get('/AllPost',async(req,res)=>{
+  const qsearch = req.query.search;
   try{
-    const AllPost=await Post.find();
-      res.status(200).json(AllPost)
+    let Searched;
+    if (qsearch)
+      Searched = await Post.find({
+        tag: { $in: [qsearch] },
+      });
+    else 
+    Searched=await Post.find().sort({$natural:-1});
+      res.status(200).json(Searched)
   }
   catch(err){
     res.status(500).json(err);
@@ -82,22 +89,6 @@ router.put("/liked/:id", async (req, res) => {
   }
 });
 
-//Search post Endpoint
-router.get("/searching", async (req, res) => {
-  const qsearch = req.query.search;
-  try {
-    let Searched;
-    if (qsearch)
-      Searched = await Post.find({
-        tag: { $in: [qsearch] },
-      });
-    else Searched = await Post.find();
-    // const Searched=await Post.find();
-    res.status(200).json(Searched);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
 
 
 
