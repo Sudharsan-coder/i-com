@@ -7,7 +7,7 @@ import { notifications } from "@mantine/notifications";
 const Register = ({ close }) => {
     const [reg, setreg] = useState({
         first: "",
-        Last: "",
+        last: "",
         emailid: "",
         username: "",
         password: "",
@@ -19,11 +19,16 @@ const Register = ({ close }) => {
             .then((res) => {
                 console.log(res);
                 close(false);
+                notifications.show({
+                    title: "Registered Successfully",
+                    message: "Hey there, welcome to our community",
+                })
             })
             .catch((err) => {
                 console.log(err);
             });
     };
+    console.log(reg);
     return (
         <Container>
             <Form onSubmit={handleSubmit}>
@@ -58,7 +63,11 @@ const Register = ({ close }) => {
                         setreg({ ...reg, username: e.target.value });
                     }}
                 />
-                <Input icon={<IconAt />} placeholder="Your email" radius="md" />
+                <Input icon={<IconAt />} placeholder="Your email" radius="md"
+                 value={reg.emailid}
+                 onChange={(e) => {
+                     setreg({ ...reg, emailid: e.target.value });
+                 }}/>
                 <PasswordInput
                     placeholder="Your password"
                     icon={<IconLock size="1rem" />}

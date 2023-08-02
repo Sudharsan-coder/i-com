@@ -33,7 +33,7 @@ const Log_in_button = () => {
         ) : (
         <div>
           <Button>{auth.user}</Button>
-          <Button onClick={setShow_post_box(true)}>+</Button>
+          <Button onClick={()=>setShow_post_box(true)}>+</Button>
         </div>
         )}
       </Group>
