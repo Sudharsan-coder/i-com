@@ -6,15 +6,16 @@ import { FaRegCommentDots } from "react-icons/fa";
 import { useState,useRef } from "react";
 import { Link } from "react-router-dom";
 
-const Likes = () => {
+const Likes = (props) => {
     const [Liked, setLiked] = useState(false);
-    const num=useRef(10);
+    const num=useRef(props.likeCount);
     function ScroolTo(event, item) {
       event.preventDefault();
       document
         .getElementById(item)
         .scrollIntoView({ behavior: "smooth", block: "start" });
     }
+    console.log(props.likeCount);
   
   return (
     <Container>

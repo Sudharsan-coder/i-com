@@ -20,9 +20,9 @@ const Single_comment = (props) => {
           </div>
         </div>
       </div>
-      <div className="likes">
+      {/* <div className="likes">
         <Like />
-      </div>
+      </div> */}
     </Container>
   );
 };
