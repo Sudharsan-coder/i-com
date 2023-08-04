@@ -1,7 +1,7 @@
 import Log_in from "./Log_in_button.jsx";
 import Logo from "../assets/I_com_Logo_no_background.png";
 import { styled } from "styled-components";
-import { BsSearch } from "react-icons/Bs";
+import { BsSearch } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/auth.jsx";
 const Nav_bar = () => {

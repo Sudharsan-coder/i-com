@@ -4,6 +4,7 @@ import { styled } from "styled-components";
 import axios from "axios";
 import { useAuth } from "../context/auth";
 
+
 const Main_page = () => {
   const [post,setPost]=useState([]);
   const auth=useAuth();
