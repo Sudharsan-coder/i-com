@@ -2,11 +2,12 @@ import Log_in from "./Log_in_button.jsx";
 import Logo from "../assets/I_com_Logo_no_background.png";
 import { styled } from "styled-components";
 import { BsSearch } from "react-icons/Bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/auth.jsx";
 const Nav_bar = () => {
   const auth = useAuth();
   console.log(auth.search);
+  const navigate=useNavigate();
   return (
     <Container>
       <Link to={"/"}>
@@ -19,6 +20,9 @@ const Nav_bar = () => {
           value={auth.search}
           onChange={(e) => {
             auth.searching(e.target.value);
+          }}
+          onClick={()=>{
+            navigate('/');
           }}
         ></input>
         <S_Icon>

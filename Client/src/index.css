@@ -1,8 +1,11 @@
 body{
   margin: 0px;
-  font-family: 'Noto Sans TC', sans-serif;
+  
   background-color: rgb(245, 245, 245);
   box-sizing: border-box;
+}
+*{
+  font-family: '-apple-system';
 }
 .mantine-16nrau2{
   padding: 0%;
