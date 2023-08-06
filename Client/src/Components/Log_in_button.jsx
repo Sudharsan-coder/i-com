@@ -8,6 +8,7 @@ import { styled } from "styled-components";
 import Post_create_box from "./Post_create/Post_create_box.jsx"
 const Log_in_button = () => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [opened_post, post_obj] = useDisclosure(false);
   // const [show_post_create,setShow_post_create]=useState(true);
   const [dis, setdis] = useState(false);
   const auth = useAuth();
@@ -25,6 +26,7 @@ const Log_in_button = () => {
           )}
         </Navbtn>
       </Modal>}
+      <Modal opened={opened_post} onClose={post_obj.close} size="auto" title="Create" centered><Post_create_box/></Modal>
       <Group position="center">
         {!auth.user ? (
           <Button onClick={()=>{setShowModel(true);open()}} radius={"xl"} color="indigo">
@@ -33,11 +35,11 @@ const Log_in_button = () => {
         ) : (
         <div>
           <Button>{auth.user}</Button>
-          <Button onClick={()=>setShow_post_box(true)}>+</Button>
+          <Button onClick={()=>{post_obj.open()}}>+</Button>
         </div>
         )}
       </Group>
-      {show_post_box && <Post_create_box setShow={show_post_box}/>}
+      {/* {show_post_box && <Post_create_box setShow={setShow_post_box}/>} */}
     </>
   );
 };

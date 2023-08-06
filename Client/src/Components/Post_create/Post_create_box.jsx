@@ -3,10 +3,16 @@ import { render } from "react-dom";
 import { styled } from "styled-components";
 // import Content from "./Content";
 import { Link } from "react-router-dom";
+import { Modal, Group, Button } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+
 
 // export const Post_content=createContext();
 
 const Post_create_box = (prop) => {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [dis, setdis] = useState(false);
+
     let [tags, setTags] = useState([]);
     function add_tag() {
         const tag = document.querySelector(".add_tag");
@@ -15,8 +21,10 @@ const Post_create_box = (prop) => {
         setTags(arr);
         tag.value = ""
     }
+    console.log("hi");
     return (
-        <div className="fullscreen center">
+            // <Modal opened={opened} onClose={close} title="Authentication" centered>
+            // <div className="fullscreen center">
             <Container>
                 <label>Title</label>
                 <input
@@ -38,9 +46,9 @@ const Post_create_box = (prop) => {
                 </div>
                 <label>Description</label>
                 <textarea className='post_context' placeholder="provide in markup language"></textarea>
-                <input className="submit" type="button" value="Post" onClick={()=>{localStorage.setItem("post_des", document.querySelector('.post_context').value);prop.setShow(false)}} />
+                <input className="submit" type="button" value="Post" onClick={()=>{prop.setShow(false)}} />
             </Container>
-        </div>
+            // </div>
     );
 };
 
@@ -50,9 +58,9 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background-color: rgb(227, 226, 226);
-    padding: 1.5% 5%;
-    border-radius: 5px;
+    /* background-color: rgb(227, 226, 226); */
+    /* padding: 1.5% 5%; */
+    width:fit-content;
     input {
         width: 500px;
     }
@@ -61,7 +69,7 @@ const Container = styled.div`
     }
     textarea {
         width: 500px;
-        height: 250px;
+        height: 200px;
     }
     .tag_container {
         input[type="button"] {
