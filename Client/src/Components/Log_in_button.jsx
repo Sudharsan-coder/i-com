@@ -12,7 +12,7 @@ const Log_in_button = () => {
   // const [show_post_create,setShow_post_create]=useState(true);
   const [dis, setdis] = useState(false);
   const auth = useAuth();
-  const [show_post_box,setShow_post_box]=useState(false);
+  const [show_post_box,setShow_post_box]=useState(true);
   const [showModel,setShowModel]=useState(true);
   return (
     <>
@@ -26,7 +26,7 @@ const Log_in_button = () => {
           )}
         </Navbtn>
       </Modal>}
-      <Modal opened={opened_post} onClose={post_obj.close} size="auto" title="Create" centered><Post_create_box/></Modal>
+      {show_post_box  && <Modal opened={opened_post} onClose={post_obj.close} size="auto" title="Create" centered><Post_create_box close={setShow_post_box}/></Modal>}
       <Group position="center">
         {!auth.user ? (
           <Button onClick={()=>{setShowModel(true);open()}} radius={"xl"} color="indigo">

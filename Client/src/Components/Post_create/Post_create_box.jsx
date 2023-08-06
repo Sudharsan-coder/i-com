@@ -6,7 +6,7 @@ import { notifications } from "@mantine/notifications";
 
 // export const Post_content=createContext();
 
-const Post_create_box = (prop) => {
+const Post_create_box = ({ close }) => {
   const auth = useAuth();
   
   const [postUpload, setPostUpload] = useState({
@@ -19,18 +19,16 @@ const Post_create_box = (prop) => {
   
   // let [tags, setTags] = useState([]);
   const {tag,...others}=postUpload;
-  let i=0;
   function add_tag() {
     const tags = document.querySelector(".add_tag");
     let arr = [...tag];
     arr.push(
-      <div className="single_tag" key={i}>
+      <div className="single_tag" key={tags.value}>
         #{tags.value}
       </div>
     );
     setPostUpload({...postUpload,tag:arr});
     tags.value = "";
-    i++;
   }
   console.log("hi");
   console.log(tag)
@@ -45,7 +43,7 @@ const Post_create_box = (prop) => {
       .post("http://localhost:5010/post/",postUpload)
       .then((res) => {
         console.log(res);
-        prop.setShow(false);
+        close(false);
         notifications.show({
           title: "Posted Successfully",
           message: "Hey there,User post is Uploaded",
