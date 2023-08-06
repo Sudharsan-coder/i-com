@@ -29,4 +29,28 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+
+//Find specific User
+router.get("/",async(req,res)=>{
+const username=req.query.username;
+  try{
+  const userdetails=await User.findOne({userName:username});
+  res.status(200).json(userdetails);
+  }
+  catch(err){
+    res.status(500).json(err);
+  }
+})
+
+//Get all Users
+router.get("/all",async(req,res)=>{
+    try{
+    const userdetails=await User.find();
+    res.status(200).json(userdetails);
+    }
+    catch(err){
+      res.status(500).json(err);
+    }
+})
 module.exports = router;

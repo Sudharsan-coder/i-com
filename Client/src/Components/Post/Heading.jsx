@@ -12,7 +12,7 @@ const nav=()=>{
       <Tag >
       {
         tag.map((data,index)=>(
-            <div className="tag" key={index}>#{data}</div>
+            <div className="tag" key={index}>#{data}&emsp;</div>
             ))
           }
           </Tag>
@@ -24,10 +24,10 @@ export default Heading;
 
 const Tag = styled.div`
   display: flex;
-
   margin-top: 10px;
   .tag{
     font-size: 0.55em;
+    
   }
 `;
 

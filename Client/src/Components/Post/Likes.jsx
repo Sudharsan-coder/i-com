@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { styled } from "styled-components";
 import { AiOutlineHeart } from "react-icons/ai";
 import { AiFillHeart } from "react-icons/ai";
@@ -7,33 +7,32 @@ import { useState,useRef } from "react";
 import { Link } from "react-router-dom";
 
 const Likes = (props) => {
-    const [Liked, setLiked] = useState(false);
-    const num=useRef(props.likeCount);
+  const [Liked, setLiked] = useState(false);
+    
     function ScroolTo(event, item) {
       event.preventDefault();
       document
         .getElementById(item)
         .scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    console.log(props.likeCount);
-  
+   
   return (
     <Container>
       <div className="like_container">
       <div
         className="like"
-        onClick={() => {
-          setLiked(!Liked);
-          if(Liked)
-          num.current-=1;
-          else
-          num.current+=1;
-        }}
+        // onClick={() => {
+        //   setLiked(!Liked);
+        //   if(Liked)
+        //   //decrease the like count by one
+        //   else
+        //   //increase the like count by one
+        // }}
       >
         {Liked ? <AiFillHeart size="20px" color="red"/> : <AiOutlineHeart size="20px"/>}
-        <div className="num">{num.current}</div>
+        <div className="num">{props.likeCount}</div>
       </div>
-      <div className="comment" onClick={(event)=>{ScroolTo(event,"comment")}}>
+      <div className="comment" id="#comment" onClick={(event)=>{ScroolTo(event,"comment")}}>
         <Link to="/post"><FaRegCommentDots size="20px" color="black"/></Link>
       </div>
       </div>

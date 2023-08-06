@@ -12,10 +12,10 @@ router.post("/", async (req, res) => {
   }
 });
 
-//Get Users Post
-router.get("/UserPostFind/:username", async (req, res) => {
+//Get Specific User Posts
+router.get("/UserPostFind", async (req, res) => {
   try {
-    const posts = await Post.find({ userName: req.params.username });
+    const posts = await Post.find({ userName: req.query.username });
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json(err);

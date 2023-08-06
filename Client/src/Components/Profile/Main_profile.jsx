@@ -4,12 +4,13 @@ import Profile_pic from "./Profile_pic.jsx";
 import Buttons from "./Buttons.jsx";
 import Detail from "./Detail.jsx";
 
-const Main_profile = () => {
+const Main_profile = (props) => {
+console.log(props.userName);
   return (
     <Conatiner>
       <Profile_pic />
       <Buttons />
-      <Detail />
+      <Detail {...props} />
     </Conatiner>
   );
 };

@@ -2,15 +2,16 @@
 import { styled } from "styled-components";
 
 import user_pic from "../../assets/logo.png"
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 const User_detail = (props) => {
+const navigate=useNavigate();
 // console.log(props);
   return (
     <Container>
       <div className="frame">
         <Link to="/profile"><img src={user_pic} alt="pic" /></Link>
-        <div className="frame_content">
-        <div className="user_name">{props.userName}</div>
+      <div className="frame_content">
+      <div className="user_name" onClick={()=>{navigate(`/profile/${props.userName}`)}}>{props.userName}</div>
         <div className="date">Posted on 22 Jan</div>
         </div>
       </div>
@@ -32,9 +33,16 @@ const Container=styled.div`
       height: 50px;
       width:50px;
       border-radius: 100%;
-  }
-  .user_name{
-      font-size: 1.2em;
+    }
+    .user_name{
+      font-size: 1em;
+      cursor: pointer;
+      display: inline;
+      &:hover{
+        
+        background-color: #F6F6F6;
+        transition: cubic-bezier(0.165, 0.84, 0.44, 1);
+      }
   }
   .frame_content{
       margin-left:15px;
