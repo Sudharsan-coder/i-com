@@ -8,7 +8,7 @@ export const AuthProvider=({children})=>{
     const login=(user)=>{
         setUser(user);
     }
-    
+
     const logout=()=>{
         setUser(null);
     }

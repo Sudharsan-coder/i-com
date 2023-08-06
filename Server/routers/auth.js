@@ -28,8 +28,8 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ userName: req.body.username });
 
-    {
-      !user && res.status(401).json("Wrong Credentials");
+    if (!user) {
+      return res.status(401).send("Wrong Credentials");
     }
 
     const hashedPassword = CryptoJS.AES.decrypt(
@@ -37,16 +37,17 @@ router.post("/login", async (req, res) => {
       process.env.PASS_SEC
     ).toString(CryptoJS.enc.Utf8);
 
-    {
-      hashedPassword !== req.body.password &&
-        res.status(401).json("Wrong Credentials");
+    if (hashedPassword !== req.body.password) {
+      return res.status(401).json("Wrong Credentials");
     }
 
     const { password, ...others } = user._doc;
-    res.status(200).json(others);
+    res.status(200).send(others);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).send(err);
   }
 });
+
+
 
 module.exports = router;
