@@ -55,6 +55,7 @@ const Login = ({ close }) => {
       </Form>
     </Container>
   );
+    
 };
 
 export default Login;
