@@ -16,10 +16,11 @@ const Main_page = () => {
       .catch((err)=>{
           console.log(err);
       })
-  },[auth.search])
+  })
   return (
     <>
       <Container>
+        
           <Main_post Post={post} />
       
       </Container>

@@ -6,6 +6,7 @@ import Register from "./Register";
 import { useAuth } from "../context/auth";
 import { styled } from "styled-components";
 import Post_create_box from "./Post_create/Post_create_box.jsx"
+import User from "./User";
 const Log_in_button = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [opened_post, post_obj] = useDisclosure(false);
@@ -26,7 +27,7 @@ const Log_in_button = () => {
           )}
         </Navbtn>
       </Modal>}
-      {show_post_box  && <Modal opened={opened_post} onClose={post_obj.close} size="auto" title="Create" centered><Post_create_box close={setShow_post_box}/></Modal>}
+      {show_post_box  && <Modal opened={opened_post} onClose={post_obj.close} size="auto" title="Create Post" centered><Post_create_box close={setShow_post_box}/></Modal>}
       <Group position="center">
         {!auth.user ? (
           <Button onClick={()=>{setShowModel(true);open()}} radius={"xl"} color="indigo">
@@ -34,7 +35,7 @@ const Log_in_button = () => {
           </Button>
         ) : (
         <div>
-          <Button>{auth.user}</Button>
+          <User/>
           <Button onClick={()=>{post_obj.open()}}>+</Button>
         </div>
         )}

@@ -10,6 +10,10 @@ body{
 .mantine-16nrau2{
   padding: 0%;
 }
+.mantine-MultiSelect-input{
+  width: 505px;
+  
+}
 .fullscreen{
   position: fixed;
   top: 0px;

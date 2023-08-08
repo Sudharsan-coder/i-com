@@ -3,6 +3,7 @@ import { styled } from "styled-components";
 import { useAuth } from "../../context/auth";
 import axios from "axios";
 import { notifications } from "@mantine/notifications";
+import { Input, MultiSelect } from "@mantine/core";
 
 // export const Post_content=createContext();
 
@@ -19,19 +20,26 @@ const Post_create_box = ({ close }) => {
   
   // let [tags, setTags] = useState([]);
   const {tag,...others}=postUpload;
-  function add_tag() {
-    const tags = document.querySelector(".add_tag");
-    let arr = [...tag];
-    arr.push(
-      <div className="single_tag" key={tags.value}>
-        #{tags.value}
-      </div>
-    );
-    setPostUpload({...postUpload,tag:arr});
-    tags.value = "";
-  }
-  console.log("hi");
+  // function add_tag() {
+  //   const tags = document.querySelector(".add_tag").value;
+  //   let arr = [...tag];
+  //   arr.push(
+  //     <div className="single_tag" key={tags}>
+  //       #{tags}
+  //     </div>
+  //   );
+  //   console.log(arr);
+  //   setPostUpload({...postUpload,tag:arr});
+  //   tags.value = "";
+  // }
   console.log(tag)
+  
+  const [data, setData] = useState([
+    { value: 'react', label: 'React' },
+    { value: 'ng', label: 'Angular' },
+  ]);
+
+  
   const handleChange=(e)=>{
     const {name,value}=e.target;
     setPostUpload({...postUpload,[name]:value});
@@ -57,9 +65,9 @@ const Post_create_box = ({ close }) => {
   return (
     <Container onSubmit={handleSubmit}>
       <label>Title</label>
-      <input
+      <Input
         className="title"
-        placeholder="title"
+        placeholder="Title of the Your Post"
         type="text"
         value={postUpload.title}
         name="title"
@@ -67,15 +75,26 @@ const Post_create_box = ({ close }) => {
         required
       />
       <label>Tags</label>
-      <div className="tag_container">
-        <div className="tags">{tag}</div>
-        <input className="add_tag" placeholder="tag" type="text"></input>
-        <input onClick={add_tag} type="button" value="Add" />
-      </div>
+      <MultiSelect
+      data={data}
+      placeholder="Select Tags"
+      searchable
+      creatable
+      getCreateLabel={(query) => `+ Create ${query}`}
+      onCreate={(query) => {
+        const item = { value: query, label: query };
+        setData((current) => [...current, item]);
+        return item;
+      }}
+      size="md"
+      rightSectionWidth={1}
+      maxDropdownHeight={160}
+      onChange={(value)=>{setPostUpload({...postUpload,tag:value})}}
+    />
       <label>Description</label>
       <textarea
         className="post_context"
-        placeholder="provide in markup language"
+        placeholder="Provide in markup language"
         name="content"
         onChange={handleChange}
       ></textarea>
@@ -97,15 +116,23 @@ const Container = styled.form`
   /* background-color: rgb(227, 226, 226); */
   /* padding: 1.5% 5%; */
   width: fit-content;
-  input {
-    width: 500px;
-  }
   .add_tag {
     width: 200px;
   }
   textarea {
     width: 500px;
     height: 200px;
+    border-radius: 10px;
+    font-size: 24px;
+    &:focus{
+      border: 1px solid #1a89ea;
+      outline: none;
+    }
+    &::placeholder{
+      color: #D2D0D0;
+      font-size: 18px;
+      padding:10px;
+    }
   }
   .tag_container {
     input[type="button"] {

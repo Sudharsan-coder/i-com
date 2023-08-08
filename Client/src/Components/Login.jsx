@@ -16,8 +16,8 @@ const Login = ({ close }) => {
     axios
       .post("http://localhost:5010/auth/login", log)
       .then((res) => {
-        console.log(res.data);
-        auth.login(res.data.userName);
+        console.log(res.data.others);
+        auth.login(res.data.others.userName);
         close(false);
       })
       .catch((err) => {
