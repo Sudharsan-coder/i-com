@@ -53,10 +53,10 @@ router.get("/",async(req,res)=>{
 })
 
 //Add comment
-router.put("/AddComment/:id", async (req, res) => {
+router.put("/AddComment", async (req, res) => {
   try {
-    await Post.findByIdAndUpdate(
-      { _id: req.params.id },
+    const comment=await Post.findByIdAndUpdate(
+      { _id: req.query.postid },
       {
         $push: {
           comments: {
@@ -71,19 +71,34 @@ router.put("/AddComment/:id", async (req, res) => {
       { $inc: { commentCount: 1 } }
     );
 
-    res.status(200).json("Upadated");
+    res.status(200).json(comment);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
 //Like Endpoint
-router.put("/liked/:id", async (req, res) => {
+router.put("/liked", async (req, res) => {
+  
   try {
-    await Post.findByIdAndUpdate(
-      { _id: req.params.id },
+    const post = await Post.findByIdAndUpdate(
+      { _id: req.query.postid },
       { $inc: { likeCount: 1 } }
     );
+    res.status(200).json(post);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.put("/unliked", async (req, res) => {
+  
+  try {
+    const post = await Post.findByIdAndUpdate(
+      { _id: req.query.postid },
+      { $inc: { likeCount: -1 } }
+    );
+    res.status(200).json(post);
   } catch (err) {
     res.status(500).json(err);
   }

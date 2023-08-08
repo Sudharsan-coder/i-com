@@ -8,7 +8,7 @@ const Post_page_display = () => {
   const params = useParams();
   const postid = params.id;
   const [postdetails, setPostDetails] = useState(null);
-  console.log(postid);
+  // console.log(postid);
   useEffect(() => {
     axios
       .get(`http://localhost:5010/post?postid=${postid}`)
@@ -18,8 +18,8 @@ const Post_page_display = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
-  console.log(postdetails);
+  });
+  // console.log(postdetails);
   return (
     <Container>
     <Like_pallet {...postdetails}/>

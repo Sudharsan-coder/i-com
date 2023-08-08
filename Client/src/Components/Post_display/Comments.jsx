@@ -1,21 +1,40 @@
-import React from "react"; // Make sure to import React
+import { useState } from "react"; // Make sure to import React
 import { styled } from "styled-components";
 import Single_comment from "./Single_comment";
+import { useAuth } from "../../context/auth";
+import { IconSend } from "@tabler/icons-react";
+import axios from "axios";
 
 const Comments = (props) => {
-  const commentArray = props.comments;
-  console.log(commentArray);
+const auth=useAuth();
+  const commentArray = [...props.comments];
+  // const a=[1,2,3,4,5];
+  // console.log(auth.user);
+  const [commentdesc,setCommentdesc]=useState({username:`${auth.user}`,comment:""});
+  // console.log(commentArray);
+  const handleSubmit=(e)=>{
+    e.preventDefault();
+    commentdesc.comment="";
+    axios.put(`http://localhost:5010/post/AddComment?postid=${props._id}`,commentdesc)
+    .then((res)=>{
+      console.log(res);
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+  }
   return (
     <Container>
       <div className="head" id="comment">
         Commands
       </div>
-      <div className="comment">
+      <Comment onSubmit={handleSubmit}>
         <img src="" alt="me" />
-        <textarea placeholder="Add to the discussion" />
-      </div>
+        <textarea placeholder="Add to the discussion"  value={commentdesc.comment} onChange={(e)=>{setCommentdesc({...commentdesc,comment:e.target.value})}}/>
+        <button type="submit"><IconSend/></button>
+      </Comment>
       {/* Use parentheses to wrap the map function body */}
-      {commentArray.map((data) => (
+      {(commentArray.reverse()).map((data) => (
         <Single_comment key={data._id} {...data} />
       ))}
 
@@ -31,9 +50,12 @@ const Container = styled.div`
     font-weight: bold;
     margin: 50px 0px;
   }
-  .comment {
+  `;
+const Comment=styled.form` 
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 10px;
     img {
       background: black;
       height: 45px;
@@ -44,5 +66,15 @@ const Container = styled.div`
       width: 90%;
       height: 100px;
     }
-  }
-`;
+    button{
+      color: white;
+      background-color: #4162E9;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      &:hover{
+        cursor: pointer;
+      }
+    }
+    
+`
