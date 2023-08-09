@@ -17,6 +17,7 @@
     "@mantine/modals": "^6.0.17",
     "@mantine/notifications": "^6.0.17",
     "@mantine/nprogress": "^6.0.17",
+    "@mantine/prism": "^6.0.18",
     "@mantine/spotlight": "^6.0.17",
     "@tabler/icons-react": "^2.30.0",
     "axios": "^1.4.0",

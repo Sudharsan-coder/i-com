@@ -6,38 +6,62 @@ import { IconSend } from "@tabler/icons-react";
 import axios from "axios";
 
 const Comments = (props) => {
-const auth=useAuth();
+  const auth = useAuth();
   const commentArray = [...props.comments];
   // const a=[1,2,3,4,5];
   // console.log(auth.user);
-  const [commentdesc,setCommentdesc]=useState({username:`${auth.user}`,comment:""});
-  // console.log(commentArray);
-  const handleSubmit=(e)=>{
+  const [commentdesc, setCommentdesc] = useState({
+    username: `${auth.user.username}`,
+    comments: "",
+    profile: `${auth.user.profile}`,
+  });
+  console.log(commentdesc);
+  const handleSubmit = (e) => {
     e.preventDefault();
-    commentdesc.comment="";
-    axios.put(`http://localhost:5010/post/AddComment?postid=${props._id}`,commentdesc)
-    .then((res)=>{
-      console.log(res);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-  }
+    commentdesc.comment = "";
+    axios
+      .put(
+        `http://localhost:5010/post/AddComment?postid=${props._id}`,
+        commentdesc
+      )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <Container>
-      <div className="head" id="comment">
+      <div
+        className='head'
+        id='comment'
+      >
         Commands
       </div>
       <Comment onSubmit={handleSubmit}>
-        <img src="" alt="me" />
-        <textarea placeholder="Add to the discussion"  value={commentdesc.comment} onChange={(e)=>{setCommentdesc({...commentdesc,comment:e.target.value})}}/>
-        <button type="submit"><IconSend/></button>
+        <img
+          src={auth.user.profile? auth.user.profile:"https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"}
+          alt='me'
+        />
+        <textarea
+          placeholder='Add to the discussion'
+          value={commentdesc.comments}
+          onChange={(e) => {
+            setCommentdesc({ ...commentdesc, comments: e.target.value });
+          }}
+        />
+        <button type='submit'>
+          <IconSend />
+        </button>
       </Comment>
       {/* Use parentheses to wrap the map function body */}
-      {(commentArray.reverse()).map((data) => (
-        <Single_comment key={data._id} {...data} />
+      {commentArray.reverse().map((data) => (
+        <Single_comment
+          key={data._id}
+          {...data}
+        />
       ))}
-
     </Container>
   );
 };
@@ -50,31 +74,30 @@ const Container = styled.div`
     font-weight: bold;
     margin: 50px 0px;
   }
-  `;
-const Comment=styled.form` 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    img {
-      background: black;
-      height: 45px;
-      width: 50px;
-      border-radius: 100%;
+`;
+const Comment = styled.form`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  img {
+    background: black;
+    height: 45px;
+    width: 50px;
+    border-radius: 100%;
+  }
+  textarea {
+    width: 90%;
+    height: 100px;
+  }
+  button {
+    color: white;
+    background-color: #4162e9;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    &:hover {
+      cursor: pointer;
     }
-    textarea {
-      width: 90%;
-      height: 100px;
-    }
-    button{
-      color: white;
-      background-color: #4162E9;
-      border: none;
-      padding: 10px;
-      border-radius: 10px;
-      &:hover{
-        cursor: pointer;
-      }
-    }
-    
-`
+  }
+`;

@@ -3,14 +3,19 @@ import Main_post from "../Components/Post/Main_post";
 import { styled } from "styled-components";
 import axios from "axios";
 import { useAuth } from "../context/auth";
+import MainpageLoading from "../Components/Loading/MainpageLoading";
+
+
 
 const Main_page = () => {
   const [post,setPost]=useState([]);
   const auth=useAuth();
+  const [Loading,setLoading]=useState(true)
   useEffect(()=>{
       axios.get(`http://localhost:5010/post/AllPost?search=${auth.search}`)
       .then((res)=>{
           setPost(res.data);
+          setLoading(false)
           console.log(res.data);
       })
       .catch((err)=>{
@@ -21,7 +26,7 @@ const Main_page = () => {
     <>
       <Container>
         
-          <Main_post Post={post} />
+         {Loading?(<MainpageLoading/>): <Main_post Post={post} />}
       
       </Container>
     </>

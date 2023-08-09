@@ -3,52 +3,42 @@ import { styled } from "styled-components";
 import { useAuth } from "../../context/auth";
 import axios from "axios";
 import { notifications } from "@mantine/notifications";
-import { Input, MultiSelect } from "@mantine/core";
+import { Box, Input, LoadingOverlay, MultiSelect } from "@mantine/core";
+import { AiFillExclamationCircle } from "react-icons/ai";
 
 // export const Post_content=createContext();
 
 const Post_create_box = ({ close }) => {
   const auth = useAuth();
-  
+  const [visible, toggle ] = useState(false);
+
   const [postUpload, setPostUpload] = useState({
-    userName: auth.user,
+    userName: auth.user.username,
     title: "",
-    content:"",
+    content: "",
     tag: [],
+    profilePicUrl: auth.user.profile,
   });
-  
-  
-  // let [tags, setTags] = useState([]);
-  const {tag,...others}=postUpload;
-  // function add_tag() {
-  //   const tags = document.querySelector(".add_tag").value;
-  //   let arr = [...tag];
-  //   arr.push(
-  //     <div className="single_tag" key={tags}>
-  //       #{tags}
-  //     </div>
-  //   );
-  //   console.log(arr);
-  //   setPostUpload({...postUpload,tag:arr});
-  //   tags.value = "";
-  // }
-  console.log(tag)
-  
+
+  const { tag, ...others } = postUpload;
+
+  // console.log(tag)
+
   const [data, setData] = useState([
-    { value: 'react', label: 'React' },
-    { value: 'ng', label: 'Angular' },
+    { value: "react", label: "React" },
+    { value: "ng", label: "Angular" },
   ]);
 
-  
-  const handleChange=(e)=>{
-    const {name,value}=e.target;
-    setPostUpload({...postUpload,[name]:value});
-  }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPostUpload({ ...postUpload, [name]: value });
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    toggle(true);
     axios
-      .post("http://localhost:5010/post/",postUpload)
+      .post("http://localhost:5010/post/", postUpload)
       .then((res) => {
         console.log(res);
         close(false);
@@ -58,52 +48,75 @@ const Post_create_box = ({ close }) => {
         });
       })
       .catch((err) => {
+        notifications.show({
+          title: "Post Not Uploaded",
+          message: "Some thing went Wrong",
+          color: "red",
+          icon: (
+            <AiFillExclamationCircle
+              color='white'
+              size='3rem'
+            />
+          ),
+        });
         console.log(err);
+        toggle(false);
       });
   };
 
   return (
-    <Container onSubmit={handleSubmit}>
-      <label>Title</label>
-      <Input
-        className="title"
-        placeholder="Title of the Your Post"
-        type="text"
-        value={postUpload.title}
-        name="title"
-        onChange={handleChange}
-        required
+    <Box
+      maw={400}
+      pos='relative'
+    >
+      <LoadingOverlay
+        visible={visible}
+        overlayBlur={2}
       />
-      <label>Tags</label>
-      <MultiSelect
-      data={data}
-      placeholder="Select Tags"
-      searchable
-      creatable
-      getCreateLabel={(query) => `+ Create ${query}`}
-      onCreate={(query) => {
-        const item = { value: query, label: query };
-        setData((current) => [...current, item]);
-        return item;
-      }}
-      size="md"
-      rightSectionWidth={1}
-      maxDropdownHeight={160}
-      onChange={(value)=>{setPostUpload({...postUpload,tag:value})}}
-    />
-      <label>Description</label>
-      <textarea
-        className="post_context"
-        placeholder="Provide in markup language"
-        name="content"
-        onChange={handleChange}
-      ></textarea>
-      <input
-        className="submit"
-        type="submit"
-        value="Post"
-      />
-    </Container>
+      <Container onSubmit={handleSubmit}>
+        <label>Title</label>
+        <Input
+          className='title'
+          placeholder='Title of the Your Post'
+          type='text'
+          value={postUpload.title}
+          name='title'
+          onChange={handleChange}
+          required
+        />
+        <label>Tags</label>
+        <MultiSelect
+          data={data}
+          placeholder='Select Tags'
+          searchable
+          creatable
+          getCreateLabel={(query) => `+ Create ${query}`}
+          onCreate={(query) => {
+            const item = { value: query, label: query };
+            setData((current) => [...current, item]);
+            return item;
+          }}
+          size='md'
+          rightSectionWidth={1}
+          maxDropdownHeight={160}
+          onChange={(value) => {
+            setPostUpload({ ...postUpload, tag: value });
+          }}
+        />
+        <label>Description</label>
+        <textarea
+          className='post_context'
+          placeholder='Provide in markup language'
+          name='content'
+          onChange={handleChange}
+        ></textarea>
+        <input
+          className='submit'
+          type='submit'
+          value='Post'
+        />
+      </Container>
+    </Box>
   );
 };
 
@@ -124,14 +137,14 @@ const Container = styled.form`
     height: 200px;
     border-radius: 10px;
     font-size: 24px;
-    &:focus{
+    &:focus {
       border: 1px solid #1a89ea;
       outline: none;
     }
-    &::placeholder{
-      color: #D2D0D0;
+    &::placeholder {
+      color: #d2d0d0;
       font-size: 18px;
-      padding:10px;
+      padding: 10px;
     }
   }
   .tag_container {
@@ -158,5 +171,6 @@ const Container = styled.form`
     border-radius: 5px;
     padding: 1.5% 3.5%;
     color: white;
+    cursor: pointer;
   }
 `;

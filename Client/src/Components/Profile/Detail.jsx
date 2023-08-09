@@ -3,8 +3,10 @@ import {LiaBirthdayCakeSolid} from 'react-icons/lia'
 import {FiMail} from 'react-icons/fi'
 import { styled } from 'styled-components'
 
+
 const Detail = (props) => {
 console.log(props.userName);
+
   return (
     <Block>
     <div className="name">{props.userName}</div>
@@ -19,6 +21,7 @@ console.log(props.userName);
         <FiMail size="25px"/>
         {props.emailId}
     </div>
+        {/* <Main_post Post={userpost}/> */}
     </Block>
   )
 }

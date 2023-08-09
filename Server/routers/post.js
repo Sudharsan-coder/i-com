@@ -61,7 +61,8 @@ router.put("/AddComment", async (req, res) => {
         $push: {
           comments: {
             Name: req.body.username,
-            comment: req.body.comment,
+            comment: req.body.comments,
+            pic:req.body.profile,
           },
         },
       }

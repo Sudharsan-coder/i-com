@@ -8,7 +8,7 @@ const Single_comment = (props) => {
     <Container>
       <div className="frame">
         <Link to="/profile">
-          <img src={im1} alt="pic" />
+          <img src={props.pic} alt="pic" />
         </Link>
         <div className="frame_content">
           <div className="title">

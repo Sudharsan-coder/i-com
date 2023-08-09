@@ -1,9 +1,9 @@
 import pic from '../../assets/I_com_Logo.png'
 import { styled } from 'styled-components'
 
-const Profile_pic = () => {
+const Profile_pic = (props) => {
   return (
-    <Block>
+    <Block profile={props.profilePicUrl}>
     </Block>
   )
 }
@@ -17,6 +17,6 @@ const Block=styled.div`
     height: 110px;
     border-radius: 100%;
     border: 10px solid black;
-    background-image: url(${pic});
+    background-image:url( ${({profile})=>(profile)});
     background-size: cover;
 `
