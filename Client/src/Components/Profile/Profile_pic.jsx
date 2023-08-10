@@ -19,4 +19,5 @@ const Block=styled.div`
     border: 10px solid black;
     background-image:url( ${({profile})=>(profile)});
     background-size: cover;
+    background-position: center;
 `

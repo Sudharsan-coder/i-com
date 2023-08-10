@@ -16,25 +16,25 @@ const Likes = (props) => {
           className='like'
           onClick={() => {
             setLiked(!Liked);
-            console.log(Liked)
-            if(!Liked)
-           { axios
-              .put(`http://localhost:5010/post/liked?postid=${props._id}`)
-              .then(() => {
-                console.log("success");
-              })
-              .catch((err) => {
-                console.log(err);
-              });}
-            else{
+            console.log(Liked);
+            if (!Liked) {
               axios
-              .put(`http://localhost:5010/post/unliked?postid=${props._id}`)
-              .then(() => {
-                console.log("success");
-              })
-              .catch((err) => {
-                console.log(err);
-              });
+                .put(`http://localhost:5010/post/liked?postid=${props._id}`)
+                .then(() => {
+                  console.log("success");
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            } else {
+              axios
+                .put(`http://localhost:5010/post/unliked?postid=${props._id}`)
+                .then(() => {
+                  console.log("success");
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
             }
           }}
         >
@@ -46,18 +46,23 @@ const Likes = (props) => {
           ) : (
             <IconHeartPlus size='20px' />
           )}
-          <div className='num'>{props.likeCount>10? "10+": props.likeCount}</div>
-      </div>
+          <div className='num'>
+            {props.likeCount > 10 ? "10+" : props.likeCount}
+          </div>
+        </div>
         <div
           className='comment'
           id='#comment'
         >
-          <Link to='/post'>
+          <Link to={`/post/${props._id}`}>
             <FaRegCommentDots
-              size='20px'
+              size='17px'
               color='black'
             />
           </Link>
+            <div className="num">
+              {props.commentCount}
+            </div>
         </div>
       </div>
     </Container>
@@ -70,6 +75,7 @@ const Container = styled.div`
   .like_container {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 20px;
     width: 90px;
     height: 20px;
@@ -78,6 +84,12 @@ const Container = styled.div`
       display: flex;
       align-items: center;
       transition: all 5s ease;
+    }
+    .comment{
+     text-align: center;
+     display: flex;
+      align-items: center;
+     }
     }
   }
 `;

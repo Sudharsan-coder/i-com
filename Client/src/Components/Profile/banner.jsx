@@ -1,6 +1,6 @@
 import { styled } from 'styled-components'
 
-const banner = () => {
+const Banner = () => {
   return (
     <Container>
     <div>banner</div>
@@ -8,7 +8,7 @@ const banner = () => {
   )
 }
 
-export default banner
+export default Banner
 
 const Container=styled.div`
     background: black;

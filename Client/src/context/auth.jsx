@@ -10,7 +10,7 @@ export const AuthProvider=({children})=>{
     }
 
     const logout=()=>{
-        setUser(null);
+        setUser({username:null,profile:null});
     }
     
     const searching=(search)=>{

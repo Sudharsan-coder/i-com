@@ -1,10 +1,11 @@
 import { styled } from "styled-components";
 import { useEffect, useState } from "react";
-import Banner from "../Components/Profile/banner.jsx";
+import Banner from "../Components/Profile/Banner.jsx";
 import Main_profile from "../Components/Profile/Main_profile.jsx";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Main_post from "../Components/Post/Main_post.jsx";
+import Counter from "../Components/Profile/Counter.jsx";
 const Profile_page = () => {
 const params=useParams();
 const username=params.username;
@@ -36,9 +37,13 @@ console.log(userpost)
 // console.log(profiledetails.userName);
   return (
     <Container>
-      <Banner />
+      <Banner/>
       {profiledetails && <Main_profile {...profiledetails}/>}
-      {userpost && <Main_post Post={userpost}/>}
+      
+      <Content>
+      {profiledetails && <Counter/>}
+        {userpost && <Main_post Post={userpost}/>}
+      </Content>
     </Container>
   );
 };
@@ -50,3 +55,8 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: 0.3fr 2fr 0.3fr;
 `;
+
+const Content=styled.div`
+  display: flex;
+  gap: 30px;
+`

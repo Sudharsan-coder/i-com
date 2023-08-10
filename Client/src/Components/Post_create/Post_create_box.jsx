@@ -17,12 +17,24 @@ const Post_create_box = ({ close }) => {
     title: "",
     content: "",
     tag: [],
+    bannerPic:"",
     profilePicUrl: auth.user.profile,
   });
 
   const { tag, ...others } = postUpload;
 
   // console.log(tag)
+  
+  const imagetobase64=(e)=>{
+    var reader=new FileReader();
+    reader.readAsDataURL(e.target.files[0]);
+    reader.onload=()=>{
+      setPostUpload({...postUpload,bannerPic:reader.result});
+    }
+    reader.onerror=(err)=>{
+      console.log(err);
+    }
+  }
 
   const [data, setData] = useState([
     { value: "react", label: "React" },
@@ -66,7 +78,6 @@ const Post_create_box = ({ close }) => {
 
   return (
     <Box
-      maw={400}
       pos='relative'
     >
       <LoadingOverlay
@@ -74,6 +85,12 @@ const Post_create_box = ({ close }) => {
         overlayBlur={2}
       />
       <Container onSubmit={handleSubmit}>
+      <input
+            type='file'
+            id='images'
+            accept='image/*'
+            onChange={imagetobase64}
+          />
         <label>Title</label>
         <Input
           className='title'
