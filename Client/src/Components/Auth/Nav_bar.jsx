@@ -1,9 +1,9 @@
 import Log_in from "./Log_in_button.jsx";
-import Logo from "../assets/I_com_Logo_no_background.png";
+import Logo from "../../assets/I_com_Logo_no_background.png";
 import { styled } from "styled-components";
 import { BsSearch } from "react-icons/Bs";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/auth.jsx";
+import { useAuth } from "../../context/auth.jsx";
 const Nav_bar = () => {
   const auth = useAuth();
   console.log(auth.search);
@@ -11,7 +11,7 @@ const Nav_bar = () => {
   return (
     <Container>
       <Link to={"/"}>
-        <img src={Logo} alt="logo" />
+        <img src={Logo} alt="logo" className="logo"/>
       </Link>
       <div className="search_bar">
         <input
@@ -43,7 +43,8 @@ const Container = styled.div`
   justify-content: space-around;
   align-items: center;
   background: white;
-  img {
+  z-index: 200;
+  .logo {
     width: 75px;
     height: 75px;
   }

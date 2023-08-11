@@ -10,6 +10,10 @@ body{
 .mantine-16nrau2{
   padding: 0%;
 }
+.mantine-MultiSelect-input{
+  width: 505px;
+  
+}
 .fullscreen{
   position: fixed;
   top: 0px;
@@ -33,4 +37,24 @@ body{
   html{
     font-size: 12px;
   }
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 20px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

@@ -3,13 +3,14 @@ import { styled } from "styled-components";
 
 import user_pic from "../../assets/logo.png"
 import {Link, useNavigate} from "react-router-dom"
+import { useAuth } from "../../context/auth";
 const User_detail = (props) => {
 const navigate=useNavigate();
-// console.log(props);
+console.log(props);
   return (
     <Container>
       <div className="frame">
-        <Link to="/profile"><img src={user_pic} alt="pic" /></Link>
+        <Link to="/profile"><img src={props.profilePicUrl} alt="pic" /></Link>
       <div className="frame_content">
       <div className="user_name" onClick={()=>{navigate(`/profile/${props.userName}`)}}>{props.userName}</div>
         <div className="date">Posted on 22 Jan</div>

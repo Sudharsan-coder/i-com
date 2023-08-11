@@ -3,44 +3,54 @@ import { styled } from "styled-components";
 import { useAuth } from "../../context/auth";
 import axios from "axios";
 import { notifications } from "@mantine/notifications";
+import { Box, Input, LoadingOverlay, MultiSelect } from "@mantine/core";
+import { AiFillExclamationCircle } from "react-icons/ai";
 
 // export const Post_content=createContext();
 
 const Post_create_box = ({ close }) => {
   const auth = useAuth();
-  
+  const [visible, toggle ] = useState(false);
+
   const [postUpload, setPostUpload] = useState({
-    userName: auth.user,
+    userName: auth.user.username,
     title: "",
-    content:"",
+    content: "",
     tag: [],
+    bannerPic:"",
+    profilePicUrl: auth.user.profile,
   });
+
+  const { tag, ...others } = postUpload;
+
+  // console.log(tag)
   
-  
-  // let [tags, setTags] = useState([]);
-  const {tag,...others}=postUpload;
-  function add_tag() {
-    const tags = document.querySelector(".add_tag");
-    let arr = [...tag];
-    arr.push(
-      <div className="single_tag" key={tags.value}>
-        #{tags.value}
-      </div>
-    );
-    setPostUpload({...postUpload,tag:arr});
-    tags.value = "";
-  }
-  console.log("hi");
-  console.log(tag)
-  const handleChange=(e)=>{
-    const {name,value}=e.target;
-    setPostUpload({...postUpload,[name]:value});
+  const imagetobase64=(e)=>{
+    var reader=new FileReader();
+    reader.readAsDataURL(e.target.files[0]);
+    reader.onload=()=>{
+      setPostUpload({...postUpload,bannerPic:reader.result});
+    }
+    reader.onerror=(err)=>{
+      console.log(err);
+    }
   }
 
+  const [data, setData] = useState([
+    { value: "react", label: "React" },
+    { value: "ng", label: "Angular" },
+  ]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPostUpload({ ...postUpload, [name]: value });
+  };
+
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    toggle(true);
     axios
-      .post("http://localhost:5010/post/",postUpload)
+      .post("http://localhost:5010/post/", postUpload)
       .then((res) => {
         console.log(res);
         close(false);
@@ -50,41 +60,80 @@ const Post_create_box = ({ close }) => {
         });
       })
       .catch((err) => {
+        notifications.show({
+          title: "Post Not Uploaded",
+          message: "Some thing went Wrong",
+          color: "red",
+          icon: (
+            <AiFillExclamationCircle
+              color='white'
+              size='3rem'
+            />
+          ),
+        });
         console.log(err);
+        toggle(false);
       });
   };
 
   return (
-    <Container onSubmit={handleSubmit}>
-      <label>Title</label>
-      <input
-        className="title"
-        placeholder="title"
-        type="text"
-        value={postUpload.title}
-        name="title"
-        onChange={handleChange}
-        required
+    <Box
+      pos='relative'
+    >
+      <LoadingOverlay
+        visible={visible}
+        overlayBlur={2}
       />
-      <label>Tags</label>
-      <div className="tag_container">
-        <div className="tags">{tag}</div>
-        <input className="add_tag" placeholder="tag" type="text"></input>
-        <input onClick={add_tag} type="button" value="Add" />
-      </div>
-      <label>Description</label>
-      <textarea
-        className="post_context"
-        placeholder="provide in markup language"
-        name="content"
-        onChange={handleChange}
-      ></textarea>
+      <Container onSubmit={handleSubmit}>
       <input
-        className="submit"
-        type="submit"
-        value="Post"
-      />
-    </Container>
+            type='file'
+            id='images'
+            accept='image/*'
+            onChange={imagetobase64}
+          />
+        <label>Title</label>
+        <Input
+          className='title'
+          placeholder='Title of the Your Post'
+          type='text'
+          value={postUpload.title}
+          name='title'
+          onChange={handleChange}
+          required
+        />
+        <label>Tags</label>
+        <MultiSelect
+          data={data}
+          placeholder='Select Tags'
+          searchable
+          creatable
+          getCreateLabel={(query) => `+ Create ${query}`}
+          onCreate={(query) => {
+            const item = { value: query, label: query };
+            setData((current) => [...current, item]);
+            return item;
+          }}
+          size='md'
+          rightSectionWidth={1}
+          maxDropdownHeight={160}
+          onChange={(value) => {
+            setPostUpload({ ...postUpload, tag: value });
+          }}
+        />
+        <label>Description</label>
+        <textarea
+          className='post_context'
+          placeholder='Provide in markup language'
+          name='content'
+          onChange={handleChange}
+        ></textarea>
+        <input
+          className='submit'
+          type='submit'
+          value='Post'
+        />
+      </Container>
+    </Box>
   );
 };
 
@@ -97,15 +146,23 @@ const Container = styled.form`
   /* background-color: rgb(227, 226, 226); */
   /* padding: 1.5% 5%; */
   width: fit-content;
-  input {
-    width: 500px;
-  }
   .add_tag {
     width: 200px;
   }
   textarea {
     width: 500px;
     height: 200px;
+    border-radius: 10px;
+    font-size: 24px;
+    &:focus {
+      border: 1px solid #1a89ea;
+      outline: none;
+    }
+    &::placeholder {
+      color: #d2d0d0;
+      font-size: 18px;
+      padding: 10px;
+    }
   }
   .tag_container {
     input[type="button"] {
@@ -131,5 +188,6 @@ const Container = styled.form`
     border-radius: 5px;
     padding: 1.5% 3.5%;
     color: white;
+    cursor: pointer;
   }
 `;

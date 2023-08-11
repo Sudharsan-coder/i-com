@@ -1,40 +1,69 @@
-import React, { useEffect } from "react";
 import { styled } from "styled-components";
-import { AiOutlineHeart } from "react-icons/ai";
 import { AiFillHeart } from "react-icons/ai";
 import { FaRegCommentDots } from "react-icons/fa";
-import { useState,useRef } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { IconHeartPlus } from "@tabler/icons-react";
 
 const Likes = (props) => {
   const [Liked, setLiked] = useState(false);
-    
-    function ScroolTo(event, item) {
-      event.preventDefault();
-      document
-        .getElementById(item)
-        .scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-   
+  // console.log(props);
   return (
     <Container>
-      <div className="like_container">
-      <div
-        className="like"
-        // onClick={() => {
-        //   setLiked(!Liked);
-        //   if(Liked)
-        //   //decrease the like count by one
-        //   else
-        //   //increase the like count by one
-        // }}
-      >
-        {Liked ? <AiFillHeart size="20px" color="red"/> : <AiOutlineHeart size="20px"/>}
-        <div className="num">{props.likeCount}</div>
-      </div>
-      <div className="comment" id="#comment" onClick={(event)=>{ScroolTo(event,"comment")}}>
-        <Link to="/post"><FaRegCommentDots size="20px" color="black"/></Link>
-      </div>
+      <div className='like_container'>
+        <div
+          className='like'
+          onClick={() => {
+            setLiked(!Liked);
+            console.log(Liked);
+            if (!Liked) {
+              axios
+                .put(`http://localhost:5010/post/liked?postid=${props._id}`)
+                .then(() => {
+                  console.log("success");
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            } else {
+              axios
+                .put(`http://localhost:5010/post/unliked?postid=${props._id}`)
+                .then(() => {
+                  console.log("success");
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
+          }}
+        >
+          {Liked ? (
+            <AiFillHeart
+              size='20px'
+              color='red'
+            />
+          ) : (
+            <IconHeartPlus size='20px' />
+          )}
+          <div className='num'>
+            {props.likeCount > 10 ? "10+" : props.likeCount}
+          </div>
+        </div>
+        <div
+          className='comment'
+          id='#comment'
+        >
+          <Link to={`/post/${props._id}`}>
+            <FaRegCommentDots
+              size='17px'
+              color='black'
+            />
+          </Link>
+            <div className="num">
+              {props.commentCount}
+            </div>
+        </div>
       </div>
     </Container>
   );
@@ -42,16 +71,25 @@ const Likes = (props) => {
 
 export default Likes;
 
-const Container=styled.div`
-.like_container{
-   display: flex;
+const Container = styled.div`
+  .like_container {
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 20px;
     width: 90px;
     height: 20px;
     .like {
       cursor: pointer;
       display: flex;
+      align-items: center;
       transition: all 5s ease;
     }
+    .comment{
+     text-align: center;
+     display: flex;
+      align-items: center;
+     }
+    }
   }
-`
+`;

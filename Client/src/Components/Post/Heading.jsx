@@ -32,6 +32,7 @@ const Tag = styled.div`
 `;
 
 const Title=styled.div`
+  text-transform: capitalize;
   &:hover{
     cursor: pointer;
     color: blue;

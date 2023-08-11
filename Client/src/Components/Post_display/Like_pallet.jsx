@@ -23,8 +23,10 @@ const Container = styled.div`
     justify-content: space-around;
     align-items: center;
     .like {
-      display: flex;
       flex-direction: column;
+    }
+    .comment{
+    flex-direction: column;
     }
   }
 `;

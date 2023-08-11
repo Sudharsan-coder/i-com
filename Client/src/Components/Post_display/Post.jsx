@@ -7,7 +7,7 @@ const Post = (postdetails) => {
   
   console.log(postdetails);
   return (
-    <Container>
+    <Container banner={postdetails.bannerPic}>
       <div className="banner"></div>
       
         <div className="main">
@@ -31,7 +31,9 @@ const Container = styled.div`
   border-radius: 15px;
   overflow: hidden;
   .banner {
-    background: black;
+    background:${(props)=>(props!==undefined? `url(${props.banner})`:"black")};
+    background-size: cover;
+    background-repeat:no-repeat;
     height: 50vh;
     /* margin: 0px -50px; */
   }

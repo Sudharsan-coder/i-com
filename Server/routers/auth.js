@@ -1,14 +1,16 @@
 const User = require("../models/User");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
+const jwt = require("jsonwebtoken");
 
 //Register Endpoint
 router.post("/register", async (req, res) => {
   const newUser = new User({
-    firstName:req.body.first,
-    lastName:req.body.last,
+    firstName: req.body.first,
+    lastName: req.body.last,
+    profilePicUrl:req.body.profile,
     userName: req.body.username,
-    emailId:req.body.emailid,
+    emailId: req.body.emailid,
     password: CryptoJS.AES.encrypt(
       req.body.password,
       process.env.PASS_SEC
@@ -42,12 +44,19 @@ router.post("/login", async (req, res) => {
     }
 
     const { password, ...others } = user._doc;
-    res.status(200).send(others);
+
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_SEC, 
+      {
+        expiresIn: "3d",
+      }
+    );
+
+    res.status(200).send({others,accessToken});
   } catch (err) {
     res.status(500).send(err);
   }
 });
-
-
 
 module.exports = router;
