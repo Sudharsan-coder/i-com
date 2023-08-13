@@ -44,7 +44,7 @@ const Log_in_button = () => {
         <Modal
           opened={opened_post}
           onClose={post_obj.close}
-          size='auto'
+          size='540px'
           title='Create Post'
           centered
         >

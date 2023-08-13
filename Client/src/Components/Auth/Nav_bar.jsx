@@ -22,7 +22,7 @@ const Nav_bar = () => {
             auth.searching(e.target.value);
           }}
           onClick={()=>{
-            navigate('/');
+            navigate('/search',{replace:true});
           }}
         ></input>
         <S_Icon>

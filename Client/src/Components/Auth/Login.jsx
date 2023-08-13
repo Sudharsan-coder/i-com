@@ -22,6 +22,7 @@ const Login = ({ close }) => {
         auth.login({
           username: res.data.others.userName,
           profile: res.data.others.profilePicUrl,
+          following:res.data.others.followings,
         });
         close(false);
       })

@@ -21,7 +21,7 @@ useEffect(() => {
   .catch((err) => {
     console.log(err);
   });
-}, []);
+},[username]);
 
 const [userpost,setuserpost]=useState([]);
 useEffect(()=>{
@@ -32,7 +32,7 @@ useEffect(()=>{
     .catch((err)=>{
         console.log(err);
     })
-},[])
+},[username])
 console.log(userpost)
 // console.log(profiledetails.userName);
   return (
@@ -41,7 +41,7 @@ console.log(userpost)
       {profiledetails && <Main_profile {...profiledetails}/>}
       
       <Content>
-      {profiledetails && <Counter/>}
+      {profiledetails && userpost && <Counter Post={profiledetails} len={userpost.length}/>}
         {userpost && <Main_post Post={userpost}/>}
       </Content>
     </Container>
@@ -53,10 +53,12 @@ export default Profile_page;
 const Container = styled.div`
   margin-top: 10vh;
   display: grid;
-  grid-template-columns: 0.3fr 2fr 0.3fr;
+  grid-template-columns: 0.6fr 2fr 0.6fr;
 `;
 
 const Content=styled.div`
-  display: flex;
-  gap: 30px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  grid-column: 2;
 `

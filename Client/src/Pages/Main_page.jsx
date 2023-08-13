@@ -12,7 +12,7 @@ const Main_page = () => {
   const auth=useAuth();
   const [Loading,setLoading]=useState(true)
   useEffect(()=>{
-      axios.get(`http://localhost:5010/post/AllPost?search=${auth.search}`)
+      axios.get(`http://localhost:5010/post/AllPost`)
       .then((res)=>{
           setPost(res.data);
           setLoading(false)
@@ -21,7 +21,7 @@ const Main_page = () => {
       .catch((err)=>{
           console.log(err);
       })
-  })
+  },[])
   return (
     <>
       <Container>
