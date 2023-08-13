@@ -22,9 +22,9 @@ router.put("/:id", async (req, res) => {
 });
 
 //delete User Account
-router.delete("/:id", async (req, res) => {
+router.delete("/", async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
+    await User.deleteOne({userName:req.query.username});
     res.status(200).json("Your account is deleted");
   } catch (err) {
     res.status(500).json(err);
@@ -40,7 +40,7 @@ const search=req.query.search;
     const Search=await User.find({userName:search});
     res.status(200).json(Search);
   }
-  else{
+  else if(username){
     const userdetails=await User.findOne({userName:username});
     const hashedPassword = CryptoJS.AES.decrypt(
         userdetails.password,
@@ -48,6 +48,10 @@ const search=req.query.search;
       ).toString(CryptoJS.enc.Utf8);
     const {password,...others}=userdetails._doc
     res.status(200).json({...others,hashedPassword});
+  }
+  else{
+      const user=await User.find();
+      res.status(200).json(user);
   }
   }
   catch(err){
