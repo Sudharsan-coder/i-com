@@ -20,6 +20,7 @@ const EditProfile = () => {
   const [profiledetails, setProfileDetails] = useState(null);
   const auth=useAuth();
   
+  
   useEffect(() => {
     axios
       .get(`http://localhost:5010/user?username=${auth.user.username}`)
@@ -202,9 +203,9 @@ const EditProfile = () => {
                 <Input
                   placeholder='India, TamilNadu, Chennai'
                   radius='md'
-                  value={profiledetails.userBio}
+                  value={profiledetails.location}
                   onChange={handleChange}
-                  name='userBio'
+                  name='location'
                 />
               </Input.Wrapper>
 
@@ -214,6 +215,9 @@ const EditProfile = () => {
                 autosize
                 minRows={2}
                 maxRows={4}
+                name="userBio"
+                value={profiledetails.userBio}
+                onChange={handleChange}
               />
 
               <DateInput
@@ -222,6 +226,7 @@ const EditProfile = () => {
                 placeholder='DOB'
                 value={profiledetails.DOB}
                 name='DOB'
+                onChange={setProfileDetails}
               />
 
               <MultiSelect

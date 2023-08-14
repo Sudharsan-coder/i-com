@@ -150,10 +150,11 @@ const Container = styled.form`
     width: 200px;
   }
   textarea {
-    width: 500px;
+    width: 450px;
     height: 200px;
     border-radius: 10px;
-    font-size: 24px;
+    font-size: 20px;
+    padding: 10px;
     &:focus {
       border: 1px solid #1a89ea;
       outline: none;
@@ -161,7 +162,6 @@ const Container = styled.form`
     &::placeholder {
       color: #d2d0d0;
       font-size: 18px;
-      padding: 10px;
     }
   }
   .tag_container {

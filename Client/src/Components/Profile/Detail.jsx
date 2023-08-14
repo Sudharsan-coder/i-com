@@ -16,8 +16,8 @@ const auth=useAuth();
         {props.userBio ? props.userBio :(auth.user.username==props.userName?"Update your Profile":"Bio is not Updated")}
     </div>
     <div className="details">
-       { <GrLocation size="25px"/> &&
-        props.location}
+       <GrLocation size="25px"/>
+        {(props.location)}
         {<LiaBirthdayCakeSolid size="25px"/> &&
         props.DOB}
         <FiMail size="25px"/>
