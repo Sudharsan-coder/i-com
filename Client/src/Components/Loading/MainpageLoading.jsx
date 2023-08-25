@@ -8,8 +8,6 @@ const MainpageLoading = () => {
       <LoadingSkeleton/>
       <LoadingSkeleton/>
       <LoadingSkeleton/>
-      <LoadingSkeleton/>
-      <LoadingSkeleton/>
     </Loading>
   )
 }
