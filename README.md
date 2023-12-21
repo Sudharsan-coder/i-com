@@ -11,8 +11,7 @@ Thank you to all the contributors who have put their time and effort into making
 
 
 ## Contributors
-
-- [Contributor 1](https://github.com/Sudharsan-coder) :technologist:
-- [Contributor 2](https://github.com/Furiousfox-01) :computer:
-- [Contributor 3](https://github.com/pradeepkumar24rk) :rocket:
+<a href = "https://github.com/Sudharsan-coder/i-com/graphs/contributors">
+    <img src = "https://contrib.rocks/image?repo=Sudharsan-coder/i-com"/>
+</a>
     
