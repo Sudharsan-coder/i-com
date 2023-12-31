@@ -46,16 +46,22 @@ router.post("/login", async (req, res) => {
     const { password, ...others } = user._doc;
 
     const accessToken = jwt.sign(
-      { id: user._id },
-      process.env.ACCESS_SEC, 
+      user._doc,
+      process.env.ACCESS_TOKEN_SEC, 
+      {
+        expiresIn: "15m",
+      }
+    );
+    const refreshToken = jwt.sign(
+      user._doc,
+      process.env.REFRESH_TOKEN_SEC, 
       {
         expiresIn: "3d",
       }
     );
-
-    res.status(200).send({others,accessToken});
+    res.status(200).send({ others, accessToken,refreshToken });
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send(err.message);
   }
 });
 
