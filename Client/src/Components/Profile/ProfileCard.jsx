@@ -1,24 +1,34 @@
 import React from 'react';
-import { Card, Avatar, Title, Text, Badge } from '@mantine/core';
+import { Card, Avatar, Title, Text, Button } from '@mantine/core';
+import styled from 'styled-components';
 
-const ProfileCard = ({ name, username, bio, avatarUrl, badge }) => {
+const ProfileCard = () => {
   return (
-    <Card shadow="sm" style={{ maxWidth: 400, margin: 'auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: 15 }}>
-        <Avatar size={80} radius="xl" src={avatarUrl} alt={name} />
+  <Container>
+    <Card shadow="sm" style={{ maxWidth: 250, margin: 'auto', marginTop: 40, textAlign:'center' }}>
+      <div style={{ textAlign: 'center', marginBottom: 15, display: 'flex', justifyContent: 'center' }}>
+        <Avatar size={80} radius="xl" src={"https://images.pexels.com/photos/1374509/pexels-photo-1374509.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"} alt={"pradeep"} />
       </div>
       <Title order={3} orderMd={2} style={{ marginBottom: 5 }}>
-        {name}
+      pradeep
       </Title>
       <Text size="sm" style={{ color: 'gray', marginBottom: 10 }}>
-        @{username}
+        @{"pradeep24"}
       </Text>
-      <Text size="md" style={{ marginBottom: 15 }}>
-        {bio}
-      </Text>
-      {badge && <Badge color="teal">{badge}</Badge>}
+      <Button
+        variant="light"
+      >
+        View full Profile
+      </Button>
     </Card>
+  </Container>
   );
 };
 
 export default ProfileCard;
+
+const Container = styled.div `
+  grid-column:1;
+`
+
+
