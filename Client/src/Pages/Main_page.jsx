@@ -4,30 +4,31 @@ import { styled } from "styled-components";
 import axios from "axios";
 import { useAuth } from "../context/auth";
 import MainpageLoading from "../Components/Loading/MainpageLoading";
-
-
+import ProfileCard from "../Components/Profile/ProfileCard";
+import TopRecentTag from "../Components/Post/TopRecentTag";
 
 const Main_page = () => {
-  const [post,setPost]=useState([]);
-  const auth=useAuth();
-  const [Loading,setLoading]=useState(true)
-  useEffect(()=>{
-      axios.get(`http://localhost:5010/post/AllPost`)
-      .then((res)=>{
-          setPost(res.data);
-          setLoading(false)
-          console.log(res.data);
+  const [post, setPost] = useState([]);
+  const auth = useAuth();
+  const [Loading, setLoading] = useState(true);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5010/post/AllPost`)
+      .then((res) => {
+        setPost(res.data);
+        setLoading(false);
+        console.log(res.data);
       })
-      .catch((err)=>{
-          console.log(err);
-      })
-  },[])
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
   return (
     <>
       <Container>
-        
-         {Loading?(<MainpageLoading/>): <Main_post Post={post} />}
-      
+        <ProfileCard />
+        {Loading ? <MainpageLoading /> : <Main_post Post={post} />}
+        <TopRecentTag/>
       </Container>
     </>
   );
