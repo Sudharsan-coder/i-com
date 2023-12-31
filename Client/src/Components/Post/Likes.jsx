@@ -46,10 +46,10 @@ const Likes = (props) => {
             <AiFillHeart
               size='20px'
               color='red'
-            />
+            /> 
           ) : (
             <IconHeartPlus size='20px' />
-          )}
+          )}&nbsp;
           <div className='num'>
             {like > 10 ? "10+" : like}
           </div>
@@ -62,8 +62,8 @@ const Likes = (props) => {
             <FaRegCommentDots
               size='17px'
               color='black'
-            />
-          </Link>
+            /> 
+          </Link> &nbsp;
             <div className="num">
               {props.commentCount}
             </div>
