@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 //Add Post
 router.post("/", async (req, res) => {
@@ -23,46 +24,56 @@ router.get("/UserPostFind", async (req, res) => {
 });
 
 //Get all post(Main page) && Search post Endpoint
-router.get('/AllPost',async(req,res)=>{
-  const qsearch = req.query.search;
-  try{
+router.get("/AllPost", async (req, res) => {
+  const tag = req.query.tag;
+  try {
     let Searched;
-    if (qsearch)
+    if (tag)
       Searched = await Post.find({
-        tag: { $in: [qsearch] },
+        tag: { $in: [tag] },
       });
-    else 
-    Searched=await Post.find().sort({$natural:-1});
-      res.status(200).json(Searched)
+    else Searched = await Post.find().sort({ $natural: -1 });
+    res.status(200).json(Searched);
+  } catch (err) {
+    res.status(500).json(err);
   }
-  catch(err){
+});
+
+router.get("/post/:userId", async(req,res) => {
+  const userId = req.params.userId;
+  console.log(userId);
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize)|| 10;
+  try {
+    const user = await User.findById(userId)
+    .populate('followers');
+    res.status(200).json(user);
+  } catch (err) {
     res.status(500).json(err);
   }
 })
 
-//Particular Post
-router.get("/",async(req,res)=>{
-  const postid=req.query.postid;
-  try{
-  const postdetails=await Post.findById(postid);
-  res.status(200).send(postdetails);
-  }
-  catch(err){
 
-  }
-})
+//Particular Post
+router.get("/", async (req, res) => {
+  const postid = req.query.postid;
+  try {
+    const postdetails = await Post.findById(postid);
+    res.status(200).send(postdetails);
+  } catch (err) {}
+});
 
 //Add comment
 router.put("/AddComment", async (req, res) => {
   try {
-    const comment=await Post.findByIdAndUpdate(
+    const comment = await Post.findByIdAndUpdate(
       { _id: req.query.postid },
       {
         $push: {
           comments: {
             Name: req.body.username,
             comment: req.body.comments,
-            pic:req.body.profile,
+            pic: req.body.profile,
           },
         },
       }
@@ -80,7 +91,6 @@ router.put("/AddComment", async (req, res) => {
 
 //Like Endpoint
 router.put("/liked", async (req, res) => {
-  
   try {
     const post = await Post.findByIdAndUpdate(
       { _id: req.query.postid },
@@ -93,7 +103,6 @@ router.put("/liked", async (req, res) => {
 });
 
 router.put("/unliked", async (req, res) => {
-  
   try {
     const post = await Post.findByIdAndUpdate(
       { _id: req.query.postid },
@@ -104,8 +113,5 @@ router.put("/unliked", async (req, res) => {
     res.status(500).json(err);
   }
 });
-
-
-
 
 module.exports = router;
