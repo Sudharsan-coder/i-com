@@ -21,6 +21,8 @@ const Login = ({ close }) => {
         console.log(res.data.others);
         auth.login({
           username: res.data.others.userName,
+          firstname: res.data.others.firstName,
+          lastname: res.data.others.lastName,
           profile: res.data.others.profilePicUrl,
           following:res.data.others.followings,
         });

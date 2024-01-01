@@ -3,14 +3,14 @@ import { createContext, useContext, useState } from "react";
 const AuthContext=createContext(null);
 
 export const AuthProvider=({children})=>{
-    const [user,setUser]=useState({username:null,profile:null,following:[]});
+    const [user,setUser]=useState({username:null,firstname: null, lastname: null,profile:null,following:[]});
     const [search,setSearch]=useState();
     const login=(user)=>{
         setUser(user);
     }
 
     const logout=()=>{
-        setUser({username:null,profile:null,following:null});
+        setUser({username:null,firstname: null, lastname: null,profile:null,following:null});
     }
     
     const searching=(search)=>{
