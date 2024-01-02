@@ -26,9 +26,12 @@ router.get("/UserPostFind", async (req, res) => {
 //Get all post(Main page) && Search post Endpoint
 router.get("/AllPost", async (req, res) => {
   const tag = req.query.tag;
+  const search = req.query.search;
   try {
     let Searched;
-    if (tag)
+    if(search)
+      Searched = await Post.find({title: {$regex: search, $options: 'i'} })  
+    else if (tag)
       Searched = await Post.find({
         tag: { $in: [tag] },
       });
@@ -39,20 +42,24 @@ router.get("/AllPost", async (req, res) => {
   }
 });
 
-router.get("/post/:userId", async(req,res) => {
+router.get("/AllPost/:userId", async(req,res) => {
   const userId = req.params.userId;
   console.log(userId);
   const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize)|| 10;
+  const pageSize = parseInt(req.query.pageSize)|| 10;   
   try {
-    const user = await User.findById(userId)
-    .populate('followers');
-    res.status(200).json(user);
+    // const user = await User.findById(userId)
+    // .populate('followers');
+    const totalCount = await Post.countDocuments();
+    const totalPages = Math.ceil(totalCount/pageSize);
+    const post = await Post.find()
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+    res.status(200).json({totalCount,totalPages,page,pageSize,post});
   } catch (err) {
     res.status(500).json(err);
   }
 })
-
 
 //Particular Post
 router.get("/", async (req, res) => {
