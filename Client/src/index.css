@@ -1,7 +1,32 @@
 body{
   margin: 0px;
-  font-family: 'Noto Sans TC', sans-serif;
+  
   background-color: rgb(245, 245, 245);
+  box-sizing: border-box;
+}
+*{
+  font-family: '-apple-system';
+}
+.mantine-16nrau2{
+  padding: 0%;
+}
+/* .mantine-MultiSelect-input{
+  width: 505px;
+  
+} */
+.fullscreen{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  z-index: 1;
+  backdrop-filter: blur(1px);
+}
+.center{
+  justify-content: center;
+  align-items: center;
 }
 @media (max-width:700px){
   html{
@@ -12,4 +37,24 @@ body{
   html{
     font-size: 12px;
   }
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 20px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

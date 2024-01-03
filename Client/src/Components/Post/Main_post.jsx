@@ -1,10 +1,17 @@
 //containers all the posts
 import { styled } from 'styled-components';
-import Post from "./Single_post.jsx"
-const Main_post = () => {
+import Single_post from "./Single_post.jsx"
+const Main_post = (props) => {
+const PostArray=props.Post;
   return (
     <Container>
-        <Post/>
+    {
+      PostArray.map((Post)=>
+        (
+          <Single_post {...Post} key={Post._id}/>
+         )
+        )
+      }
     </Container>
   )
 }
@@ -15,4 +22,7 @@ const Container=styled.div`
     height:90vh;
     padding:3%;
     box-sizing:border-box;
-    `
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+`

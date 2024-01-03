@@ -1,22 +1,19 @@
 //has single post in the main_post
 import { styled } from "styled-components";
-import User_det from "./User_detail.jsx";
-import { useState } from "react";
-import Likes from "../Likes.jsx";
+import User_detail from "./User_detail.jsx";
+import Likes from "./Likes.jsx";
 import Heading from "./Heading.jsx";
 import { Link } from "react-router-dom";
 
-const Single_post = () => {
-  const [Liked, setLiked] = useState(false);
+const Single_post = (props) => {
+// console.log(props);
   return (
     <Container>
       <Block>
-        <User_det />
-        <StyledLink to="/post">
-          <Heading />
-        </StyledLink>
+        <User_detail {...props} />
+          <Heading {...props}/>
         <div className="icons">
-          <Likes />
+          <Likes {...props} />
         </div>
       </Block>
     </Container>
@@ -41,10 +38,9 @@ const Block = styled.div`
     padding: 15px 0px;
   }
   .icons {
-   margin-left: 65px;
+    margin-left: 65px;
   }
 `;
-
 
 const StyledLink = styled(Link)`
   text-decoration: none;
