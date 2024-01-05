@@ -2,23 +2,23 @@ const User = require("../models/User");
 const router = require("express").Router();
 
 //followService
-router.put("/:follower/:following", async (req, res) => {
+router.put("/", async (req, res) => {
   try {
-    const followerId = req.params.follower;
-    const followingId = req.params.following;
-    if (!followerId || !followingId) return res.status(401).json("Wrong");
+    const followerName = req.query.follower;
+    const followingName = req.query.following;
+    if (!followerName || !followingName) return res.status(401).json("Wrong");
     else {
-      await User.findByIdAndUpdate(
-        { _id: followerId },
-        { inc: { followingCount: 1 },
-        $push:{followings:followingId} }
+     const follower= await User.findOneAndUpdate(
+        { userName: followerName },
+        { $inc: { followingsCount: 1 },
+        $push:{followings:followingName} }
       );
-      await User.findByIdAndUpdate(
-        { _id: followingId },
-        { inc: { followerCount: 1 },
-         $push:{followers:followerId} }
+    const following=  await User.findOneAndUpdate(
+        { userName: followingName },
+        { $inc: { followersCount: 1 },
+         $push:{followers:followerName} }
       )
-      const user=await User.find();
+      const user=await User.find({userName:followerName});
       res.status(200).json(user);
     }
   } catch (err) {

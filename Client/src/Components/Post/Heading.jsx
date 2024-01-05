@@ -25,6 +25,7 @@ export default Heading;
 const Tag = styled.div`
   display: flex;
   margin-top: 10px;
+  flex-wrap: wrap;
   .tag{
     font-size: 0.55em;
     

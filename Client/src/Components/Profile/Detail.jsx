@@ -2,22 +2,24 @@ import {GrLocation} from 'react-icons/gr'
 import {LiaBirthdayCakeSolid} from 'react-icons/lia'
 import {FiMail} from 'react-icons/fi'
 import { styled } from 'styled-components'
+import { useAuth } from '../../context/auth'
 
 
 const Detail = (props) => {
 console.log(props.userName);
+const auth=useAuth();
 
   return (
     <Block>
     <div className="name">{props.userName}</div>
     <div className="about">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae vitae distinctio consequatur expedita perspiciatis mollitia, illo voluptatem maiores! Ipsa repellat earum vel magnam deserunt corrupti corporis soluta reprehenderit aspernatur, ducimus blanditiis voluptas illo nulla nisi enim nobis? Hic harum quis eius, laboriosam quos distinctio, ratione, asperiores voluptatem illo quas repellat.
+        {props.userBio ? props.userBio :(auth.user.username==props.userName?"Update your Profile":"Bio is not Updated")}
     </div>
     <div className="details">
-        <GrLocation size="25px"/>
-        Thiruchengode
-        <LiaBirthdayCakeSolid size="25px"/>
-        22 Jan 2003
+       <GrLocation size="25px"/>
+        {(props.location)}
+        {<LiaBirthdayCakeSolid size="25px"/> &&
+        props.DOB}
         <FiMail size="25px"/>
         {props.emailId}
     </div>
