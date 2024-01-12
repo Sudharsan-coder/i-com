@@ -1,19 +1,22 @@
-import React from "react";
 import { styled } from "styled-components";
 import User_det from "../Post/User_detail.jsx";
 import Heading from "../Post/Heading.jsx";
 import Content from "../Post_create/Content.jsx";
-import Comment from "./Comments.jsx"
-const Post = () => {
+import Comment from "./Comments.jsx";
+const Post = (postdetails) => {
+  
+  console.log(postdetails);
   return (
-    <Container>
+    <Container banner={postdetails.bannerPic}>
       <div className="banner"></div>
-      <div className="main">
-        <User_det />
-        <Heading />
-        <Content />
-        <Comment/>
-      </div>
+      
+        <div className="main">
+          <User_det {...postdetails} />
+          <Heading {...postdetails} />
+          <Content {...postdetails} />
+          <Comment {...postdetails} />
+        </div>
+    
     </Container>
   );
 };
@@ -28,7 +31,9 @@ const Container = styled.div`
   border-radius: 15px;
   overflow: hidden;
   .banner {
-    background: black;
+    background:${(props)=>(props!==undefined? `url(${props.banner})`:"black")};
+    background-size: cover;
+    background-repeat:no-repeat;
     height: 50vh;
     /* margin: 0px -50px; */
   }

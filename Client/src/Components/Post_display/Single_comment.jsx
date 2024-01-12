@@ -1,29 +1,28 @@
 import { styled } from "styled-components";
 import { Link } from "react-router-dom";
-import Like from "../Likes.jsx";
-import im1 from '../../assets/logo.png'
+import Like from "../Post/Likes.jsx";
+import im1 from "../../assets/logo.png";
 
-const Single_comment = () => {
+const Single_comment = (props) => {
   return (
     <Container>
       <div className="frame">
         <Link to="/profile">
-          <img src={im1} alt="pic" />
+          <img src={props.pic} alt="pic" />
         </Link>
         <div className="frame_content">
           <div className="title">
-            <div className="user_name">Sudharsan</div>
+            <div className="user_name">{props.Name}</div>
             <div className="date">Posted on 22 Jan</div>
           </div>
           <div className="body">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eum,
-            sapiente illo. Rerum, eveniet hic. Quisquam atque doloribus velit
-            eveniet nisi.
+            {props.comment}
           </div>
         </div>
       </div>
-      <div className="likes">
-      <Like /></div>
+      {/* <div className="likes">
+        <Like />
+      </div> */}
     </Container>
   );
 };
@@ -42,7 +41,7 @@ const Container = styled.div`
       background-color: black;
     }
     .frame_content {
-      border: 2px solid rgb(178, 178, 178);
+      /* border: 2px solid rgb(178, 178, 178); */
       margin-left: 15px;
       padding: 10px;
       box-sizing: border-box;
@@ -59,7 +58,7 @@ const Container = styled.div`
       margin-bottom: 10px;
     }
   }
-  .likes{
-    margin:20px 70px;
+  .likes {
+    margin: 20px 70px;
   }
 `;
