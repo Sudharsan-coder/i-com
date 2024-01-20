@@ -59,7 +59,9 @@ router.post("/login", async (req, res) => {
         expiresIn: "3d",
       }
     );
-    res.status(200).send({ others, accessToken,refreshToken });
+    // console.log(accessToken);
+    // res.cookie("a",accessToken,{ httpOnly: true, secure: true, maxAge: 3600000 });
+    res.status(200).send({ others });
   } catch (err) {
     res.status(500).send(err.message);
   }

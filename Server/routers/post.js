@@ -7,6 +7,11 @@ router.post("/", async (req, res) => {
   const newPost = new Post(req.body);
   try {
     const savedPost = await newPost.save();
+    await User.findOneAndUpdate({userName: req.body.userName}, {
+      $push: {
+        posts: savedPost._id
+      }
+    })
     res.status(201).json(savedPost);
   } catch (err) { 
     res.status(500).json(err);
@@ -54,7 +59,7 @@ router.get("/AllPost/:userId", async(req,res) => {
     const totalPages = Math.ceil(totalCount/pageSize);
     const post = await Post.find()
       .skip((page - 1) * pageSize)
-      .limit(pageSize);
+      .limit(pageSize).sort({ createdAt: -1 });
     res.status(200).json({totalCount,totalPages,page,pageSize,post});
   } catch (err) {
     res.status(500).json(err);
@@ -120,5 +125,16 @@ router.put("/unliked", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+// Deleting the Post EndPoint
+router.delete('/delete/:postid', async(req,res)=> {
+  const postId = req.params.postid;
+  try {
+    await Post.deleteOne({id: postId});
+    res.status(200).send("Deleted successfully");
+  } catch (err) {
+    res.status(500).send("Not deleted")
+  }
+})
 
 module.exports = router;
