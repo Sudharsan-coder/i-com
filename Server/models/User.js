@@ -16,11 +16,11 @@ const UserSchema=new mongoose.Schema(
         DOB:{type:String},
         skills:{type:Array},
         profilePicUrl:{type:String,default:"https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"}, //array of urls for multiple images
-        followersCount:{type:Number,default:0},
         followers:[{type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-        followingsCount:{type:Number,default:0},
         followings:[{type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-        posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
+        posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+        commented: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+        liked: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
     }
 )
 

@@ -1,35 +1,59 @@
 const mongoose = require("mongoose");
 
+const replySchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  text: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const commentSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  text: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  replies: [replySchema],
+});
+
 const PostSchema = new mongoose.Schema(
   {
     title: { type: String, require: true },
     content: { type: String },
-    tag: { type: Array },
-    userName: { type: String, require: true },
-    profilePicUrl: {
-      type: String,
-      default:
-        "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
-      require: true,
+    tags: {
+      type: [String],
+      default: [],
     },
-    likeCount: { type: Number, default: 0 },
-    commentCount: { type: Number, default: 0 },
-    bannerPic: { type: String },
-    comments: [
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    likes: [
       {
-        Name: {
-          type: String,
-        },
-        pic: {
-          type: String,
-          default:
-            "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
-        },
-        comment: {
-          type: String,
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
       },
     ],
+    bannerPic: { type: String },
+    comments: [commentSchema],
   },
   {
     timestamps: true,
