@@ -1,24 +1,21 @@
 const User = require("../models/User");
 const router = require("express").Router();
+const TokenVerify = require("./verifyToken");
 
 //followService
-router.put("/", async (req, res) => {
+router.put("/",TokenVerify, async (req, res) => {
   try {
-    const followerName = req.query.follower;
-    const followingName = req.query.following;
-    if (!followerName || !followingName) return res.status(401).json("Wrong");
+    const followerId = req.user._id;
+    const followingId = req.query.userid;
+    if (!followerId || !followingId) return res.status(401).json("Wrong");
     else {
-     const follower= await User.findOneAndUpdate(
-        { userName: followerName },
-        { $inc: { followingsCount: 1 },
-        $push:{followings:followingName} }
-      );
-    const following=  await User.findOneAndUpdate(
-        { userName: followingName },
-        { $inc: { followersCount: 1 },
-         $push:{followers:followerName} }
-      )
-      const user=await User.find({userName:followerName});
+      await User.findByIdAndUpdate(followerId, {
+        $addToSet: { followings: followingId },
+      });
+      await User.findByIdAndUpdate(followingId, {
+        $addToSet: { followers: followerId },
+      });
+      const user = await User.find({ _id: followerId });
       res.status(200).json(user);
     }
   } catch (err) {
@@ -26,4 +23,4 @@ router.put("/", async (req, res) => {
   }
 });
 
-module.exports=router;
+module.exports = router;
