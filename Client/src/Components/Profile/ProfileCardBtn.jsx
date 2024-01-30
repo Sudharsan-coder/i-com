@@ -1,20 +1,18 @@
 import { useDisclosure } from "@mantine/hooks";
 import { Modal, Group, Button } from "@mantine/core";
 import { useState } from "react";
-import Login from "./Login";
-import Register from "./Register";
+import Login from "../Auth/Login";
+import Register from "../Auth/Register";
 import { useAuth } from "../../context/auth";
 import { styled } from "styled-components";
-import Post_create_box from "../Post_create/Post_create_box.jsx";
-import User from "./User";
+import User from "../Auth/User";
 import { IconSquareRoundedPlus } from "@tabler/icons-react";
-const Log_in_button = () => {
+import { useNavigate } from "react-router-dom";
+const ProfileCardBtn = () => {
   const [opened, { open, close }] = useDisclosure(false);
-  const [opened_post, post_obj] = useDisclosure(false);
-  // const [show_post_create,setShow_post_create]=useState(true);
+  const navigator = useNavigate();
   const [dis, setdis] = useState(false);
   const auth = useAuth();
-  const [show_post_box, setShow_post_box] = useState(true);
   const [showModel, setShowModel] = useState(true);
   return (
     <>
@@ -40,18 +38,6 @@ const Log_in_button = () => {
         </Modal>
       )}
       
-      {show_post_box && (
-        <Modal
-          opened={opened_post}
-          onClose={post_obj.close}
-          size='510px'
-          title='Create Post'
-          centered
-        >
-          <Post_create_box close={setShow_post_box} />
-        </Modal>
-      )}
-      
       <Group position='center'>
         {!auth.user.username ? (
           <Button
@@ -65,17 +51,16 @@ const Log_in_button = () => {
             Sign up/ Sign in
           </Button>
         ) : (
-          <Log>
-            <User />
+          <Profile>
             <Button
-            leftIcon={<IconSquareRoundedPlus/>}
+              variant="light"
               onClick={() => {
-                post_obj.open();
+                navigator(`/profile/${auth.user.username}`)
               }}
             >
-              Create Post
+              View Full Profile
             </Button>
-          </Log>
+          </Profile>
         )}
       </Group>
       {/* {show_post_box && <Post_create_box setShow={setShow_post_box}/>} */}
@@ -83,7 +68,7 @@ const Log_in_button = () => {
   );
 };
 
-export default Log_in_button;
+export default ProfileCardBtn;
 
 const Navbtn = styled.button`
   all: unset;
@@ -93,7 +78,7 @@ const Navbtn = styled.button`
   }
 `;
 
-const Log=styled.div`
+const Profile=styled.div`
   display: flex;
   align-items: center;
   gap: 20px;

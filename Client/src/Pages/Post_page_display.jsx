@@ -4,16 +4,19 @@ import Post from "../Components/Post_display/Post.jsx"
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import PostdisplayLoading from "../Components/Loading/PostdisplayLoading.jsx";
 const Post_page_display = () => {
   const params = useParams();
   const postid = params.id;
   const [postdetails, setPostDetails] = useState(null);
   // console.log(postid);
+  const [Loading,setLoading]=useState(true)
   useEffect(() => {
     axios
       .get(`http://localhost:5010/post?postid=${postid}`)
       .then((res) => {
         setPostDetails(res.data);
+        setLoading(false)
       })
       .catch((err) => {
         console.log(err);
@@ -23,7 +26,7 @@ const Post_page_display = () => {
   return (
     <Container>
     <Like_pallet {...postdetails}/>
-     {postdetails &&
+     {Loading?<PostdisplayLoading/> : postdetails &&
       <Post {...postdetails}/>}
     </Container>
   )

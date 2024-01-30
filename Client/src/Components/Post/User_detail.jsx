@@ -1,11 +1,11 @@
 //has the user info for the post
 import { styled } from "styled-components";
-
-import user_pic from "../../assets/logo.png"
 import {Link, useNavigate} from "react-router-dom"
-import { useAuth } from "../../context/auth";
+// import { formatDistanceToNow } from 'date-fns';
 const User_detail = (props) => {
 const navigate=useNavigate();
+// const { createdAt } = props;
+// const relativeTime = formatDistanceToNow(new Date(createdAt), { addSuffix: true });
 console.log(props);
   return (
     <Container>
@@ -13,7 +13,7 @@ console.log(props);
         <Link to="/profile"><img src={props.profilePicUrl} alt="pic" /></Link>
       <div className="frame_content">
       <div className="user_name" onClick={()=>{navigate(`/profile/${props.userName}`)}}>{props.userName}</div>
-        <div className="date">Posted on 22 Jan</div>
+        {/* <div className="date">{relativeTime}</div> */}
         </div>
       </div>
       
@@ -22,9 +22,6 @@ console.log(props);
 };
 
 export default User_detail;
-
-
-
 
 const Container=styled.div`
 .frame{

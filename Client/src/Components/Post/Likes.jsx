@@ -9,6 +9,8 @@ import { IconHeartPlus } from "@tabler/icons-react";
 const Likes = (props) => {
   const [Liked, setLiked] = useState(false);
   // console.log(props);
+  
+  const [like,setLike]=useState(props.likeCount);
   return (
     <Container>
       <div className='like_container'>
@@ -18,6 +20,7 @@ const Likes = (props) => {
             setLiked(!Liked);
             console.log(Liked);
             if (!Liked) {
+              setLike(like+1);
               axios
                 .put(`http://localhost:5010/post/liked?postid=${props._id}`)
                 .then(() => {
@@ -27,6 +30,7 @@ const Likes = (props) => {
                   console.log(err);
                 });
             } else {
+            setLike(like-1);
               axios
                 .put(`http://localhost:5010/post/unliked?postid=${props._id}`)
                 .then(() => {
@@ -42,12 +46,12 @@ const Likes = (props) => {
             <AiFillHeart
               size='20px'
               color='red'
-            />
+            /> 
           ) : (
             <IconHeartPlus size='20px' />
-          )}
+          )}&nbsp;
           <div className='num'>
-            {props.likeCount > 10 ? "10+" : props.likeCount}
+            {like > 10 ? "10+" : like}
           </div>
         </div>
         <div
@@ -58,8 +62,8 @@ const Likes = (props) => {
             <FaRegCommentDots
               size='17px'
               color='black'
-            />
-          </Link>
+            /> 
+          </Link> &nbsp;
             <div className="num">
               {props.commentCount}
             </div>
