@@ -37,9 +37,8 @@ const Search = () => {
 
   return (
     <Container>
-    <div className='DS'>
 
-        <Tabs defaultValue="gallery">
+        <Tabs defaultValue="gallery" className='DS'>
         <Tabs.List>
           <Tabs.Tab value="gallery" icon={<IconPhoto size="0.8rem" />}>Posts</Tabs.Tab>
           <Tabs.Tab value="messages" icon={<IconUser size="0.8rem" />}>Users</Tabs.Tab>
@@ -53,7 +52,6 @@ const Search = () => {
           {Loading?(<MainpageLoading/>): <Single_user_card User={user}/>}
         </Tabs.Panel>
       </Tabs>
-    </div>
     </Container>
   )
 }
@@ -69,5 +67,6 @@ const Container= styled.div`
   grid-row-gap: 50px;
   .DS{
     grid-column: 2;
+    margin-top: 40px;
   }
 `

@@ -1,8 +1,9 @@
 const User = require("../models/User");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
+const TokenVerify = require("./verifyToken");
 
-//Update User password
+//Update User profile
 router.put("/:id", async (req, res) => {
   if (req.body.password || req.body.hashedPassword) {
     req.body.password = CryptoJS.AES.encrypt(
@@ -22,22 +23,22 @@ router.put("/:id", async (req, res) => {
 });
 
 //delete User Account
-router.delete("/", async (req, res) => {
+router.delete("/delete",TokenVerify, async (req, res) => {
   try {
-    await User.deleteOne({userName:req.query.username});
+    await User.deleteOne({_id: req.user._id});
     res.status(200).json("Your account is deleted");
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-//Find specific User
+//Find specific User and searching users
 router.get("/",async(req,res)=>{
 const username=req.query.username;
 const search=req.query.search;
   try{
   if(search){
-    const Search=await User.find({userName:search});
+    const Search=await User.find({ userName: { $regex: search, $options: "i" } });
     res.status(200).json(Search);
   }
   else if(username){
