@@ -28,7 +28,7 @@ router.post("/register", async (req, res) => {
 //Login Endpoint
 router.post("/login", async (req, res) => {
   try {
-    const user = await User.findOne({ userName: req.body.username });
+    const user = await User.findOne({ emailId: req.body.emailid });
 
     if (!user) {
       return res.status(401).send("Wrong Credentials");
@@ -49,7 +49,7 @@ router.post("/login", async (req, res) => {
       user._doc,
       process.env.ACCESS_TOKEN_SEC, 
       {
-        expiresIn: "15m",
+        expiresIn: "1d",
       }
     );
     const refreshToken = jwt.sign(
@@ -59,7 +59,9 @@ router.post("/login", async (req, res) => {
         expiresIn: "3d",
       }
     );
-    res.status(200).send({ others, accessToken,refreshToken });
+    // console.log(accessToken);
+    // res.cookie("a",accessToken+"");
+    res.status(200).send({ others, accessToken });
   } catch (err) {
     res.status(500).send(err.message);
   }

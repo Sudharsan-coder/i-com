@@ -2,11 +2,13 @@ import React from 'react'
 import { styled } from 'styled-components'
 
 const Counter = (props) => {
+console.log(props);
+const postCount = props.Post.posts
   return (
     <Container>
       <div>{props.Post.followersCount} Followers</div>
       <div>{props.Post.followingsCount} Following</div>
-      <div>{props.len} Post Published</div>
+      <div>{postCount.length} Post Published</div>
       
     </Container>
   )

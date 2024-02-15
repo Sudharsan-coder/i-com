@@ -1,7 +1,8 @@
 const jwt=require("jsonwebtoken")
 
-const TokenVerfiy=(req,res,next)=>{
+const TokenVerify=(req,res,next)=>{
     const authHeader=req.headers.token;
+    // console.log(authHeader);
     if(authHeader)
     {
         const token=authHeader.split(" ")[1];
@@ -17,4 +18,4 @@ const TokenVerfiy=(req,res,next)=>{
 }
 
 
-module.exports=(TokenVerfiy)
+module.exports=TokenVerify;

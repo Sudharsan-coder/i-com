@@ -10,7 +10,7 @@ const auth=useAuth();
   return (
     <Conatiner>
       <Profile_pic {...props} />
-      {(auth.user.username!==props.userName) && <Buttons {...props} />}
+      {/* {(auth.user.username!==props.userName) && <Buttons {...props} />} */}
       <Detail {...props} />
     </Conatiner>
   );
