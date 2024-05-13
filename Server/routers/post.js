@@ -5,9 +5,10 @@ const TokenVerify = require("./verifyToken");
 
 //Add Post
 router.post("/create", TokenVerify, async (req, res) => {
-  const newPost = new Post(req.body);
-  console.log(req.user);
   const userId = req.user._id;
+  const body = {...req.body, user: userId}
+  const newPost = new Post(body);
+  console.log(req.user);
 
   try {
     await newPost.save(); // Save the new post
@@ -86,8 +87,8 @@ router.get("/", async (req, res) => {
 //Get Following Post Endpoint
 router.get("/followingPost", TokenVerify, async (req, res) => {
   const userId = req.user._id;
-  const userid2 = "65aca91a243715df848816b7";
-  console.log(userid2);
+  // const userid2 = "65aca91a243715df848816b7";
+  // console.log(userid2);
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
   try {
@@ -105,11 +106,11 @@ router.get("/followingPost", TokenVerify, async (req, res) => {
     });
     const totalPages = Math.ceil(totalCount / pageSize);
 
-    const posts = await Post.find({ user: { $in: followingIds } });
-    // .skip((page - 1) * pageSize)
-    // .limit(pageSize)
-    // .sort({ createdAt: -1 })
-    // .populate("user", "userName profilePicUrl");
+    const posts = await Post.find({ user: { $in: followingIds } })
+    .skip((page - 1) * pageSize)
+    .limit(pageSize)
+    .sort({ createdAt: -1 })
+    .populate("user", "userName profilePicUrl");
 
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (err) {
@@ -340,16 +341,21 @@ router.delete("/delete/:postid", TokenVerify, async (req, res) => {
   const postId = req.params.postid;
   const userId = req.user._id;
   try {
-    await Post.deleteOne({ _id: postId });
-    await User.updateOne(
-      { _id: userId },
-      {
-        $pull: {
-          posts: postId,
-        },
-      }
-    );
-    res.status(200).send("Deleted successfully");
+    const post  = await Post.findOne({ _id: postId });
+    console.log(post, post.user, userId);
+    if(post.user == userId) {
+      await Post.deleteOne({ _id: postId });
+      await User.updateOne(
+        { _id: userId },
+        {
+          $pull: {
+            posts: postId,
+          },
+        }
+      );
+      res.status(200).send("Deleted successfully");
+    } else
+      res.status(500).send("Your not authorizated user");
   } catch (err) {
     res.status(500).send("Not deleted");
   }
