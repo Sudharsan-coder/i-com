@@ -2,6 +2,20 @@ const User = require("../models/User");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
 const TokenVerify = require("./verifyToken");
+const nodemailer = require("nodemailer");
+const otpGenerator = require("otp-generator");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.example.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: "pkumar24rk@gmail.com",
+    pass: "mzlckvjjvjhsoksf",
+  },
+  tls: { rejectUnauthorized: false }
+});
 
 //Update User profile
 router.put("/:id", async (req, res) => {
@@ -70,4 +84,51 @@ router.get("/all",async(req,res)=>{
       res.status(500).json(err);
     }
 })
+  
+router.post("/send-otp", async (req, res) => {
+  const { email } = req.body;
+
+  // Generate OTP
+  const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
+
+  // Send OTP to the user's email
+  try {
+    
+    await transporter.sendMail({
+      from: {
+        name:"pradeep",
+        address: "pkumar24rk@gmail.com"
+      },
+      to: email,
+      subject: "OTP Verification",
+      text: `Your OTP is ${otp}.`,
+    });
+  
+    // Save OTP in MongoDB
+    await User.updateOne({ emailId: email }, {$set: {otp: otp} });
+    const user = await User.findOne({ emailId: email });
+    console.log(user);
+    res.json({ message: "OTP sent successfully", email,otp });
+  } catch(err) {
+    res.status(500).json(err);
+  }
+
+});
+
+
+router.post("/verify-otp", async (req, res) => {
+  const { email, enteredOTP } = req.body;
+
+  // Retrieve stored OTP from MongoDB
+  const user = await User.findOne({ emailId:email });
+  const storedOTP = user ? user.otp : "";
+  // console.log(user);
+  // Verify OTP
+  if (enteredOTP === storedOTP) {
+    res.json({ message: "OTP verification successful" });
+  } else {
+    res.status(401).json({ message: "Invalid OTP" });
+  }
+});
+
 module.exports = router;
