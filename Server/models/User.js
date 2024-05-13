@@ -20,7 +20,8 @@ const UserSchema=new mongoose.Schema(
         followings:[{type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
         commented: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
-        liked: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
+        liked: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+        otp: {type:String}
     }
 )
 
