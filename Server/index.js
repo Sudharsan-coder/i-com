@@ -24,8 +24,7 @@ mongoose
   })
   .catch((err) => {
     console.error(err)
-  });
-
+});
 
 //Endpoint call
 app.use('/auth',authRoute);
@@ -33,7 +32,8 @@ app.use('/post',postRoute);
 app.use('/follow',followRoute);
 app.use('/user',userRoute);
 
-
-app.listen(5010, () => {
+const http = require("http");
+const server = http.createServer(app);
+server.listen(5010, () => {
   console.log("Server is running");
 });

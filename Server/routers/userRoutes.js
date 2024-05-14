@@ -11,14 +11,14 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: "pkumar24rk@gmail.com",
-    pass: "mzlckvjjvjhsoksf",
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASSWORD,
   },
   tls: { rejectUnauthorized: false }
 });
 
 //Update User profile
-router.put("/:id", async (req, res) => {
+router.put("/updateProfile",TokenVerify, async (req, res) => {
   if (req.body.password || req.body.hashedPassword) {
     req.body.password = CryptoJS.AES.encrypt(
       req.body.hashedPassword,
@@ -26,10 +26,10 @@ router.put("/:id", async (req, res) => {
     ).toString();
   }
   try {
-    const updataedUser = await User.findByIdAndUpdate(req.params.id, {
+    const updataedUser = await User.findByIdAndUpdate(req.user._id, {
       $set: req.body,
     });
-    const user =await User.find({_id:req.params.id})
+    const user =await User.find({_id:req.user._id})
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json(err);
