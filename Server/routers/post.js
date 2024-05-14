@@ -128,6 +128,21 @@ router.get("/:postid", async (req, res) => {
   } catch (err) {}
 });
 
+// Get TOP 10 Category
+router.get("/topCategory", async(req,res)=> {
+  try {
+    const categories = await Post.aggregate([
+      { $unwind: "$tag" }, // Deconstruct the tag array
+      { $group: { _id: "$tag", total_likes: { $sum: "$likes" } } },
+      { $sort: { total_likes: -1 } },
+      { $limit: 10 }
+    ]);
+    res.status(200).json(categories);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 // Add comment
 router.post("/:postId/comment", TokenVerify, async (req, res) => {
   const { postId } = req.params;
