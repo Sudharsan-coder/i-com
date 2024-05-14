@@ -89,6 +89,11 @@ const Comment = styled.form`
   textarea {
     width: 90%;
     height: 100px;
+    border-radius: 10px;
+    &:focus{
+      border: 1px solid #1a89ea;
+      outline: none;
+    }
   }
   button {
     color: white;

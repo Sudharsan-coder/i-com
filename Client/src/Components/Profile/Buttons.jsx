@@ -1,12 +1,42 @@
 import { styled } from "styled-components";
 import { TfiMoreAlt } from "react-icons/tfi";
-import { useState } from "react";
-const Buttons = () => {
+import { useRef, useState } from "react";
+import axios from "axios";
+import { useAuth } from "../../context/auth";
+const Buttons = (props) => {
   
   const [report, setReport] = useState(false);
+  const [click,setClicked]=useState(false);
+  const auth=useAuth();
+  const userref=useRef();
+  
+  let followingsArray=auth.user.following;
+  console.log(followingsArray);
+  const follow=()=>{
+    setClicked(!click);
+    // console.log(click);
+    if(!click)
+    {
+      axios.put(`http://localhost:5010/follow?following=${props.userName}&follower=${auth.user.username}`)
+      .then((res)=>{
+        console.log(res.data.followings);
+        userref.current.value="Following" 
+        followingsArray=res.data.followings;
+        
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+    } 
+  }
+  // console.log(click);
+  
+  const vals=()=>{
+    return followingsArray.find((e)=>(e===props.userName))
+  }
   return (
     <Block>
-      <input type="button" value="Follow" />
+      <Followbtn type="submit" ref={userref} value={vals()!==undefined?"Following":"Follow"} onClick={follow} clicks={click.toString()}></Followbtn>
       <div
         className="more"
         onClick={() => {
@@ -31,18 +61,7 @@ const Block = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  input[type="button"] {
-    background: rgb(66, 99, 235);
-    padding: 11px 15px;
-    border: 0px;
-    border-radius: 5px;
-    margin-right: 5%;
-    color: white;
-    cursor: pointer;
-    &:hover {
-      background: blue;
-    }
-  }
+  
   .more {
     cursor: pointer;
   }
@@ -61,3 +80,16 @@ const Block = styled.div`
     display: none;
   }
 `;
+
+const Followbtn=styled.input`
+  background:${({value})=> (value==="Follow"? "rgb(66, 99, 235)":"gray")};
+  padding: 11px 15px;
+  border: 0px;
+  border-radius: 5px;
+  margin-right: 5%;
+  color: white;
+  cursor: pointer;
+  &:hover {
+    background:${({value})=> (value!=="Follow"? "rgb(66, 99, 235)":"gray")};
+  }
+`

@@ -1,11 +1,12 @@
 const jwt=require("jsonwebtoken")
 
-const TokenVerfiy=(req,res,next)=>{
+const TokenVerify=(req,res,next)=>{
     const authHeader=req.headers.token;
+    // console.log(authHeader);
     if(authHeader)
     {
         const token=authHeader.split(" ")[1];
-        jwt.verify(token,process.env.ACCESS_SEC,(err,user)=>{
+        jwt.verify(token,process.env.ACCESS_TOKEN_SEC,(err,user)=>{
             if(err)
                 res.status(403).json("Token is not valid");
             req.user=user;
@@ -17,4 +18,4 @@ const TokenVerfiy=(req,res,next)=>{
 }
 
 
-module.exports=(TokenVerfiy )
+module.exports=TokenVerify;

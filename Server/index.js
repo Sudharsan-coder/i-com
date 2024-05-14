@@ -1,14 +1,14 @@
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
 const cors=require('cors');
-app.use(cors());
-
 const dotenv = require("dotenv");
+const cookieParser = require('cookie-parser');
+
 dotenv.config();
-
+const app = express();
+app.use(cookieParser());
+app.use(cors());
 app.use(express.json({limit:"3mb"}));
-
 
 //Routers
 const authRoute=require("./routers/auth");
@@ -24,8 +24,7 @@ mongoose
   })
   .catch((err) => {
     console.error(err)
-  });
-
+});
 
 //Endpoint call
 app.use('/auth',authRoute);
@@ -33,7 +32,8 @@ app.use('/post',postRoute);
 app.use('/follow',followRoute);
 app.use('/user',userRoute);
 
-
-app.listen(5010, () => {
+const http = require("http");
+const server = http.createServer(app);
+server.listen(5010, () => {
   console.log("Server is running");
 });
