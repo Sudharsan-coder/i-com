@@ -61,7 +61,7 @@ router.post("/login", async (req, res) => {
     );
     // console.log(accessToken);
     // res.cookie("a",accessToken+"");
-    res.status(200).send({ others, accessToken });
+    res.status(200).send({ ...others, accessToken });
   } catch (err) {
     res.status(500).send(err.message);
   }
