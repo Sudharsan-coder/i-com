@@ -48,15 +48,15 @@ router.delete("/delete",TokenVerify, async (req, res) => {
 
 //Find specific User and searching users
 router.get("/",async(req,res)=>{
-const username=req.query.username;
+const id=req.query.id;
 const search=req.query.search;
   try{
   if(search){
     const Search=await User.find({ userName: { $regex: search, $options: "i" } });
     res.status(200).json(Search);
   }
-  else if(username){
-    const userdetails=await User.findOne({userName:username});
+  else if(id){
+    const userdetails=await User.findById(id);
     const hashedPassword = CryptoJS.AES.decrypt(
         userdetails.password,
         process.env.PASS_SEC
