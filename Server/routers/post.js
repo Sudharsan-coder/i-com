@@ -181,9 +181,9 @@ router.post("/:postId/comment", TokenVerify, async (req, res) => {
     );
 
     res.status(201).json(post);
-  } catch (error) {
-    console.error("Error adding comment:", error);
-    res.status(500).json({ error: "Error adding comment" });
+  } catch (err) {
+    // console.error("Error adding comment:", error);
+    res.json(err);
   }
 });
 
