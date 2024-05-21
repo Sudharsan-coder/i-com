@@ -6,13 +6,13 @@ const User_detail = (props) => {
 const navigate=useNavigate();
 // const { createdAt } = props;
 // const relativeTime = formatDistanceToNow(new Date(createdAt), { addSuffix: true });
-console.log(props);
+// console.log(props);
   return (
     <Container>
       <div className="frame">
-        <Link to="/profile"><img src={props.profilePicUrl} alt="pic" /></Link>
+        <Link to="/profile"><img src={props.user.profilePicUrl} alt="pic" /></Link>
       <div className="frame_content">
-      <div className="user_name" onClick={()=>{navigate(`/profile/${props.userName}`)}}>{props.userName}</div>
+      <div className="user_name" onClick={()=>{navigate(`/profile/${props.userName}`)}}>{props.user.userName}</div>
         {/* <div className="date">{relativeTime}</div> */}
         </div>
       </div>

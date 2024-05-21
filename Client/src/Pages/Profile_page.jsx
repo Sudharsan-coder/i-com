@@ -11,15 +11,15 @@ import LoadingSkeleton from "../Components/Loading/LoadingSkeleton.jsx";
 import MainpageLoading from "../Components/Loading/MainpageLoading.jsx";
 const Profile_page = () => {
   const params = useParams();
-  const username = params.username;
+  const id = params.id;
   const [profiledetails, setProfileDetails] = useState(null);
-  console.log(username);
+  console.log(id);
 
   const [Loading1, setLoading1] = useState(true);
   const [Loading2, setLoading2] = useState(true);
   useEffect(() => {
     axios
-      .get(`http://localhost:5010/user?username=${username}`)
+      .get(`https://icom-okob.onrender.com/user?id=${id}`)
       .then((res) => {
         setProfileDetails(res.data);
         console.log(res.data);
@@ -28,12 +28,12 @@ const Profile_page = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [username]);
+  }, [id]);
 
   const [userpost, setuserpost] = useState([]);
   useEffect(() => {
     axios
-      .get(`http://localhost:5010/post/UserPostFind?username=${username}`)
+      .get(`https://icom-okob.onrender.com/post/user/${id}/posts`)
       .then((res) => {
         setuserpost(res.data);
         setLoading2(false);
@@ -41,7 +41,7 @@ const Profile_page = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [username]);
+  }, [id]);
   console.log(userpost);
   // console.log(profiledetails.userName);
   return (

@@ -13,7 +13,7 @@ const Post_page_display = () => {
   const [Loading,setLoading]=useState(true)
   useEffect(() => {
     axios
-      .get(`http://localhost:5010/post?postid=${postid}`)
+      .get(`https://icom-okob.onrender.com/post/${postid}`)
       .then((res) => {
         setPostDetails(res.data);
         setLoading(false)
@@ -21,7 +21,7 @@ const Post_page_display = () => {
       .catch((err) => {
         console.log(err);
       });
-  });
+  },[postid]);
   // console.log(postdetails);
   return (
     <Container>

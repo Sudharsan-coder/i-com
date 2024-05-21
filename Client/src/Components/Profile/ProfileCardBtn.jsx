@@ -13,10 +13,10 @@ const ProfileCardBtn = () => {
   const navigator = useNavigate();
   const [dis, setdis] = useState(false);
   const auth = useAuth();
-  const [showModel, setShowModel] = useState(true);
+  // const [showModel, setShowModel] = useState(true);
   return (
     <>
-      {showModel && (
+      {auth.showModel && (
         <Modal
           opened={opened}
           onClose={close}
@@ -24,9 +24,9 @@ const ProfileCardBtn = () => {
           centered
         >
           {dis ? (
-            <Login close={setShowModel} />
+            <Login close={auth.setShowModel} />
           ) : (
-            <Register close={setShowModel} />
+            <Register close={auth.setShowModel} />
           )}
           <Navbtn onClick={() => setdis((prev) => (prev ? false : true))}>
             {dis ? (
@@ -39,10 +39,10 @@ const ProfileCardBtn = () => {
       )}
       
       <Group position='center'>
-        {!auth.user.username ? (
+        {Object.keys(auth.user).length === 0 ? (
           <Button
             onClick={() => {
-              setShowModel(true);
+              auth.setShowModel(true);
               open();
             }}
             radius={"xl"}
@@ -55,7 +55,7 @@ const ProfileCardBtn = () => {
             <Button
               variant="light"
               onClick={() => {
-                navigator(`/profile/${auth.user.username}`)
+                navigator(`/profile/${auth.user._id}`)
               }}
             >
               View Full Profile

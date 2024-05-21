@@ -15,10 +15,11 @@ const Log_in_button = () => {
   const [dis, setdis] = useState(false);
   const auth = useAuth();
   const [show_post_box, setShow_post_box] = useState(true);
-  const [showModel, setShowModel] = useState(true);
+  // const [showModel, setShowModel] = useState(true);
+  
   return (
     <>
-      {showModel && (
+      {auth.showModel && (
         <Modal
           opened={opened}
           onClose={close}
@@ -26,9 +27,9 @@ const Log_in_button = () => {
           centered
         >
           {dis ? (
-            <Login close={setShowModel} />
+            <Login close={auth.setShowModel} />
           ) : (
-            <Register close={setShowModel} />
+            <Register close={auth.setShowModel} />
           )}
           <Navbtn onClick={() => setdis((prev) => (prev ? false : true))}>
             {dis ? (
@@ -53,10 +54,11 @@ const Log_in_button = () => {
       )}
       
       <Group position='center'>
-        {!auth.user.username ? (
+      {/* {console.log(auth.user)} */}
+        {Object.keys(auth.user).length === 0 ? (
           <Button
             onClick={() => {
-              setShowModel(true);
+              auth.setShowModel(true);
               open();
             }}
             radius={"xl"}

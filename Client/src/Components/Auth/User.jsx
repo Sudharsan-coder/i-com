@@ -63,7 +63,7 @@ const User = () => {
 
       <Menu.Dropdown>
         <Menu.Label >@{auth.user.username}</Menu.Label>
-        <Menu.Item icon={<IconUser size={14} /> } onClick={()=>{navigate(`/profile/${auth.user.username}`)}}>Profile</Menu.Item>
+        <Menu.Item icon={<IconUser size={14} /> } onClick={()=>{navigate(`/profile/${auth.user._id}`)}}>Profile</Menu.Item>
         <Menu.Item icon={<IconUserEdit size={14} /> } onClick={()=>{navigate("/editprofile")}}>Edit Profile</Menu.Item>
         <Menu.Item icon={<IconMessageCircle size={14} />}>Messages</Menu.Item>
         <Menu.Item icon={<IconLogout2 size={14} /> } onClick={()=>{auth.logout()}}>Logout</Menu.Item>
