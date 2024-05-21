@@ -119,25 +119,27 @@ router.get("/followingPost", TokenVerify, async (req, res) => {
   }
 });
 
-// Get Particular Post Endpoint
+//Get Particular Post Endpoint
 router.get("/:postid", async (req, res) => {
   const postid = req.params.postid;
   try {
-    const postdetails = await Post.findById(postid);
+    const postdetails = await Post.findById(postid)
+    .populate("user", "userName profilePicUrl");
     res.status(200).send(postdetails);
   } catch (err) {}
 });
 
-// Get TOP 10 Category
-router.get("/topCategory", async(req,res)=> {
+//Get Top 10 Category
+router.get('/topCategory', async (req, res) => {
   try {
-    const categories = await Post.aggregate([
-      { $unwind: "$tag" }, // Deconstruct the tag array
-      { $group: { _id: "$tag", total_likes: { $sum: "$likes" } } },
-      { $sort: { total_likes: -1 } },
-      { $limit: 10 }
-    ]);
-    res.status(200).json(categories);
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+
+    const posts = await Post.find({
+      createdAt: { $gte: last7Days }
+    });
+
+    res.status(200).json(posts);
   } catch (err) {
     res.status(500).send(err);
   }
