@@ -28,7 +28,7 @@ router.put("/updateProfile",TokenVerify, async (req, res) => {
   try {
     const updataedUser = await User.findByIdAndUpdate(req.user._id, {
       $set: req.body,
-    });
+    },{upsert: true});
     const user =await User.find({_id:req.user._id})
     res.status(200).json(user);
   } catch (err) {
