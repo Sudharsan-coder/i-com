@@ -6,27 +6,25 @@ import { useAuth } from "../context/auth";
 import MainpageLoading from "../Components/Loading/MainpageLoading";
 import ProfileCard from "../Components/Profile/ProfileCard";
 import TopRecentTag from "../Components/Post/TopRecentTag";
-import InfiniteScroll from "react-infinite-scroll-component";
 
 const Main_page = () => {
-  const [res,setRes] = useState({totalpage: 1, post:[]});
-  const [totalpage, setTotalPage] = useState(1);
-  const [page, setPage] = useState(1);
-  const [post, setPost] = useState([]);
-  const [hasMore, sethasMore] = useState(true);
+
   const [Loading, setLoading] = useState(true);
+  const auth = useAuth()
 
   useEffect(() => {
+    console.log(auth.post);
+    if(Object.entries(auth.post).length !== 0){
+      setLoading(false);
+      return;
+    } 
     console.log("API CALLING")
-    console.log(page)
-    if (page <= totalpage) {
       axios
         .get(
-          `http://localhost:5010/post/AllPost/657dcf8009c183a1147db831?page=${page}&pageSize=1`
+          `https://icom-okob.onrender.com/post`
         )
         .then((res) => {
-          setTotalPage(res.data.totalPages);
-          setPost((prevPost) => [...prevPost, ...res.data.post]);
+          auth.setPost(res.data);
           setLoading(false);
           console.log(res.data);
           
@@ -34,33 +32,16 @@ const Main_page = () => {
         .catch((err) => {
           console.log(err);
         });
-    } else {
-      console.log("over")
-      sethasMore(false);
-    }
-  }, [page]);
-  console.log( totalpage);
+  }, []);
+  // console.log( totalpage);
 // console.log(post)
   return (    <>
       <Container>
-        <ProfileCard />
+        {/* <ProfileCard /> */}
         {Loading ? (
           <MainpageLoading />
-        ) : post.length != 0 ? (
-          <InfiniteScroll
-            dataLength={post.length}
-            next={() => {
-              setPage((prev) => prev + 1);
-              console.log(page)
-            }}
-            hasMore={hasMore}
-            loader={<h1>Loading....</h1>}
-            
-          >
-            <Main_post Post={post} />
-
-            {/* <h1>{post}</h1> */}
-          </InfiniteScroll>
+        ) : Object.entries(auth.post).length!==0? (
+            <Main_post Post={auth.post} />
         ) : (
           <h1>No data</h1>
         )}

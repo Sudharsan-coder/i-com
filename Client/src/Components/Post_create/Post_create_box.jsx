@@ -13,15 +13,13 @@ const Post_create_box = ({ close }) => {
   const [visible, toggle ] = useState(false);
 
   const [postUpload, setPostUpload] = useState({
-    userName: auth.user.username,
     title: "",
     content: "",
-    tag: [],
+    tags: [],
     bannerPic:"",
-    profilePicUrl: auth.user.profile,
   });
 
-  const { tag, ...others } = postUpload;
+  const { tags, ...others } = postUpload;
 
   // console.log(tag)
   
@@ -50,7 +48,12 @@ const Post_create_box = ({ close }) => {
     e.preventDefault();
     toggle(true);
     axios
-      .post("http://localhost:5010/post/", postUpload)
+      .post("https://icom-okob.onrender.com/post/create", postUpload,{
+          headers: {
+            token: `Bearer ${auth.user.accessToken}`,
+          },
+        
+      })
       .then((res) => {
         console.log(res);
         close(false);
@@ -117,7 +120,7 @@ const Post_create_box = ({ close }) => {
           rightSectionWidth={1}
           maxDropdownHeight={160}
           onChange={(value) => {
-            setPostUpload({ ...postUpload, tag: value });
+            setPostUpload({ ...postUpload, tags: value });
           }}
         />
         <label>Description</label>

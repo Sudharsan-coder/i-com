@@ -22,7 +22,13 @@ const User = () => {
             autoClose: false,
             withCloseButton: false,
           });
-          axios.delete(`http://localhost:5010/user?username=${auth.user.username}`)
+          axios.delete(`http://localhost:5010/user/delete`,
+          {
+            headers: {
+              token: `Bearer ${auth.user.accessToken}`,
+            },
+          }
+          )
           .then(()=>{
             notifications.update({
               id: 'load-data',
@@ -58,11 +64,11 @@ const User = () => {
   return (
     <Menus shadow="md" width={200}>
       <Menu.Target>
-      <Avatar src={auth.user.profile} alt={auth.user.username}  />
+      <Avatar src={auth.user.profile} alt={auth.user.userName}  />
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Label >@{auth.user.username}</Menu.Label>
+        <Menu.Label >@{auth.user.userName}</Menu.Label>
         <Menu.Item icon={<IconUser size={14} /> } onClick={()=>{navigate(`/profile/${auth.user._id}`)}}>Profile</Menu.Item>
         <Menu.Item icon={<IconUserEdit size={14} /> } onClick={()=>{navigate("/editprofile")}}>Edit Profile</Menu.Item>
         <Menu.Item icon={<IconMessageCircle size={14} />}>Messages</Menu.Item>

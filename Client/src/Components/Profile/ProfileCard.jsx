@@ -11,7 +11,7 @@ const ProfileCard = () => {
 
   return (
     <Container>
-      {auth.user ? (
+      {auth.user.userName ? (
         <Card
           shadow='sm'
           style={{
@@ -44,23 +44,23 @@ const ProfileCard = () => {
             orderMd={2}
             style={{ marginBottom: 5 }}
           >
-            {auth.user.username ? auth.user.firstname + " " + auth.user.lastname : ""}
+            {auth.user.userName ? auth.user.firstName + " " + auth.user.lastName : ""}
           </Title>
           <Text
             size='sm'
             style={{ color: "gray", marginBottom: 10 }}
           >
-            {auth.user.username? (`@${auth.user.username}`) : ""}
+            {auth.user.userName? (`@${auth.user.userName}`) : ""}
           </Text>
-          {/* <Button
+          <Button
             variant='light'
-            onClick={() => { auth.user.username ?
-              navigate(`/profile/${auth.user.username}`):navigate();
+            onClick={() => { auth.user.userName ?
+              navigate(`/profile/${auth.user._id}`):navigate();
             }}
           >
             View full Profile
-          </Button> */}
-          <ProfileCardBtn/>
+          </Button>
+          {/* <ProfileCardBtn/> */}
         </Card>
       ) : (
         <Card

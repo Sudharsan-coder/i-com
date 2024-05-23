@@ -37,7 +37,7 @@ const Register = ({ close }) => {
     toggle(true);
     e.preventDefault();
     axios
-      .post("http://localhost:5010/auth/register", reg)
+      .post("https://icom-okob.onrender.com/auth/register", reg)
       .then((res) => {
         console.log(res);
         close(false);

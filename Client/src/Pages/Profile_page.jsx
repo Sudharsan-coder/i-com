@@ -54,10 +54,9 @@ const Profile_page = () => {
       )}
 
       <Content>
-        {profiledetails && userpost && (
+        {profiledetails && (
           <Counter
-            Post={profiledetails}
-            len={userpost.length}
+            userdetails={profiledetails}
           />
         )}
         {Loading2 ? (

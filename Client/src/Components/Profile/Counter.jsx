@@ -3,12 +3,12 @@ import { styled } from 'styled-components'
 
 const Counter = (props) => {
 console.log(props);
-const postCount = props.Post.posts
+const user = props.userdetails
   return (
     <Container>
-      <div>{props.Post.followersCount} Followers</div>
-      <div>{props.Post.followingsCount} Following</div>
-      <div>{postCount.length} Post Published</div>
+      <div>{user.followers.length} Followers</div>
+      <div>{user.followings.length} Following</div>
+      <div>{user.posts.length} Post Published</div>
       
     </Container>
   )

@@ -22,12 +22,26 @@ const Post_page_display = () => {
         console.log(err);
       });
   },[postid]);
+  
+   const [commentArray, setCommentArray] = useState(null);
+  useEffect(() => {
+    axios
+      .get(`https://icom-okob.onrender.com/post/${postid}/comments`)
+      .then((res) => {
+      console.log(res.data.comments);
+        setCommentArray(res.data.comments);
+        // setLoading(false)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },[postid]);
   // console.log(postdetails);
   return (
     <Container>
     <Like_pallet {...postdetails}/>
      {Loading?<PostdisplayLoading/> : postdetails &&
-      <Post {...postdetails}/>}
+      <Post post={postdetails} commentArray = {commentArray}/>}
     </Container>
   )
 }
