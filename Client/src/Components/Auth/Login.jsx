@@ -16,7 +16,7 @@ const Login = ({ close }) => {
   toggle(true);
     e.preventDefault();
     axios
-      .post("https://icom-okob.onrender.com/auth/login", log)
+      .post("http://localhost:5010/auth/login", log)
       .then((res) => {
         console.log(res.data);
         auth.login(res.data);

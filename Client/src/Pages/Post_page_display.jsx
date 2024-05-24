@@ -17,6 +17,7 @@ const Post_page_display = () => {
       .then((res) => {
         setPostDetails(res.data);
         setLoading(false)
+        console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -36,10 +37,10 @@ const Post_page_display = () => {
         console.log(err);
       });
   },[postid]);
-  // console.log(postdetails);
+  console.log(postdetails);
   return (
     <Container>
-    <Like_pallet {...postdetails}/>
+    {!Loading && <Like_pallet {...postdetails}/>}
      {Loading?<PostdisplayLoading/> : postdetails &&
       <Post post={postdetails} commentArray = {commentArray}/>}
     </Container>

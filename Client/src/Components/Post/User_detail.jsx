@@ -6,7 +6,7 @@ const User_detail = (props) => {
 const navigate=useNavigate();
 const { createdAt } = props;
 const relativeTime = formatDistanceToNow(new Date(createdAt), { addSuffix: true });
-console.log(props);
+// console.log(props);
   return (
     <Container>
       <div className="frame">
