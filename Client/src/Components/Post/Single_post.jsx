@@ -26,6 +26,7 @@ const Container = styled.div`
   background: white;
   height: fit-content;
   border-radius: 15px;
+  margin-bottom: 20px;
 `;
 
 const Block = styled.div`

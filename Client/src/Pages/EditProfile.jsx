@@ -4,37 +4,39 @@ import {
   Input,
   Loader,
   MultiSelect,
-  PasswordInput,
   Textarea,
   Title,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { notifications } from "@mantine/notifications";
-import {
-  IconAlertCircleFilled,
-  IconDiscountCheckFilled,
-} from "@tabler/icons-react";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
-import { useAuth } from "../context/auth";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const EditProfile = () => {
-  const [profiledetails, setProfileDetails] = useState(null);
-  const auth = useAuth();
+  const {user, isProfileUpdating,isAuth} = useSelector((state)=>state.auth)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [profiledetails, setProfileDetails] = useState({
+    firstName: "",
+    lastName: "",
+    userName: "",
+    emailId: "",
+    userBio: "",
+    location: "",
+    DOB: "",
+    skills: [],
+    profilePicUrl: "",
+  });
 
   useEffect(() => {
-    axios
-      .get(`https://icom-okob.onrender.com/user?id=${auth.user._id}`)
-      .then((res) => {
-        setProfileDetails(res.data);
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-        setProfileDetails(null);
-      });
-  }, [auth.user._id]);
+  // console.log("hello");
+  
+    if(!isAuth)
+      navigate('/sign_in');
+    setProfileDetails(user)
+  }, [user._id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,60 +62,11 @@ const EditProfile = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    notifications.show({
-      id: "load-data",
-      loading: true,
-      title: "Loading your data",
-      message: "Data will be loaded in 3 seconds, you cannot close this yet",
-      autoClose: false,
-      withCloseButton: false,
-    });
-    console.log(profiledetails);
-    axios
-      .put(
-        `https://icom-okob.onrender.com/user/updateProfile`,
-        profiledetails,
-        {
-          headers: {
-            token: `Bearer ${auth.user.accessToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        console.log(res.data[0].profilePicUrl);
-        notifications.update({
-          id: "load-data",
-          title: "Updated Successfully",
-          message: "Your profile is updated",
-          color: "green",
-          icon: (
-            <IconDiscountCheckFilled
-              color='green'
-              size='3rem'
-            />
-          ),
-        });
-        auth.profilePic(res.data[0].profilePicUrl);
-      })
-      .catch((err) => {
-        console.log(err);
-        notifications.show({
-          title: "Something went wrong",
-          message: "Your profile is not updated",
-          color: "red",
-          icon: (
-            <IconAlertCircleFilled
-              color='red'
-              size='3rem'
-            />
-          ),
-        });
-      });
+    dispatch({type:"UPDATE_PROFILE",data:profiledetails})
   };
 
   return (
     <Container>
-      {profiledetails ? (
         <Form onSubmit={handleSubmit}>
           <Boxs
             bg={"white"}
@@ -154,6 +107,7 @@ const EditProfile = () => {
               <Input
                 placeholder='Username'
                 radius='md'
+                name = "UserName"
                 value={profiledetails.userName}
                 disabled
               />
@@ -165,18 +119,6 @@ const EditProfile = () => {
                 value={profiledetails.emailId}
                 onChange={handleChange}
                 name='emailId'
-              />
-            </Input.Wrapper>
-            <Input.Wrapper
-              label='Password'
-              withAsterisk
-            >
-              <PasswordInput
-                placeholder='Create new password'
-                radius='md'
-                value={profiledetails.hashedPassword}
-                onChange={handleChange}
-                name='hashedPassword'
               />
             </Input.Wrapper>
             <Input.Wrapper label='Profile Image'>
@@ -225,14 +167,16 @@ const EditProfile = () => {
               onChange={handleChange}
             />
 
-            <DateInput
-              valueFormat='YYYY MMM DD'
-              label='Date Of Birth'
-              placeholder='DOB'
-              value={profiledetails.DOB}
-              name='DOB'
-              onChange={setProfileDetails}
-            />
+          <DateInput
+            valueFormat='YYYY MMM DD'
+            label='Date Of Birth'
+            placeholder='DOB'
+            value={profiledetails.DOB ? new Date(profiledetails.DOB) : null}
+            name='DOB'
+            onChange={(val) => {
+              setProfileDetails({ ...profiledetails, DOB: val?.toDateString()||"" });
+            }}
+          />
 
             <MultiSelect
               label='Skills'
@@ -240,6 +184,7 @@ const EditProfile = () => {
               placeholder='Add Skills'
               searchable
               creatable
+              name="skills"
               getCreateLabel={(query) => `+ Create ${query}`}
               onCreate={(query) => {
                 const item = { value: query, label: query };
@@ -264,9 +209,8 @@ const EditProfile = () => {
             />
           </Boxs>
         </Form>
-      ) : (
-        <Loading variant='bars' />
-      )}
+      {/* {isProfileUpdating ? ( <Loading variant='bars' />): (
+      )} */}
     </Container>
   );
 };

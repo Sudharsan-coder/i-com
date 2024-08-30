@@ -1,55 +1,47 @@
 import { useState } from "react";
 import { styled } from "styled-components";
 import Single_comment from "./Single_comment";
-import { useAuth } from "../../context/auth";
 import { IconSend } from "@tabler/icons-react";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Comments = (props) => {
-  const auth = useAuth();
-  // console.log(props);
-  // console.log(auth.user._id);
-  const [commentdesc, setCommentdesc] = useState({
-    user: {
-      _id: `${auth.user._id}`,
-      profilePicUrl: `${auth.user.profilePicUrl}`,
-      userName: `${auth.user.userName}`,
-    },
-    text: "",
-  });
-  // console.log(props.postid);
-  const commentArray = props.commentArray;
-  // console.log(commentArray);
+  const commentArray = [...props.commentArray].reverse();   
+  const { user, isAuth } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [commentText, setCommentText] = useState(""); // Simplified state for the comment text
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // if(commentdesc.user===undefined)
-    commentdesc.user._id = auth.user._id;
-    axios
-      .post(
-        `https://icom-okob.onrender.com/post/${props.postid}/comment`,
-        { user: commentdesc.user._id, text: commentdesc.text },
-        {
-          headers: {
-            token: `Bearer ${auth.user.accessToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        console.log(res);
-        commentdesc.text = "";
-      })
-      .catch((error) => {
-        console.log("Error status:", error.response.status);
-        if(error.response.status == 403)
-        {
-              auth.setShowModel(true);
-              auth.modelOC.open();
-        }
-        // auth.setShowModel(true);
-        // console.log(auth.showModel);
-      });
+
+    if (!isAuth) {
+      navigate("/sign_in");
+      return;
+    }
+
+    // Prepare comment object
+    const commentdesc = {
+      user: {
+        _id: user._id,
+        profilePicUrl: user.profilePicUrl,
+        userName: user.userName,
+      },
+      text: commentText,
+    };
+
+    // Dispatch the comment action
+    dispatch({
+      type: "COMMENT_POST",
+      data: { commentdesc, postId: props.postid },
+    });
+
+    // Clear the comment text after submission
+    setCommentText("");
   };
+
   return (
     <Container>
       <div
@@ -60,19 +52,13 @@ const Comments = (props) => {
       </div>
       <Comment onSubmit={handleSubmit}>
         <img
-          src={
-            auth.user.profilePicUrl
-              ? auth.user.profilePicUrl
-              : "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
-          }
+          src={user.profilePicUrl}
           alt='me'
         />
-        <textarea
-          placeholder='Add to the discussion'
-          value={commentdesc.comments}
-          onChange={(e) => {
-            setCommentdesc({ ...commentdesc, text: e.target.value });
-          }}
+         <textarea
+          placeholder="Add to the discussion"
+          value={commentText} // Bind to the simplified state
+          onChange={(e) => setCommentText(e.target.value)} // Update the text state
         />
         <button type='submit'>
           <IconSend />

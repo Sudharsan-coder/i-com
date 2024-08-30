@@ -47,32 +47,51 @@ router.delete("/delete",TokenVerify, async (req, res) => {
 });
 
 //Find specific User and searching users
-router.get("/",async(req,res)=>{
-const id=req.query.id;
-const search=req.query.search;
-  try{
-  if(search){
-    const Search=await User.find({ userName: { $regex: search, $options: "i" } });
-    res.status(200).json(Search);
-  }
-  else if(id){
-    const userdetails=await User.findById(id);
-    const hashedPassword = CryptoJS.AES.decrypt(
-        userdetails.password,
+router.get("/", async (req, res) => {
+  const id = req.query.id;
+  const search = req.query.search;
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
+
+  try {
+  let totalCount,totalPages,users
+    if (search) {
+      totalCount = await User.countDocuments({
+        userName: { $regex: search, $options: "i" },
+      });
+      totalPages = Math.ceil(totalCount / pageSize);
+      users = await User.find({
+        userName: { $regex: search, $options: "i" },
+      })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize);
+
+      res.status(200).json({ totalCount, totalPages,page,pageSize, users });
+    } else if (id) {
+      const userDetails = await User.findById(id);
+      if (!userDetails) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const hashedPassword = CryptoJS.AES.decrypt(
+        userDetails.password,
         process.env.PASS_SEC
       ).toString(CryptoJS.enc.Utf8);
-    const {password,...others}=userdetails._doc
-    res.status(200).json({...others,hashedPassword});
+      
+      const { password, ...otherDetails } = userDetails._doc;
+      res.status(200).json({ ...otherDetails, hashedPassword });
+    } else {
+      totalCount = await User.countDocuments();
+      totalPages = Math.ceil(totalCount / pageSize);
+      users = await User.find()
+      .skip((page - 1) * pageSize)
+        .limit(pageSize);;
+      res.status(200).json({ totalCount, totalPages,page,pageSize, users });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  else{
-      const user=await User.find();
-      res.status(200).json(user);
-  }
-  }
-  catch(err){
-    res.status(500).json(err);
-  }
-})
+});
 
 //Get all Users
 router.get("/all",async(req,res)=>{

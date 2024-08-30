@@ -1,90 +1,58 @@
 import { styled } from "styled-components";
 import { AiFillHeart } from "react-icons/ai";
 import { FaRegCommentDots } from "react-icons/fa";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { IconHeartPlus } from "@tabler/icons-react";
-import { useAuth } from "../../context/auth";
-
+import { useDispatch, useSelector } from "react-redux";
 const Likes = (props) => {
-  const auth = useAuth();
-  const [Liked, setLiked] = useState(false);
-  // console.log(props);
+  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [Liked, setLiked] = useState(
+    props.likes.includes(user?._id) // Check if user ID is in the likes array
+  );
   
+
+  useEffect(() => {
+    // Update Liked state if the likes prop changes
+    setLiked(props.likes.includes(user?._id));
+  }, [props.likes, user?._id]);
+
+  const handleClick = () => {
+    console.log(Liked);
+    if (!user?._id) navigate("/sign_in");
+    else{
+      setLiked(!Liked);
+      if (!Liked) {
+        dispatch({
+          type: "LIKE_POST",
+          data: { userId: user._id, postId: props._id },
+        });
+      } else {
+        dispatch({
+          type: "UNLIKE_POST",
+          data: { userId: user._id, postId: props._id },
+        });
+      }
+    } 
+  };
   return (
     <Container>
       <div className='like_container'>
         <div
           className='like'
-          onClick={() => {
-            setLiked(!Liked);
-            console.log(Liked);
-            if (!Liked) {
-              if(auth.user.userName) {
-
-                auth.post.posts.map((data) => {
-                  if(data._id === props._id){
-  
-                    data.likes.push(auth.user._id);
-                    console.log(data);
-                  }
-                })
-              }
-              axios
-              .post(`https://icom-okob.onrender.com/post/like/${props._id}`,{},
-                {
-                  headers: {
-                    token: `Bearer ${auth.user.accessToken}`,
-                  },
-                })
-                .then(() => {
-                  console.log("success");
-                })
-                .catch((err) => {
-                  console.log(err);
-                  if(err.response.status == 403)
-                    {
-                          auth.setShowModel(true);
-                          auth.modelOC.open();
-                    }
-                });
-            } else {
-              auth.post.posts = auth.post.posts.map((data) => {
-                if (data._id === props._id) {
-                  data.likes = data.likes.filter((id) => id !== auth.user._id);
-                  console.log(data);
-                }
-                return data;
-              });
-              axios
-                .post(`https://icom-okob.onrender.com/post/unlike/${props._id}`,{},{
-                  headers: {
-                    token: `Bearer ${auth.user.accessToken}`,
-                  },
-                })
-                .then(() => {
-                  console.log("success");
-                })
-                .catch((err) => {
-                  console.log(err);
-                  if(err.response.status == 403)
-                    {
-                          auth.setShowModel(true);
-                          auth.modelOC.open();
-                    }
-                });
-            }
-          }}
+          onClick={handleClick}
         >
           {Liked ? (
             <AiFillHeart
               size='20px'
               color='red'
-            /> 
+            />
           ) : (
             <IconHeartPlus size='20px' />
-          )}&nbsp;
+          )}
+          &nbsp;
           <div className='num'>
             {props.likes.length > 10 ? "10+" : props.likes.length}
           </div>
@@ -97,11 +65,10 @@ const Likes = (props) => {
             <FaRegCommentDots
               size='17px'
               color='black'
-            /> 
-          </Link> &nbsp;
-            <div className="num">
-              {props.comments.length}
-            </div>
+            />
+          </Link>{" "}
+          &nbsp;
+          <div className='num'>{props.comments.length}</div>
         </div>
       </div>
     </Container>
@@ -124,11 +91,10 @@ const Container = styled.div`
       align-items: center;
       transition: all 5s ease;
     }
-    .comment{
-     text-align: center;
-     display: flex;
+    .comment {
+      text-align: center;
+      display: flex;
       align-items: center;
-     }
     }
   }
 `;
