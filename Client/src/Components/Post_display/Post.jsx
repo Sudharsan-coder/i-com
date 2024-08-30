@@ -7,14 +7,14 @@ const Post = (postdetails) => {
   
   console.log(postdetails);
   return (
-    <Container banner={postdetails.bannerPic}>
+    <Container banner={postdetails.post.bannerPic}>
       <div className="banner"></div>
       
         <div className="main">
-          <User_det {...postdetails} />
-          <Heading {...postdetails} />
-          <Content {...postdetails} />
-          <Comment {...postdetails} />
+          <User_det {...postdetails.post} />
+          <Heading {...postdetails.post} />
+          <Content {...postdetails.post} />
+          <Comment postid = {postdetails.post._id} commentArray = {postdetails.commentArray} />
         </div>
     
     </Container>

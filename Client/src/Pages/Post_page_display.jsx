@@ -13,21 +13,36 @@ const Post_page_display = () => {
   const [Loading,setLoading]=useState(true)
   useEffect(() => {
     axios
-      .get(`http://localhost:5010/post?postid=${postid}`)
+      .get(`https://icom-okob.onrender.com/post/${postid}`)
       .then((res) => {
         setPostDetails(res.data);
         setLoading(false)
+        console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
       });
-  });
-  // console.log(postdetails);
+  },[postid]);
+  
+   const [commentArray, setCommentArray] = useState(null);
+  useEffect(() => {
+    axios
+      .get(`https://icom-okob.onrender.com/post/${postid}/comments`)
+      .then((res) => {
+      console.log(res.data.comments);
+        setCommentArray(res.data.comments);
+        // setLoading(false)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },[postid]);
+  console.log(postdetails);
   return (
     <Container>
-    <Like_pallet {...postdetails}/>
+    {!Loading && <Like_pallet {...postdetails}/>}
      {Loading?<PostdisplayLoading/> : postdetails &&
-      <Post {...postdetails}/>}
+      <Post post={postdetails} commentArray = {commentArray}/>}
     </Container>
   )
 }

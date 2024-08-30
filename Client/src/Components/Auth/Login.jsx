@@ -10,7 +10,7 @@ import { AiFillExclamationCircle } from "react-icons/ai";
 
 const Login = ({ close }) => {
   const auth = useAuth();
-  const [log, setLog] = useState({ username: "", password: "" });
+  const [log, setLog] = useState({ emailid: "", password: "" });
   const [visible, toggle ] = useState(false);
   const handleSubmit = (e) => {
   toggle(true);
@@ -18,14 +18,8 @@ const Login = ({ close }) => {
     axios
       .post("http://localhost:5010/auth/login", log)
       .then((res) => {
-        console.log(res.data.others);
-        auth.login({
-          username: res.data.others.userName,
-          firstname: res.data.others.firstName,
-          lastname: res.data.others.lastName,
-          profile: res.data.others.profilePicUrl,
-          following:res.data.others.followings,
-        });
+        console.log(res.data);
+        auth.login(res.data);
         close(false);
       })
       .catch((err) => {
@@ -51,11 +45,11 @@ const Login = ({ close }) => {
       <Form onSubmit={handleSubmit}>
         <Input
           icon={<IconUserCircle />}
-          placeholder='Your UserName'
+          placeholder='Your Email ID'
           radius='md'
-          value={log.username}
+          value={log.emailid}
           onChange={(e) => {
-            setLog({ ...log, username: e.target.value });
+            setLog({ ...log, emailid: e.target.value });
           }}
         />
         <PasswordInput

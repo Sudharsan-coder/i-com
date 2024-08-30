@@ -21,7 +21,6 @@ export default Main_profile;
 const Conatiner = styled.div`
   background: white;
   grid-column: 2;
-  
   z-index: 2;
   margin-top: 10vh;
   border-radius: 10px;

@@ -2,7 +2,8 @@
 import { styled } from 'styled-components';
 import Single_post from "./Single_post.jsx"
 const Main_post = (props) => {
-const PostArray=props.Post;
+const PostArray=props.Post.posts;
+console.log(PostArray);
   return (
     <Container>
     {

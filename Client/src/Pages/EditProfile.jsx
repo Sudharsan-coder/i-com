@@ -10,7 +10,10 @@ import {
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
-import { IconAlertCircleFilled, IconDiscountCheckFilled } from "@tabler/icons-react";
+import {
+  IconAlertCircleFilled,
+  IconDiscountCheckFilled,
+} from "@tabler/icons-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
@@ -18,26 +21,25 @@ import { useAuth } from "../context/auth";
 
 const EditProfile = () => {
   const [profiledetails, setProfileDetails] = useState(null);
-  const auth=useAuth();
-  
-  
+  const auth = useAuth();
+
   useEffect(() => {
     axios
-      .get(`http://localhost:5010/user?username=${auth.user.username}`)
+      .get(`https://icom-okob.onrender.com/user?id=${auth.user._id}`)
       .then((res) => {
         setProfileDetails(res.data);
         console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
-        setProfileDetails(null)
+        setProfileDetails(null);
       });
-  }, [auth.user.username]);
+  }, [auth.user._id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfileDetails({ ...profiledetails, [name]: value });
-    console.log(profiledetails)
+    console.log(profiledetails);
   };
 
   const [data, setData] = useState([
@@ -59,21 +61,28 @@ const EditProfile = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     notifications.show({
-      id: 'load-data',
+      id: "load-data",
       loading: true,
-      title: 'Loading your data',
-      message: 'Data will be loaded in 3 seconds, you cannot close this yet',
+      title: "Loading your data",
+      message: "Data will be loaded in 3 seconds, you cannot close this yet",
       autoClose: false,
       withCloseButton: false,
     });
-    console.log(profiledetails._id)
+    console.log(profiledetails);
     axios
-      .put(`http://localhost:5010/user/${profiledetails._id}`,profiledetails)
+      .put(
+        `https://icom-okob.onrender.com/user/updateProfile`,
+        profiledetails,
+        {
+          headers: {
+            token: `Bearer ${auth.user.accessToken}`,
+          },
+        }
+      )
       .then((res) => {
-      
         console.log(res.data[0].profilePicUrl);
         notifications.update({
-          id: 'load-data',
+          id: "load-data",
           title: "Updated Successfully",
           message: "Your profile is updated",
           color: "green",
@@ -84,8 +93,7 @@ const EditProfile = () => {
             />
           ),
         });
-       auth.profilePic(res.data[0].profilePicUrl)
-     
+        auth.profilePic(res.data[0].profilePicUrl);
       })
       .catch((err) => {
         console.log(err);
@@ -107,158 +115,154 @@ const EditProfile = () => {
     <Container>
       {profiledetails ? (
         <Form onSubmit={handleSubmit}>
-        
-            <Boxs
-              bg={"white"}
-              p={30}
-              w={380}
+          <Boxs
+            bg={"white"}
+            p={30}
+            w={380}
+          >
+            <Title order={1}>User</Title>
+            <Name>
+              <Input.Wrapper
+                label='First Name'
+                withAsterisk
+              >
+                <Input
+                  placeholder='Your First Name'
+                  radius='md'
+                  value={profiledetails.firstName}
+                  onChange={handleChange}
+                  name='firstName'
+                />
+              </Input.Wrapper>
+              <Input.Wrapper
+                label='Last Name'
+                withAsterisk
+              >
+                <Input
+                  placeholder='Your Last Name'
+                  radius='md'
+                  value={profiledetails.lastName}
+                  onChange={handleChange}
+                  name='lastName'
+                />
+              </Input.Wrapper>
+            </Name>
+            <Input.Wrapper
+              label='Username'
+              withAsterisk
             >
-              <Title order={1}>User</Title>
-              <Name>
-                <Input.Wrapper
-                  label='First Name'
-                  withAsterisk
-                >
-                  <Input
-                    placeholder='Your First Name'
-                    radius='md'
-                    value={profiledetails.firstName}
-                    onChange={handleChange}
-                    name='firstName'
-                  />
-                </Input.Wrapper>
-                <Input.Wrapper
-                  label='Last Name'
-                  withAsterisk
-                >
-                  <Input
-                    placeholder='Your Last Name'
-                    radius='md'
-                    value={profiledetails.lastName}
-                    onChange={handleChange}
-                    name='lastName'
-                  />
-                </Input.Wrapper>
-              </Name>
-              <Input.Wrapper
-                label='Username'
-                withAsterisk
-              >
-                <Input
-                  placeholder='Username'
-                  radius='md'
-                  value={profiledetails.userName}
-                  disabled
-                />
-              </Input.Wrapper>
-              <Input.Wrapper
-                label='Email ID'
-              >
-                <Input
-                  placeholder='Email id'
-                  radius='md'
-                  value={profiledetails.emailId}
-                  onChange={handleChange}
-                  name='emailId'
-                />
-              </Input.Wrapper>
-              <Input.Wrapper
-                label='Password'
-                withAsterisk
-              >
-                <PasswordInput
-                  placeholder='Create new password'
-                  radius='md'
-                  value={profiledetails.hashedPassword}
-                  onChange={handleChange}
-                  name='hashedPassword'
-                />
-              </Input.Wrapper>
-              <Input.Wrapper label='Profile Image'>
-                <Profile>
-                  <Avatar
-                    src={profiledetails.profilePicUrl}
-                    alt="it's me"
-                  />
-                  <input
-                    type='file'
-                    id='images'
-                    accept='image/*'
-                    onChange={imagetobase64}
-                  />
-                </Profile>
-              </Input.Wrapper>
-            </Boxs>
-
-            <Boxs
-              bg={"white"}
-              p={30}
-              w={380}
-            >
-              <Title order={1}>Personal Information</Title>
-              <Input.Wrapper
-                label='Location'
-                withAsterisk
-              >
-                <Input
-                  placeholder='India, TamilNadu, Chennai'
-                  radius='md'
-                  value={profiledetails.location}
-                  onChange={handleChange}
-                  name='location'
-                />
-              </Input.Wrapper>
-
-              <Textarea
-                label='Bio'
-                placeholder='A short bio'
-                autosize
-                minRows={2}
-                maxRows={4}
-                name="userBio"
-                value={profiledetails.userBio}
+              <Input
+                placeholder='Username'
+                radius='md'
+                value={profiledetails.userName}
+                disabled
+              />
+            </Input.Wrapper>
+            <Input.Wrapper label='Email ID'>
+              <Input
+                placeholder='Email id'
+                radius='md'
+                value={profiledetails.emailId}
                 onChange={handleChange}
+                name='emailId'
               />
-
-              <DateInput
-                valueFormat='YYYY MMM DD'
-                label='Date Of Birth'
-                placeholder='DOB'
-                value={profiledetails.DOB}
-                name='DOB'
-                onChange={setProfileDetails}
-              />
-
-              <MultiSelect
-                label='Skills'
-                data={data}
-                placeholder='Add Skills'
-                searchable
-                creatable
-                getCreateLabel={(query) => `+ Create ${query}`}
-                onCreate={(query) => {
-                  const item = { value: query, label: query };
-                  setData((current) => [...current, item]);
-                  return item;
-                }}
-                onChange={(value) => {
-                  setProfileDetails({ ...profiledetails, skills: value });
-                }}
-              />
-            </Boxs>
-
-            <Boxs
-              bg={"white"}
-              p={30}
-              w={380}
-              mb={20}
+            </Input.Wrapper>
+            <Input.Wrapper
+              label='Password'
+              withAsterisk
             >
-              <SubmitBtn
-                type='submit'
-                value='Save Information'
+              <PasswordInput
+                placeholder='Create new password'
+                radius='md'
+                value={profiledetails.hashedPassword}
+                onChange={handleChange}
+                name='hashedPassword'
               />
-            </Boxs>
-         
+            </Input.Wrapper>
+            <Input.Wrapper label='Profile Image'>
+              <Profile>
+                <Avatar
+                  src={profiledetails.profilePicUrl}
+                  alt="it's me"
+                />
+                <input
+                  type='file'
+                  id='images'
+                  accept='image/*'
+                  onChange={imagetobase64}
+                />
+              </Profile>
+            </Input.Wrapper>
+          </Boxs>
+
+          <Boxs
+            bg={"white"}
+            p={30}
+            w={380}
+          >
+            <Title order={1}>Personal Information</Title>
+            <Input.Wrapper
+              label='Location'
+              withAsterisk
+            >
+              <Input
+                placeholder='India, TamilNadu, Chennai'
+                radius='md'
+                value={profiledetails.location}
+                onChange={handleChange}
+                name='location'
+              />
+            </Input.Wrapper>
+
+            <Textarea
+              label='Bio'
+              placeholder='A short bio'
+              autosize
+              minRows={2}
+              maxRows={4}
+              name='userBio'
+              value={profiledetails.userBio}
+              onChange={handleChange}
+            />
+
+            <DateInput
+              valueFormat='YYYY MMM DD'
+              label='Date Of Birth'
+              placeholder='DOB'
+              value={profiledetails.DOB}
+              name='DOB'
+              onChange={setProfileDetails}
+            />
+
+            <MultiSelect
+              label='Skills'
+              data={data}
+              placeholder='Add Skills'
+              searchable
+              creatable
+              getCreateLabel={(query) => `+ Create ${query}`}
+              onCreate={(query) => {
+                const item = { value: query, label: query };
+                setData((current) => [...current, item]);
+                return item;
+              }}
+              onChange={(value) => {
+                setProfileDetails({ ...profiledetails, skills: value });
+              }}
+            />
+          </Boxs>
+
+          <Boxs
+            bg={"white"}
+            p={30}
+            w={380}
+            mb={20}
+          >
+            <SubmitBtn
+              type='submit'
+              value='Save Information'
+            />
+          </Boxs>
         </Form>
       ) : (
         <Loading variant='bars' />

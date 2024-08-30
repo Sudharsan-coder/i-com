@@ -5,12 +5,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { IconHeartPlus } from "@tabler/icons-react";
+import { useAuth } from "../../context/auth";
 
 const Likes = (props) => {
+  const auth = useAuth();
   const [Liked, setLiked] = useState(false);
   // console.log(props);
   
-  const [like,setLike]=useState(props.likeCount);
   return (
     <Container>
       <div className='like_container'>
@@ -20,24 +21,58 @@ const Likes = (props) => {
             setLiked(!Liked);
             console.log(Liked);
             if (!Liked) {
-              setLike(like+1);
+              if(auth.user.userName) {
+
+                auth.post.posts.map((data) => {
+                  if(data._id === props._id){
+  
+                    data.likes.push(auth.user._id);
+                    console.log(data);
+                  }
+                })
+              }
               axios
-                .put(`http://localhost:5010/post/liked?postid=${props._id}`)
+              .post(`https://icom-okob.onrender.com/post/like/${props._id}`,{},
+                {
+                  headers: {
+                    token: `Bearer ${auth.user.accessToken}`,
+                  },
+                })
                 .then(() => {
                   console.log("success");
                 })
                 .catch((err) => {
                   console.log(err);
+                  if(err.response.status == 403)
+                    {
+                          auth.setShowModel(true);
+                          auth.modelOC.open();
+                    }
                 });
             } else {
-            setLike(like-1);
+              auth.post.posts = auth.post.posts.map((data) => {
+                if (data._id === props._id) {
+                  data.likes = data.likes.filter((id) => id !== auth.user._id);
+                  console.log(data);
+                }
+                return data;
+              });
               axios
-                .put(`http://localhost:5010/post/unliked?postid=${props._id}`)
+                .post(`https://icom-okob.onrender.com/post/unlike/${props._id}`,{},{
+                  headers: {
+                    token: `Bearer ${auth.user.accessToken}`,
+                  },
+                })
                 .then(() => {
                   console.log("success");
                 })
                 .catch((err) => {
                   console.log(err);
+                  if(err.response.status == 403)
+                    {
+                          auth.setShowModel(true);
+                          auth.modelOC.open();
+                    }
                 });
             }
           }}
@@ -51,7 +86,7 @@ const Likes = (props) => {
             <IconHeartPlus size='20px' />
           )}&nbsp;
           <div className='num'>
-            {like > 10 ? "10+" : like}
+            {props.likes.length > 10 ? "10+" : props.likes.length}
           </div>
         </div>
         <div
@@ -65,7 +100,7 @@ const Likes = (props) => {
             /> 
           </Link> &nbsp;
             <div className="num">
-              {props.commentCount}
+              {props.comments.length}
             </div>
         </div>
       </div>

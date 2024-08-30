@@ -1,4 +1,4 @@
-import { useState } from "react"; // Make sure to import React
+import { useState } from "react";
 import { styled } from "styled-components";
 import Single_comment from "./Single_comment";
 import { useAuth } from "../../context/auth";
@@ -7,28 +7,47 @@ import axios from "axios";
 
 const Comments = (props) => {
   const auth = useAuth();
-  const commentArray = [...props.comments];
-  // const a=[1,2,3,4,5];
-  // console.log(auth.user);
+  // console.log(props);
+  // console.log(auth.user._id);
   const [commentdesc, setCommentdesc] = useState({
-    username: `${auth.user.username}`,
-    comments: "",
-    profile: `${auth.user.profile}`,
+    user: {
+      _id: `${auth.user._id}`,
+      profilePicUrl: `${auth.user.profilePicUrl}`,
+      userName: `${auth.user.userName}`,
+    },
+    text: "",
   });
-  console.log(commentdesc);
+  // console.log(props.postid);
+  const commentArray = props.commentArray;
+  // console.log(commentArray);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    commentdesc.comment = "";
+    // if(commentdesc.user===undefined)
+    commentdesc.user._id = auth.user._id;
     axios
-      .put(
-        `http://localhost:5010/post/AddComment?postid=${props._id}`,
-        commentdesc
+      .post(
+        `https://icom-okob.onrender.com/post/${props.postid}/comment`,
+        { user: commentdesc.user._id, text: commentdesc.text },
+        {
+          headers: {
+            token: `Bearer ${auth.user.accessToken}`,
+          },
+        }
       )
       .then((res) => {
         console.log(res);
+        commentdesc.text = "";
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.log("Error status:", error.response.status);
+        if(error.response.status == 403)
+        {
+              auth.setShowModel(true);
+              auth.modelOC.open();
+        }
+        // auth.setShowModel(true);
+        // console.log(auth.showModel);
       });
   };
   return (
@@ -41,14 +60,18 @@ const Comments = (props) => {
       </div>
       <Comment onSubmit={handleSubmit}>
         <img
-          src={auth.user.profile? auth.user.profile:"https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"}
+          src={
+            auth.user.profilePicUrl
+              ? auth.user.profilePicUrl
+              : "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+          }
           alt='me'
         />
         <textarea
           placeholder='Add to the discussion'
           value={commentdesc.comments}
           onChange={(e) => {
-            setCommentdesc({ ...commentdesc, comments: e.target.value });
+            setCommentdesc({ ...commentdesc, text: e.target.value });
           }}
         />
         <button type='submit'>
@@ -56,7 +79,7 @@ const Comments = (props) => {
         </button>
       </Comment>
       {/* Use parentheses to wrap the map function body */}
-      {commentArray.reverse().map((data) => (
+      {commentArray && commentArray.map((data) => (
         <Single_comment
           key={data._id}
           {...data}
@@ -90,7 +113,7 @@ const Comment = styled.form`
     width: 90%;
     height: 100px;
     border-radius: 10px;
-    &:focus{
+    &:focus {
       border: 1px solid #1a89ea;
       outline: none;
     }

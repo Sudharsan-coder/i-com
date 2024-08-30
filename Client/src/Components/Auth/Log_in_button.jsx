@@ -9,36 +9,17 @@ import Post_create_box from "../Post_create/Post_create_box.jsx";
 import User from "./User";
 import { IconSquareRoundedPlus } from "@tabler/icons-react";
 const Log_in_button = () => {
-  const [opened, { open, close }] = useDisclosure(false);
   const [opened_post, post_obj] = useDisclosure(false);
   // const [show_post_create,setShow_post_create]=useState(true);
-  const [dis, setdis] = useState(false);
   const auth = useAuth();
   const [show_post_box, setShow_post_box] = useState(true);
-  const [showModel, setShowModel] = useState(true);
+  // const [opened, { open, close }] = useDisclosure(false);
+  // const [dis, setdis] = useState(false);
+  // const [showModel, setShowModel] = useState(true);
+  
   return (
     <>
-      {showModel && (
-        <Modal
-          opened={opened}
-          onClose={close}
-          title='Authentication'
-          centered
-        >
-          {dis ? (
-            <Login close={setShowModel} />
-          ) : (
-            <Register close={setShowModel} />
-          )}
-          <Navbtn onClick={() => setdis((prev) => (prev ? false : true))}>
-            {dis ? (
-              <label>Don&acute;t have an account? Register</label>
-            ) : (
-              <label>Have an account? Login</label>
-            )}
-          </Navbtn>
-        </Modal>
-      )}
+      
       
       {show_post_box && (
         <Modal
@@ -53,11 +34,12 @@ const Log_in_button = () => {
       )}
       
       <Group position='center'>
-        {!auth.user.username ? (
+      {/* {console.log(auth.user)} */}
+        {Object.keys(auth.user).length === 0 ? (
           <Button
             onClick={() => {
-              setShowModel(true);
-              open();
+              auth.setShowModel(true);
+              auth.modelOC.open();
             }}
             radius={"xl"}
             color='indigo'
@@ -85,13 +67,7 @@ const Log_in_button = () => {
 
 export default Log_in_button;
 
-const Navbtn = styled.button`
-  all: unset;
-  font-size: 12px;
-  &:hover {
-    text-decoration: underline blueviolet;
-  }
-`;
+
 
 const Log=styled.div`
   display: flex;

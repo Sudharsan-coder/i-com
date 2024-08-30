@@ -5,7 +5,7 @@ const Content = (props) => {
   return (
     <TypographyStylesProvider>
       <div dangerouslySetInnerHTML={{ __html: val }}>
-      </div>
+      </div>  
     </TypographyStylesProvider>
   )
 }

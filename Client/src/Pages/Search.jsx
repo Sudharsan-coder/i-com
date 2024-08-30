@@ -14,7 +14,7 @@ const Search = () => {
   const auth=useAuth();
   const [Loading,setLoading]=useState(true)
   useEffect(()=>{
-      axios.get(`http://localhost:5010/post/AllPost?search=${auth.search}`)
+      axios.get(`https://icom-okob.onrender.com/post?search=${auth.search}`)
       .then((res)=>{
           setPost(res.data);
           setLoading(false)
@@ -24,7 +24,7 @@ const Search = () => {
           console.log(err);
       })
       
-      axios.get(`http://localhost:5010/user?search=${auth.search}`)
+      axios.get(`https://icom-okob.onrender.com/user?search=${auth.search}`)
       .then((res)=>{
           setUser(res.data);
           setLoading(false);
@@ -45,11 +45,11 @@ const Search = () => {
         </Tabs.List>
   
         <Tabs.Panel value="gallery" pt="xs">
-          {Loading?(<MainpageLoading/>): <Main_post Post={post} />}
+          {Loading?(<MainpageLoading/>): ( post.posts.length!==0? <Main_post Post={post} /> : <h1>No Result</h1>)}
         </Tabs.Panel>
   
         <Tabs.Panel value="messages" pt="xs">
-          {Loading?(<MainpageLoading/>): <Single_user_card User={user}/>}
+          {Loading?(<MainpageLoading/>): ( user.length!==0? <Single_user_card User={user}/>:<h1>No Result</h1>)}
         </Tabs.Panel>
       </Tabs>
     </Container>

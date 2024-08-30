@@ -6,14 +6,14 @@ import { useAuth } from '../../context/auth'
 
 
 const Detail = (props) => {
-console.log(props.userName);
+console.log(props);
 const auth=useAuth();
 
   return (
     <Block>
     <div className="name">{props.userName}</div>
     <div className="about">
-        {props.userBio ? props.userBio :(auth.user.username==props.userName?"Update your Profile":"Bio is not Updated")}
+        {props.userBio ? props.userBio :(auth.user.userName==props.userName?"Update your Profile":"Bio is not Updated")}
     </div>
     <div className="details">
        <GrLocation size="25px"/>
