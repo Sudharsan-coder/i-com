@@ -39,7 +39,7 @@ const profileSlice = createSlice({
     },
     setMyPosts: (state, action) => {
       state.isGettingMyPosts = false;
-      state.myposts.data = action.payload.posts;
+      state.myposts.data = [...state.myposts.data,...action.payload.posts];
       state.myposts.page += 1;
       state.myposts.totalPages = action.payload.totalPages;
     },
