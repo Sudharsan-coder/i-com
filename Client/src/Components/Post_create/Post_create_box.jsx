@@ -1,38 +1,37 @@
 import { useState } from "react";
 import { styled } from "styled-components";
-import { useAuth } from "../../context/auth";
-import axios from "axios";
-import { notifications } from "@mantine/notifications";
-import { Box, Input, LoadingOverlay, MultiSelect } from "@mantine/core";
-import { AiFillExclamationCircle } from "react-icons/ai";
+import { Input, LoadingOverlay, MultiSelect } from "@mantine/core";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import Content from "./Content";
 
-// export const Post_content=createContext();
-
-const Post_create_box = ({ close }) => {
-  const auth = useAuth();
-  const [visible, toggle ] = useState(false);
-
+const Post_create_box = () => {
+  const { isCreatingPost } = useSelector((state) => state.publicPosts);
+  const dispatch = useDispatch();
   const [postUpload, setPostUpload] = useState({
     title: "",
     content: "",
     tags: [],
-    bannerPic:"",
+    bannerPic: "",
   });
 
   const { tags, ...others } = postUpload;
 
-  // console.log(tag)
-  
-  const imagetobase64=(e)=>{
-    var reader=new FileReader();
+  const imagetobase64 = (e) => {
+    var reader = new FileReader();
     reader.readAsDataURL(e.target.files[0]);
-    reader.onload=()=>{
-      setPostUpload({...postUpload,bannerPic:reader.result});
-    }
-    reader.onerror=(err)=>{
+    reader.onload = () => {
+      setPostUpload({
+        ...postUpload,
+        bannerPic: typeof reader.result === "string" ? reader.result : "",
+      });
+    };
+    reader.onerror = (err) => {
       console.log(err);
-    }
-  }
+    };
+  };
 
   const [data, setData] = useState([
     { value: "react", label: "React" },
@@ -44,153 +43,138 @@ const Post_create_box = ({ close }) => {
     setPostUpload({ ...postUpload, [name]: value });
   };
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    toggle(true);
-    axios
-      .post("https://icom-okob.onrender.com/post/create", postUpload,{
-          headers: {
-            token: `Bearer ${auth.user.accessToken}`,
-          },
-        
-      })
-      .then((res) => {
-        console.log(res);
-        close(false);
-        notifications.show({
-          title: "Posted Successfully",
-          message: "Hey there,User post is Uploaded",
-        });
-      })
-      .catch((err) => {
-        notifications.show({
-          title: "Post Not Uploaded",
-          message: "Some thing went Wrong",
-          color: "red",
-          icon: (
-            <AiFillExclamationCircle
-              color='white'
-              size='3rem'
-            />
-          ),
-        });
-        console.log(err);
-        toggle(false);
-      });
+    dispatch({ type: "CREATE_POST", data: postUpload });
+  };
+
+  const toolbarOptions = [
+    ["bold", "italic", "underline", "strike"],
+    ["blockquote", "code-block"],
+    ["link", "image", "video", "formula"],
+    [{ header: 1 }, { header: 2 }],
+    [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+    [{ script: "sub" }, { script: "super" }],
+    [{ indent: "-1" }, { indent: "+1" }],
+    [{ direction: "rtl" }],
+    [{ size: ["small", false, "large", "huge"] }],
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ color: [] }, { background: [] }],
+    [{ font: [] }],
+    [{ align: [] }],
+    ["clean"],
+  ];
+
+  const module = {
+    toolbar: toolbarOptions,
   };
 
   return (
-    <Box
-      pos='relative'
-    >
-      <LoadingOverlay
-        visible={visible}
-        overlayBlur={2}
-      />
-      <Container onSubmit={handleSubmit}>
-      <input
+    <Container>
+      <Left>
+        <LoadingOverlay visible={isCreatingPost} overlayBlur={2} />
+        <BOX onSubmit={handleSubmit}>
+          <label>Banner Picture</label>
+          <input
             type='file'
             id='images'
             accept='image/*'
             onChange={imagetobase64}
           />
-        <label>Title</label>
-        <Input
-          className='title'
-          placeholder='Title of the Your Post'
-          type='text'
-          value={postUpload.title}
-          name='title'
-          onChange={handleChange}
-          required
-        />
-        <label>Tags</label>
-        <MultiSelect
-          data={data}
-          placeholder='Select Tags'
-          searchable
-          creatable
-          getCreateLabel={(query) => `+ Create ${query}`}
-          onCreate={(query) => {
-            const item = { value: query, label: query };
-            setData((current) => [...current, item]);
-            return item;
-          }}
-          size='md'
-          rightSectionWidth={1}
-          maxDropdownHeight={160}
-          onChange={(value) => {
-            setPostUpload({ ...postUpload, tags: value });
-          }}
-        />
-        <label>Description</label>
-        <textarea
-          className='post_context'
-          placeholder='Provide in markup language'
-          name='content'
-          onChange={handleChange}
-        ></textarea>
-        <input
-          className='submit'
-          type='submit'
-          value='Post'
-        />
-      </Container>
-    </Box>
+          <label>Title</label>
+          <Input
+            className='title'
+            placeholder='Title of the Your Post'
+            type='text'
+            value={postUpload.title}
+            name='title'
+            onChange={handleChange}
+            required
+          />
+          <label>Tags</label>
+          <MultiSelect
+            data={data}
+            placeholder='Select Tags'
+            searchable
+            creatable
+            getCreateLabel={(query) => `+ Create ${query}`}
+            onCreate={(query) => {
+              const item = { value: query, label: query };
+              setData((current) => [...current, item]);
+              return item;
+            }}
+            size='md'
+            rightSectionWidth={1}
+            maxDropdownHeight={160}
+            onChange={(value) => {
+              setPostUpload({ ...postUpload, tags: value });
+            }}
+          />
+          <label>Description</label>
+          <ReactQuill
+            className='post_content'
+            theme='snow'
+            modules={module}
+            value={postUpload.content}
+            onChange={(e) => setPostUpload({ ...postUpload, content: e })}
+          />
+          <input className='submit' type='submit' value='Post' />
+        </BOX>
+      </Left>
+      <Right>
+      <h1>Description Preview</h1>
+        <Content {...postUpload} />
+      </Right>
+    </Container>
   );
 };
 
 export default Post_create_box;
 
-const Container = styled.form`
+const Container = styled.div`
+  display: flex;
+  gap: 20px;
+  height: calc(100vh - 10vh);
+  padding: 10px;
+  box-sizing: border-box;
+`;
+
+const Left = styled.div`
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+`;
+
+const BOX = styled.form`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* background-color: rgb(227, 226, 226); */
-  /* padding: 1.5% 5%; */
-  width: fit-content;
-  .add_tag {
-    width: 200px;
+
+  .post_content {
+    flex: 1;
   }
-  textarea {
-    width: 450px;
-    height: 200px;
-    border-radius: 10px;
-    font-size: 20px;
-    padding: 10px;
-    &:focus {
-      border: 1px solid #1a89ea;
-      outline: none;
-    }
-    &::placeholder {
-      color: #d2d0d0;
-      font-size: 18px;
-    }
+  .ql-editor{
+    /* background-color: red; */
+    min-height: 200px;
   }
-  .tag_container {
-    input[type="button"] {
-      width: fit-content;
-      margin-left: 20px;
-    }
-  }
-  .tags {
-    height: fit-content;
-    width: 500px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    .single_tag {
-      background-color: aliceblue;
-    }
-  }
+
   .submit {
-    width: fit-content;
     margin: 0px auto;
     background: blue;
     border: 0px;
     border-radius: 5px;
-    padding: 1.5% 3.5%;
+    padding: 10px 20px;
     color: white;
     cursor: pointer;
+    &:hover{
+      background: #5f5ff0;
+    }
   }
+`;
+
+const Right = styled.div`
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
 `;

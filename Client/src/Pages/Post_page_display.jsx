@@ -1,56 +1,56 @@
-import { styled } from "styled-components"
-import Like_pallet from "../Components/Post_display/Like_pallet.jsx"
-import Post from "../Components/Post_display/Post.jsx"
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { styled } from "styled-components";
+import Like_pallet from "../Components/Post_display/Like_pallet.jsx";
+import Post from "../Components/Post_display/Post.jsx";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import PostdisplayLoading from "../Components/Loading/PostdisplayLoading.jsx";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getSinglePostStarted, setSinglePost } from "../Redux/Slices/publicPostsSlice.js";
 const Post_page_display = () => {
   const params = useParams();
   const postid = params.id;
-  const [postdetails, setPostDetails] = useState(null);
-  // console.log(postid);
-  const [Loading,setLoading]=useState(true)
+  const { isGettingSinglePost, post, allPost } = useSelector(
+    (state) => state.publicPosts
+  );
+  const dispatch = useDispatch();
   useEffect(() => {
-    axios
-      .get(`https://icom-okob.onrender.com/post/${postid}`)
-      .then((res) => {
-        setPostDetails(res.data);
-        setLoading(false)
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
+    dispatch(getSinglePostStarted())
+    if (allPost.length !== 0) {
+      const posts = allPost.find((data) => data._id == postid);
+      dispatch(setSinglePost(posts));
+    } else {
+      dispatch({
+        type: "VIEW_POST",
+        data: {
+          id: postid,
+        },
       });
-  },[postid]);
-  
-   const [commentArray, setCommentArray] = useState(null);
-  useEffect(() => {
-    axios
-      .get(`https://icom-okob.onrender.com/post/${postid}/comments`)
-      .then((res) => {
-      console.log(res.data.comments);
-        setCommentArray(res.data.comments);
-        // setLoading(false)
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  },[postid]);
-  console.log(postdetails);
+    }
+    if(post.comments.page==1)
+      dispatch({ type: "GET_POST_COMMENTS", data: { id: postid } });
+  }, []);
   return (
     <Container>
-    {!Loading && <Like_pallet {...postdetails}/>}
-     {Loading?<PostdisplayLoading/> : postdetails &&
-      <Post post={postdetails} commentArray = {commentArray}/>}
+      {isGettingSinglePost ? (  
+        <PostdisplayLoading />
+      ) : (
+      <>
+        <Like_pallet {...post.data} />
+        <Post
+          post={post.data}
+          commentArray={post.comments.data}
+        />
+      </>
+      )}
     </Container>
-  )
-}
-export default Post_page_display
+  );
+};
+export default Post_page_display;
 
-const Container=styled.div`
+const Container = styled.div`
   margin-top: 10vh;
   display: grid;
   grid-template-columns: 0.3fr 3fr 1fr;
   background: rgb(245, 245, 245);
-`
+`;

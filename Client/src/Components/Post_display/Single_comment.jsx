@@ -1,9 +1,10 @@
 import { styled } from "styled-components";
 import { Link } from "react-router-dom";
-import Like from "../Post/Likes.jsx";
-import im1 from "../../assets/logo.png";
+import React from "react";
+import { formatDistanceToNow } from "date-fns";
 
-const Single_comment = (props) => {
+const Single_comment = (props) => { 
+  const relativeTime = props.createdAt ? formatDistanceToNow(new Date(props.createdAt), { addSuffix: true }) : "unknown time";
   return (
     <Container>
       <div className="frame">
@@ -13,7 +14,7 @@ const Single_comment = (props) => {
         <div className="frame_content">
           <div className="title">
             <div className="user_name">{props.userName}</div>
-            <div className="date">Posted on 22 Jan</div>
+            <div className="date">{relativeTime}</div>
           </div>
           <div className="body">
             {props.text}

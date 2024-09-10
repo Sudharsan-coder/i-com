@@ -1,56 +1,37 @@
 import { useDisclosure } from "@mantine/hooks";
 import { Modal, Group, Button } from "@mantine/core";
-import { useState } from "react";
-import Login from "./Login";
-import Register from "./Register";
-import { useAuth } from "../../context/auth";
 import { styled } from "styled-components";
 import Post_create_box from "../Post_create/Post_create_box.jsx";
 import User from "./User";
 import { IconSquareRoundedPlus } from "@tabler/icons-react";
+import { useSelector } from "react-redux";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 const Log_in_button = () => {
   const [opened_post, post_obj] = useDisclosure(false);
-  // const [show_post_create,setShow_post_create]=useState(true);
-  const auth = useAuth();
-  const [show_post_box, setShow_post_box] = useState(true);
-  // const [opened, { open, close }] = useDisclosure(false);
-  // const [dis, setdis] = useState(false);
-  // const [showModel, setShowModel] = useState(true);
-  
+  const { isAuth } = useSelector((state) => state.auth);
+  const { createPostModel } = useSelector((state) => state.publicPosts);
+  const navigate = useNavigate();
   return (
     <>
-      
-      
-      {show_post_box && (
+      {createPostModel && (
         <Modal
           opened={opened_post}
           onClose={post_obj.close}
-          size='510px'
+          fullScreen
           title='Create Post'
           centered
         >
-          <Post_create_box close={setShow_post_box} />
+          <Post_create_box />
         </Modal>
       )}
-      
+
       <Group position='center'>
-      {/* {console.log(auth.user)} */}
-        {Object.keys(auth.user).length === 0 ? (
-          <Button
-            onClick={() => {
-              auth.setShowModel(true);
-              auth.modelOC.open();
-            }}
-            radius={"xl"}
-            color='indigo'
-          >
-            Sign up/ Sign in
-          </Button>
-        ) : (
+        {isAuth ? (
           <Log>
             <User />
             <Button
-            leftIcon={<IconSquareRoundedPlus/>}
+              leftIcon={<IconSquareRoundedPlus />}
               onClick={() => {
                 post_obj.open();
               }}
@@ -58,6 +39,16 @@ const Log_in_button = () => {
               Create Post
             </Button>
           </Log>
+        ) : (
+          <Button
+            onClick={() => {
+              navigate("/sign_in");
+            }}
+            radius={"xl"}
+            color='indigo'
+          >
+            Sign up/ Sign in
+          </Button>
         )}
       </Group>
       {/* {show_post_box && <Post_create_box setShow={setShow_post_box}/>} */}
@@ -67,10 +58,8 @@ const Log_in_button = () => {
 
 export default Log_in_button;
 
-
-
-const Log=styled.div`
+const Log = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
-`
+`;

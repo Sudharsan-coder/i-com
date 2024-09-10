@@ -1,32 +1,32 @@
-//containers all the posts
-import { styled } from "styled-components";
-import Single_post from "./Single_post.jsx";
-import React from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { Loader } from "@mantine/core";
+import { Loader } from '@mantine/core';
+import React from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component';
+import styled from 'styled-components';
+import Single_user_card from './Single_user_card';
 
-const Main_post = ({allPost,fetchData,hasmore}) => {
+const Main_user = ({allUser,fetchData,hasmore}) => {
   return (
     <Container>
       <InfiniteScroll
-        dataLength={allPost.length}
+        dataLength={allUser.length}
         next={fetchData}
         hasMore={hasmore}
         loader={<Load ><Loader color="blue"/></Load>}
       >
-        {allPost.map((post) => {
+        {allUser.map((user) => {
           return (
-            <Single_post
-              {...post}
-              key={post._id}
+            <Single_user_card
+              data={user}
+              key={user._id}
             />
           );
         })}
       </InfiniteScroll>
     </Container>
-  );
-};
-export default Main_post;
+  )
+}
+
+export default Main_user
 
 const Container = styled.div`
   grid-column: 2;
