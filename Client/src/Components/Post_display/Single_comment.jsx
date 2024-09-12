@@ -42,13 +42,14 @@ const Container = styled.div`
       background-color: black;
     }
     .frame_content {
-      /* border: 2px solid rgb(178, 178, 178); */
+      border: 2px solid rgb(178, 178, 178);
+      width: 100%;
+      border-radius: 5px;
       margin-left: 15px;
       padding: 10px;
       box-sizing: border-box;
     }
     .date {
-      margin-left: 20px;
       color: rgb(113, 113, 113);
       font-size: 0.8em;
     }

@@ -1,18 +1,18 @@
-body{
+body {
   margin: 0px;
   background-color: rgb(245, 245, 245);
   box-sizing: border-box;
 }
-*{
-  font-family: '-apple-system';
-}
-.mantine-16nrau2{
-  padding: 0%;
+* {
+  font-family: "-apple-system";
 }
 :root {
   --primary_color: #5656fc;
 }
-.fullscreen{
+.mantine-16nrau2 {
+  padding: 0%;
+}
+.fullscreen {
   position: fixed;
   top: 0px;
   left: 0px;
@@ -22,17 +22,27 @@ body{
   z-index: 1;
   backdrop-filter: blur(1px);
 }
-.center{
+.noData {
+  font-size: 6rem;
+  color: #b8b9ba;
+}
+
+.mantine-Drawer-title {
+  font-size: 24px;
+  text-decoration: underline;
+}
+
+.center {
   justify-content: center;
   align-items: center;
 }
-@media (max-width:700px){
-  html{
+@media (max-width: 700px) {
+  html {
     font-size: 14px;
   }
 }
-@media (max-width:500px){
-  html{
+@media (max-width: 500px) {
+  html {
     font-size: 12px;
   }
 }

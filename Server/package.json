@@ -24,9 +24,11 @@
     "mongoose": "^7.4.1",
     "nodemailer": "^6.9.8",
     "nodemon": "^3.0.1",
-    "otp-generator": "^4.0.1"
+    "otp-generator": "^4.0.1",
+    "socket.io": "^4.7.5"
   },
   "devDependencies": {
+    "@types/node": "^22.5.2",
     "eslint": "^8.56.0",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"

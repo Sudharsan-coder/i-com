@@ -52,11 +52,11 @@ const Comments = (props) => {
       </div>
       <Comment onSubmit={handleSubmit}>
         <img
-          src={user.profilePicUrl}
+          src={user.profilePicUrl? user.profilePicUrl:"https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"}
           alt='me'
         />
          <textarea
-          placeholder="Add to the discussion"
+          placeholder="Add your discussion"
           value={commentText} // Bind to the simplified state
           onChange={(e) => setCommentText(e.target.value)} // Update the text state
         />
@@ -78,10 +78,11 @@ const Comments = (props) => {
 export default Comments;
 
 const Container = styled.div`
+
   .head {
     font-size: 1.5em;
     font-weight: bold;
-    margin: 50px 0px;
+    margin: 20px 0px;
   }
 `;
 const Comment = styled.form`
@@ -97,7 +98,8 @@ const Comment = styled.form`
   }
   textarea {
     width: 90%;
-    height: 100px;
+    height: 50px;
+    padding: 12px 20px;
     border-radius: 10px;
     &:focus {
       border: 1px solid #1a89ea;

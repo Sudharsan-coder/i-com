@@ -1,11 +1,15 @@
-import { put, takeLatest, call } from "redux-saga/effects";
+import { put, takeLatest, call, select, take, fork } from "redux-saga/effects";
+import { eventChannel } from "redux-saga";
 import {
   addCommentToPost,
   addLikeToPost,
+  closeCreatePostModel,
   creatingPostFailed,
   creatingPostStarted,
   creatingPostSuccess,
+  deleteUserPost,
   getAllPostsStarted,
+  getSinglePostStarted,
   resetAllPosts,
   setAllPosts,
   setNoMore,
@@ -44,18 +48,34 @@ import {
   profileDeletingStarted,
   profileDeletingSuccess,
   profileDeletingFailed,
+  forgetPasswordVerificationStarted,
+  forgetPasswordVerificationSuccess,
+  forgetPasswordVerificationFailed,
 } from "./Slices/authSlice";
 import {
+  addLikeToProfilePost,
+  deletePostFailed,
+  deletePostStarted,
+  deletePostSuccess,
   followersStarted,
+  getFollowUsersStarted,
+  getFollowUsersSuccess,
   getMyPostsFailed,
   getMyPostsStarted,
   getProfileFailed,
   getProfileStarted,
   newPostAdded,
   setMyPosts,
+  setNoMoreFollowUsers,
   setNoMoreMyPost,
   setProfile,
 } from "./Slices/ProfileSlice";
+import { getSocket, initiateSocketConnetion } from "./Socket";
+import {
+  newMessage,
+  sendMessageFailed,
+  sendMessageSuccess,
+} from "./Slices/messageSlice";
 
 // const baseURL = "https://icom-okob.onrender.com";
 const baseURL = "http://localhost:5010";
@@ -67,6 +87,7 @@ function* signIn(action) {
     const token = res.data.accessToken;
     Cookies.set("auth_Token", token);
     yield put(signInSuccess(res.data));
+    yield put(resetAllPosts());
   } catch (err) {
     console.log(err);
     yield put(signInFailed(err.response?.data?.message || "Sign in failed"));
@@ -97,6 +118,7 @@ function* validateUser(action) {
     const token = res.data.accessToken;
     Cookies.set("auth_Token", token);
     yield put(authenticationSucess(res.data));
+    yield put(resetAllPosts());
   } catch (err) {
     console.log(err.response);
     Cookies.remove("auth_Token");
@@ -104,7 +126,7 @@ function* validateUser(action) {
   }
 }
 
-function* signOff(action) {
+function* signOff() {
   Cookies.remove("auth_Token");
   yield put(signOffSuccess());
   yield put(resetAllPosts());
@@ -138,9 +160,11 @@ function* getAllPosts(action) {
           page: page,
         },
       });
-      yield put(setAllPosts(res.data));
+      const { isAuth } = yield select((state) => state.auth);
+      if (!isAuth) yield put(setAllPosts(res.data));
     } catch (err) {
       console.log(err);
+      yield put(setNoMore());
     }
   } else {
     yield put(setNoMore());
@@ -165,6 +189,7 @@ function* getFollingPosts(action) {
       yield put(setAllPosts(res.data));
     } catch (err) {
       console.log(err);
+      yield put(setNoMore());
     }
   } else {
     yield put(setNoMore());
@@ -173,6 +198,7 @@ function* getFollingPosts(action) {
 
 function* viewPost(action) {
   try {
+    yield put(getSinglePostStarted());
     const res = yield call(axios.get, `${baseURL}/post/${action.data.id}`);
     yield put(setSinglePost(res.data));
   } catch (err) {
@@ -195,7 +221,8 @@ function* createPost(action) {
       }
     );
     yield put(creatingPostSuccess(res.data));
-    yield put(newPostAdded(res.data))
+    yield put(closeCreatePostModel());
+    yield put(newPostAdded(res.data));
   } catch (err) {
     console.log(err);
     yield put(creatingPostFailed());
@@ -282,6 +309,12 @@ function* likePost(action) {
     );
     yield put(
       addLikeToSearchListPost({
+        userId: action.data.userId,
+        postId: action.data.postId,
+      })
+    );
+    yield put(
+      addLikeToProfilePost({
         userId: action.data.userId,
         postId: action.data.postId,
       })
@@ -421,7 +454,163 @@ function* updateProfile(action) {
   }
 }
 
+function* getFollowerUser(action) {
+  const { page, totalPages, _id } = action.data;
+  if (page <= totalPages) {
+    try {
+      if (page === 1) yield put(getFollowUsersStarted());
+      const res = yield call(axios.get, `${baseURL}/user/follower`, {
+        params: {
+          userId: _id,
+          page: page,
+        },
+      });
+      yield put(getFollowUsersSuccess(res.data));
+    } catch (err) {
+      console.log(err);
+      yield put(setNoMoreFollowUsers());
+    }
+  } else {
+    yield put(setNoMoreFollowUsers());
+  }
+}
+
+function* getFollowingUser(action) {
+  const { page, totalPages, _id } = action.data;
+
+  if (page <= totalPages) {
+    try {
+      if (page === 1) yield put(getFollowUsersStarted());
+      const res = yield call(axios.get, `${baseURL}/user/following`, {
+        params: {
+          userId: _id,
+          page: page,
+        },
+      });
+      yield put(getFollowUsersSuccess(res.data));
+    } catch (err) {
+      console.log(err);
+      yield put(setNoMoreFollowUsers());
+    }
+  } else {
+    yield put(setNoMoreFollowUsers());
+  }
+}
+
+function* deletePost(action) {
+  const { postId } = action.data;
+  try {
+    yield put(deletePostStarted());
+    const token = Cookies.get("auth_Token");
+    const res = yield call(axios.delete, `${baseURL}/post/delete/${postId}`, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+    yield put(deletePostSuccess(postId));
+    yield put(deleteUserPost(postId));
+  } catch (err) {
+    yield put(deletePostFailed(err.response.data.message));
+  }
+}
+
+function* sendOTP(action) {
+  try {
+    yield put(forgetPasswordVerificationStarted());
+    const res = yield call(
+      axios.post,
+      `${baseURL}/user/send-otp`,
+      { email: action.data },
+      {}
+    );
+    yield put(forgetPasswordVerificationSuccess());
+  } catch (err) {
+    console.log(err);
+    yield put(forgetPasswordVerificationFailed(err.response.data.message));
+  }
+}
+
+function* verifyOTP(action) {
+  try {
+    yield put(forgetPasswordVerificationStarted());
+    const res = yield call(
+      axios.post,
+      `${baseURL}/user/verify-otp`,
+      action.data,
+      {}
+    );
+    yield put(forgetPasswordVerificationSuccess());
+  } catch (err) {
+    console.log(err);
+    yield put(forgetPasswordVerificationFailed(err.response.data.message));
+  }
+}
+
+function* changePassword(action) {
+  try {
+    yield put(forgetPasswordVerificationStarted());
+    const res = yield call(
+      axios.put,
+      `${baseURL}/auth/changePassword`,
+      action.data,
+      {}
+    );
+    yield put(forgetPasswordVerificationSuccess());
+    yield* signOff();
+  } catch (err) {
+    console.log(err);
+    yield put(forgetPasswordVerificationFailed(err.response.data.message));
+  }
+}
+
+function createSocketChannel(socket) {
+  return eventChannel((emit) => {
+    socket.on("new_message", (message) => {
+      emit({ type: "NEW_MESSAGE", playload: message });
+    });
+    return () => {
+      socket.off("new_message");
+    };
+  });
+}
+
+function* initSocket() {
+  try {
+    const socket = yield call(initiateSocketConnetion);
+    const socketChannel = yield call(createSocketChannel, socket);
+    
+    while (true) {
+      const action = yield take(socketChannel);
+      console.log(action);
+      
+      yield put(newMessage(action.playload));
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function* sendMessage(action) {
+  try {
+    const socket = yield call(getSocket);
+    socket.emit("privateMessage", action.data);
+    yield put(sendMessageSuccess());
+  } catch (err) {
+    yield put(sendMessageFailed(err.message));
+  }
+}
+
+function* joinMessageRoom(action) {
+  try {
+    const socket = yield call(getSocket);
+    socket.emit("joinRoom", action.data);
+    console.log("Room Joined Successfully");
+  } catch (err) {
+    console.log(err);
+  }
+}
 function* rootSaga() {
+  yield fork(initSocket); //start socket connection
   yield takeLatest("GET_ALL_POSTS", getAllPosts);
   yield takeLatest("GET_FOLLOWING_POSTS", getFollingPosts);
   yield takeLatest("VIEW_POST", viewPost);
@@ -440,7 +629,15 @@ function* rootSaga() {
   yield takeLatest("FOLLOW_PROFILE", followProfile);
   yield takeLatest("UPDATE_PROFILE", updateProfile);
   yield takeLatest("DELETE_ACCOUNT", deleteAccount);
-  yield takeLatest("CREATE_POST",createPost);
+  yield takeLatest("CREATE_POST", createPost);
+  yield takeLatest("GET_FOLLOWER_USERS", getFollowerUser);
+  yield takeLatest("GET_FOLLOWING_USERS", getFollowingUser);
+  yield takeLatest("DELETE_POST", deletePost);
+  yield takeLatest("SEND_OTP", sendOTP);
+  yield takeLatest("VERIFY_OTP", verifyOTP);
+  yield takeLatest("CHANGE_PASSWORD", changePassword);
+  yield takeLatest("JOIN_MESSAGE_ROOM",joinMessageRoom);
+  yield takeLatest("SEND_MESSAGE_REQUEST", sendMessage);
 }
 
 export default rootSaga;

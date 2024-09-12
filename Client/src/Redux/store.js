@@ -5,6 +5,7 @@ import createSagaMiddleware from 'redux-saga'
 import rootSaga from "./Middleware";
 import authSlice from "./Slices/authSlice";
 import ProfileSlice from "./Slices/ProfileSlice";
+import messageSlice from "./Slices/messageSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -14,6 +15,7 @@ const store = configureStore({
         search:searchSlice,
         auth:authSlice,
         profile:ProfileSlice,
+        message:messageSlice,
     },
     middleware:(getDefaultMiddleware) =>
         getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware)

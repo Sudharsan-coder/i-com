@@ -12,6 +12,7 @@ import Nav_bar from "./Components/Auth/Nav_bar.jsx";
 import { useEffect } from "react";
 import Cookies from 'js-cookie';
 import React from "react";
+import ForgetPassword from "./Pages/ForgetPassword.jsx";
 
 const MainLayout = () => (
   <>
@@ -67,6 +68,10 @@ function App() {
             <Route
               path='/sign_up'
               element={<Sign_up />}
+            />
+            <Route
+              path='/forgetPassword'
+              element={<ForgetPassword />}
             />
             <Route
               path='/*'

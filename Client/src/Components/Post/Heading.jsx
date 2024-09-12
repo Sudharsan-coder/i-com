@@ -19,7 +19,7 @@ const Heading = ({ tags = [], _id = "", title = "" }) => {
             className='tag'
             key={index}
           >
-            #{data}&emsp;
+            #{data}
           </div>
         ))}
       </Tag>
@@ -42,12 +42,17 @@ const Tag = styled.div`
 
   .tag {
     font-size: 0.75em;
+    &:hover {
+    cursor: pointer;
+    color: #6b28fb;
+    text-decoration: underline;
+  }
   }
 `;
 
 const Title = styled.div`
   text-transform: capitalize;
-
+  /* font-size: 38px; */
   &:hover {
     cursor: pointer;
     color: blue;

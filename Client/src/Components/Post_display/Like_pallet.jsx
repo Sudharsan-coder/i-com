@@ -14,8 +14,6 @@ export default Like_pallet;
 const Container = styled.div`
   position: fixed;
   height: 100%;
-  width: 90px;
-  border:1px solid red;
   
   .like_container {
     margin-top: 35px;
