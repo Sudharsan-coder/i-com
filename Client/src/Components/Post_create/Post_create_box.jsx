@@ -6,6 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Content from "./Content";
+import 'prismjs/themes/prism.css';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-javascript';
 
 const Post_create_box = () => {
   const { isCreatingPost } = useSelector((state) => state.publicPosts);
@@ -67,6 +70,9 @@ const Post_create_box = () => {
   ];
 
   const module = {
+    // syntax: {
+    //   highlight: (text) => Prism.highlight(text, Prism.languages.javascript, 'javascript'),
+    // },
     toolbar: toolbarOptions,
   };
 
@@ -119,7 +125,7 @@ const Post_create_box = () => {
             value={postUpload.content}
             onChange={(e) => setPostUpload({ ...postUpload, content: e })}
           />
-          <input className='submit' type='submit' value='Post' />
+          <input className='submit' type='submit' value='Publish' />
         </BOX>
       </Left>
       <Right>

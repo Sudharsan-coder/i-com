@@ -54,9 +54,13 @@ router.post("/login", async (req, res) => {
 
     const { password, ...others } = user._doc;
 
-    const accessToken = jwt.sign({_id:user._doc._id}, process.env.ACCESS_TOKEN_SEC, {
-      expiresIn: "1d",
-    });
+    const accessToken = jwt.sign(
+      { _id: user._doc._id },
+      process.env.ACCESS_TOKEN_SEC,
+      {
+        expiresIn: "1d",
+      }
+    );
     const refreshToken = jwt.sign(user._doc, process.env.REFRESH_TOKEN_SEC, {
       expiresIn: "3d",
     });
@@ -72,17 +76,50 @@ router.post("/login", async (req, res) => {
   }
 });
 
+//ValidateUser Endpoint
 router.get("/validateUser", TokenVerify, async (req, res) => {
-  try{
+  try {
     const user = await User.findById(req.user._id);
-    const accessToken = jwt.sign({_id:user._doc._id}, process.env.ACCESS_TOKEN_SEC, {
-      expiresIn: "1d",
-    });
+    const accessToken = jwt.sign(
+      { _id: user._doc._id },
+      process.env.ACCESS_TOKEN_SEC,
+      {
+        expiresIn: "1d",
+      }
+    );
     const { password, ...others } = user._doc;
-    res.status(200).json({...others,accessToken});
+    res.status(200).json({ ...others, accessToken });
+  } catch (err) {
+    res.status(500).json({ message: "Not Found" });
+  }
+});
 
-  }catch(err){
-    res.status(500).json({message:"Not Found"});
+//Change Password Endpoint
+router.put("/changePassword", async (req, res) => {
+  if (req.body.password || req.body.hashedPassword) {
+    req.body.password = CryptoJS.AES.encrypt(
+      req.body.password,
+      process.env.PASS_SEC
+    ).toString();
+  }
+  try {
+    const updatedUser = await User.updateOne(
+      { emailId: req.body.email },
+      {
+        $set: {
+          password: req.body.password,
+        },
+      },
+      { upsert: true }
+    );
+    if (updatedUser.modifiedCount > 0) {
+      res.status(200).json({ message: "Password updated successfully" });
+    } else {
+      res.status(404).json({ message: "User not found or password is the same" });
+    }
+  } catch (err) {
+    
+    res.status(500).json(err);
   }
 });
 

@@ -63,7 +63,9 @@ const Sign_in = () => {
           </Input.Wrapper>
           <LoginBtn type='submit'>Login</LoginBtn>
           <div>
-            <ForgetPassword>Forget Password?</ForgetPassword>
+            <ForgetPassword>
+              <Link to={"/forgetPassword"}>Forget Password?</Link>
+            </ForgetPassword>
             <Signup>
               If you don't have a account{" "}
               <Link to={"/sign_up"}>Create it.</Link>

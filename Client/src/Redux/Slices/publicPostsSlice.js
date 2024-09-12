@@ -14,7 +14,15 @@ const initialState = {
       title: "",
       likes: [],
       comments: [],
-      content:""
+      content: "",
+      bannerPic: "",
+      user: {
+        _id: null,
+        profilePicUrl: "",
+        userName: "",
+        FirstName: "",
+        LastName: "",
+      },
     },
     comments: {
       data: [],
@@ -23,7 +31,7 @@ const initialState = {
     },
   },
   iscreatingPost: false,
-  createPostModel: true,
+  createPostModel: false,
 };
 
 const publicPostsSlice = createSlice({
@@ -35,7 +43,11 @@ const publicPostsSlice = createSlice({
     },
     setAllPosts: (state, action) => {
       state.isGettingAllPost = false;
-      state.allPost = [...state.allPost, ...action.payload.posts];
+      const existingPostIds = new Set(state.allPost.map((post) => post._id));
+      const newPosts = action.payload.posts.filter(
+        (newPost) => !existingPostIds.has(newPost._id)
+      );
+      state.allPost = [...state.allPost, ...newPosts];
       state.page += 1;
       state.totalPages = action.payload.totalPages;
     },
@@ -46,6 +58,7 @@ const publicPostsSlice = createSlice({
       state.allPost = [];
       state.page = 1;
       state.totalPages = 1;
+      state.more = true;
     },
     getSinglePostStarted: (state) => {
       state.isGettingSinglePost = true;
@@ -61,6 +74,11 @@ const publicPostsSlice = createSlice({
       ];
       state.post.comments.page += 1;
       state.post.comments.totalpage = action.payload.totalpage;
+    },
+    resetPost: (state) => {
+      (state.post.data = {}), (state.post.comments.data = []);
+      state.post.comments.page = 1;
+      state.post.comments.totalpage = 1;
     },
     addLikeToPost: (state, action) => {
       const { userId, postId } = action.payload;
@@ -122,7 +140,6 @@ const publicPostsSlice = createSlice({
     },
     creatingPostSuccess: (state, action) => {
       state.iscreatingPost = false;
-      state.createPostModel = false;
       state.allPost.unshift(action.payload);
       notifications.update({
         title: "Creating post",
@@ -137,6 +154,25 @@ const publicPostsSlice = createSlice({
         message: "Your Post is not created. Please try again.",
         color: "red",
         id: "creating_post",
+      });
+    },
+    openCreatePostModel: (state) => {
+      state.createPostModel = true;
+    },
+    closeCreatePostModel: (state) => {
+      state.createPostModel = false;
+    },
+    deleteUserPost: (state, action) => {
+      const filterData = state.allPost.filter(
+        (post) => post._id !== action.payload
+      );
+      state.allPost = filterData;
+    },
+    reportToPostStarted: (state) => {
+      notifications.show({
+        title: "Reporting Post",
+        message: "Your Report to post is sent Successfully",
+        color: "green",
       });
     },
   },
@@ -157,4 +193,9 @@ export const {
   creatingPostFailed,
   creatingPostStarted,
   creatingPostSuccess,
+  deleteUserPost,
+  openCreatePostModel,
+  closeCreatePostModel,
+  reportToPostStarted,
+  resetPost,
 } = publicPostsSlice.actions;

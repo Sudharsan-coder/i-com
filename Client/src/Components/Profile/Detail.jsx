@@ -3,13 +3,14 @@ import { LiaBirthdayCakeSolid } from 'react-icons/lia';
 import { FiMail } from 'react-icons/fi';
 import { styled } from 'styled-components';
 import { useSelector } from 'react-redux';
+import React from 'react';
 
 const Detail = (props) => {
   const { isAuth,user } = useSelector((state) => state.auth);
 
   return (
     <Block>
-      <div className="name">{props.userName}</div>
+      <div className="name">{props.firstName}</div>
       <div className="about">
         {props.userBio ? props.userBio : user._id===props._id ? "Update your Profile" : "Bio is not Updated"}
       </div>

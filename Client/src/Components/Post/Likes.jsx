@@ -10,17 +10,17 @@ const Likes = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [Liked, setLiked] = useState(
-    props.likes.includes(user?._id) // Check if user ID is in the likes array
+    user._id? props.likes.includes(user?._id): props.likes.includes("") // Check if user ID is in the likes array
   );
   
 
   useEffect(() => {
     // Update Liked state if the likes prop changes
-    setLiked(props.likes.includes(user?._id));
+    setLiked(user._id? props.likes.includes(user?._id): props.likes.includes(""));
   }, [props.likes, user?._id]);
 
   const handleClick = () => {
-    console.log(Liked);
+    // console.log(Liked);
     if (!user?._id) navigate("/sign_in");
     else{
       setLiked(!Liked);

@@ -7,18 +7,13 @@ import TopRecentTag from "../Components/Post/TopRecentTag";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetAllPosts } from "../Redux/Slices/publicPostsSlice";
+import FollowingTag from "../Components/Auth/FollowingTag";
 const Main_page = () => {
   const dispatch = useDispatch();
   const { allPost, page, isGettingAllPost, totalPages, more } = useSelector(
     (state) => state.publicPosts
   );
   const { isAuth } = useSelector((state) => state.auth);
-   // Reset all posts when isAuth changes
-   useEffect(() => {
-    if (isAuth) {
-      dispatch(resetAllPosts());
-    }
-  }, [isAuth, dispatch]);
 
   // Fetch posts when page or isAuth changes
   useEffect(() => {
@@ -46,11 +41,14 @@ const Main_page = () => {
         {isGettingAllPost ? (
           <MainpageLoading />
         ) : allPost.length !== 0 ? (
+          <>
+          <FollowingTag/>
           <Main_post
             allPost={allPost}
             fetchData={fetchAllPosts}
             hasmore={more}
           />
+          </>
         ) : isAuth ? (
           <NotFound>
             <h1>No Data</h1>
@@ -72,7 +70,7 @@ const Container = styled.div`
   margin-top: 10vh;
   display: grid;
   grid-template-columns: 0.7fr 2fr 0.8fr;
-  grid-row-gap: 50px;
+  /* grid-row-gap: 50px; */
 `;
 
 const NotFound = styled.div`

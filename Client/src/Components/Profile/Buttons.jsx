@@ -1,8 +1,9 @@
 import { styled } from "styled-components";
-import { TfiMoreAlt } from "react-icons/tfi";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import Message_button from "./Message_button";
 
 const Buttons = (props) => {
   const [report, setReport] = useState(false);
@@ -39,17 +40,18 @@ const Buttons = (props) => {
         onClick={handleFollow}
         isfollowing={isfollowing.toString()}
       />
-      <div
+      {/* <div
         className="more"
         onClick={() => {
           setReport(!report);
         }}
       >
         <TfiMoreAlt />
-      </div>
-      <div className={report ? "report" : "report close"}>
+      </div> */}
+      <Message_button {...props}/>
+      {/* <div className={report ? "report" : "report close"}>
         <input type="button" value="Report" />
-      </div>
+      </div> */}
     </Block>
   );
 };
@@ -57,9 +59,7 @@ const Buttons = (props) => {
 export default Buttons;
 
 const Block = styled.div`
-  width: 95%;
-  position: relative;
-  top: -100px;
+
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -89,7 +89,7 @@ const Followbtn = styled.input`
   padding: 11px 15px;
   border: 0px;
   border-radius: 5px;
-  margin-right: 5%;
+  margin-right: 2%;
   color: white;
   cursor: pointer;
   &:hover {

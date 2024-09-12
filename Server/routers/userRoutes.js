@@ -14,11 +14,11 @@ const transporter = nodemailer.createTransport({
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASSWORD,
   },
-  tls: { rejectUnauthorized: false }
+  tls: { rejectUnauthorized: false },
 });
 
 //Update User profile
-router.put("/updateProfile",TokenVerify, async (req, res) => {
+router.put("/updateProfile", TokenVerify, async (req, res) => {
   if (req.body.password || req.body.hashedPassword) {
     req.body.password = CryptoJS.AES.encrypt(
       req.body.hashedPassword,
@@ -26,10 +26,14 @@ router.put("/updateProfile",TokenVerify, async (req, res) => {
     ).toString();
   }
   try {
-    const updataedUser = await User.findByIdAndUpdate(req.user._id, {
-      $set: req.body,
-    },{upsert: true});
-    const user =await User.find({_id:req.user._id})
+    const updataedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $set: req.body,
+      },
+      { upsert: true }
+    );
+    const user = await User.find({ _id: req.user._id });
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json(err);
@@ -37,9 +41,9 @@ router.put("/updateProfile",TokenVerify, async (req, res) => {
 });
 
 //delete User Account
-router.delete("/delete",TokenVerify, async (req, res) => {
+router.delete("/delete", TokenVerify, async (req, res) => {
   try {
-    await User.deleteOne({_id: req.user._id});
+    await User.deleteOne({ _id: req.user._id });
     res.status(200).json("Your account is deleted");
   } catch (err) {
     res.status(500).json(err);
@@ -54,7 +58,7 @@ router.get("/", async (req, res) => {
   const pageSize = parseInt(req.query.pageSize) || 10;
 
   try {
-  let totalCount,totalPages,users
+    let totalCount, totalPages, users;
     if (search) {
       totalCount = await User.countDocuments({
         userName: { $regex: search, $options: "i" },
@@ -66,7 +70,7 @@ router.get("/", async (req, res) => {
         .skip((page - 1) * pageSize)
         .limit(pageSize);
 
-      res.status(200).json({ totalCount, totalPages,page,pageSize, users });
+      res.status(200).json({ totalCount, totalPages, page, pageSize, users });
     } else if (id) {
       const userDetails = await User.findById(id);
       if (!userDetails) {
@@ -77,16 +81,16 @@ router.get("/", async (req, res) => {
         userDetails.password,
         process.env.PASS_SEC
       ).toString(CryptoJS.enc.Utf8);
-      
+
       const { password, ...otherDetails } = userDetails._doc;
       res.status(200).json({ ...otherDetails, hashedPassword });
     } else {
       totalCount = await User.countDocuments();
       totalPages = Math.ceil(totalCount / pageSize);
       users = await User.find()
-      .skip((page - 1) * pageSize)
-        .limit(pageSize);;
-      res.status(200).json({ totalCount, totalPages,page,pageSize, users });
+        .skip((page - 1) * pageSize)
+        .limit(pageSize);
+      res.status(200).json({ totalCount, totalPages, page, pageSize, users });
     }
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -94,52 +98,67 @@ router.get("/", async (req, res) => {
 });
 
 //Get all Users
-router.get("/all",async(req,res)=>{
-    try{
-    const userdetails=await User.find();
+router.get("/all", async (req, res) => {
+  try {
+    const userdetails = await User.find();
     res.status(200).json(userdetails);
-    }
-    catch(err){
-      res.status(500).json(err);
-    }
-})
-  
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 router.post("/send-otp", async (req, res) => {
   const { email } = req.body;
-
-  // Generate OTP
-  const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
-
-  // Send OTP to the user's email
   try {
-    
+  
+    const ifUserAvailable = await User.findOne({ emailId: email });
+    if (!ifUserAvailable) {
+      return res.status(404).json({ message: "User not founded. Please entere the registered Email id." });
+    }
+    // Generate OTP
+    const otp = otpGenerator.generate(6, {
+      upperCase: false,
+      specialChars: false,
+      alphabets: false,
+    });
+
+    // Send OTP to the user's email
+
     await transporter.sendMail({
       from: {
-        name:"pradeep",
-        address: "pkumar24rk@gmail.com"
+        name: "pradeep",
+        address: "pkumar24rk@gmail.com",
       },
       to: email,
       subject: "OTP Verification",
-      text: `Your OTP is ${otp}.`,
+      // text: `Your OTP is ${otp}.`,
+      html: `<div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+      <h2 style="color: #4CAF50;">Password Reset Request</h2>
+      <p>Hello,</p>
+      <p>We received a request to reset your password for the account associated with this email address (${email}). If you didn't make this request, you can safely ignore this email.</p>
+      <p>To reset your password, please use the following OTP (One-Time Password):</p>
+      <h3 style="color: #4CAF50;">${otp}</h3>
+      <p>This OTP will expire in 10 minutes.</p>
+      <p>If you continue to have trouble, feel free to contact our support team for help.</p>
+      <p>Best regards,<br/>The icom Team</p>
+    </div>`,
     });
-  
+
     // Save OTP in MongoDB
-    await User.updateOne({ emailId: email }, {$set: {otp: otp} });
+    await User.updateOne({ emailId: email }, { $set: { otp: otp } });
     const user = await User.findOne({ emailId: email });
     console.log(user);
-    res.json({ message: "OTP sent successfully", email,otp });
-  } catch(err) {
-    res.status(500).json(err);
+    res.json({ message: "OTP sent successfully", email, otp });
+  } catch (err) {
+    res.status(500).json({message:"Some thing went wrong. Please try again"});
   }
-
 });
-
 
 router.post("/verify-otp", async (req, res) => {
   const { email, enteredOTP } = req.body;
 
   // Retrieve stored OTP from MongoDB
-  const user = await User.findOne({ emailId:email });
+  const user = await User.findOne({ emailId: email });
   const storedOTP = user ? user.otp : "";
   // console.log(user);
   // Verify OTP
@@ -150,4 +169,60 @@ router.post("/verify-otp", async (req, res) => {
   }
 });
 
-module.exports = router;
+//Get Following User Endpoint
+router.get("/following", async (req, res) => {
+  const userId = req.query.userId;
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
+  try {
+    const user = await User.findById(userId).populate("followings");
+    const followingIds = user.followings.map((following) => following._id);
+    const totalCount = user.followings.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    const followUsers = await User.find(
+      { _id: { $in: followingIds } },
+      { userName: 1, profilePicUrl: 1 }
+    )
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .sort({ $natural: -1 });
+
+    res
+      .status(200)
+      .json({ totalCount, totalPages, page, pageSize, followUsers });
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({ message: "Not found" });
+  }
+});
+
+//Get Follower User Endpoint
+router.get("/follower", async (req, res) => {
+  const userId = req.query.userId;
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
+  try {
+    const user = await User.findById(userId).populate("followers");
+    const followerIds = user.followers.map((follower) => follower._id);
+    const totalCount = user.followers.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    const followUsers = await User.find(
+      { _id: { $in: followerIds } },
+      { userName: 1, profilePicUrl: 1 }
+    )
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .sort({ $natural: -1 });
+
+    res
+      .status(200)
+      .json({ totalCount, totalPages, page, pageSize, followUsers });
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({ message: "Not found" });
+  }
+});
+
+module.exports = router

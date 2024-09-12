@@ -13,6 +13,13 @@ const initialState = {
   isSigningIn: false,
   isSigningUp: false,
   isProfileUpdating: false,
+  isforgetPassword: {
+    email:"",
+    activeStep: 0,
+    isVerifying: false,
+    isVerificationFailed: false,
+    isVerificationFailedMessage: "",
+  },
 };
 
 const authSlice = createSlice({
@@ -170,6 +177,26 @@ const authSlice = createSlice({
         autoClose: false,
       });
     },
+    setForgetPasswordVerificationEmail:(state,action)=>{
+      state.isforgetPassword.email = action.payload;
+    },
+    forgetPasswordVerificationStarted: (state) => {
+      state.isforgetPassword.isVerifying = true;
+      state.isforgetPassword.isVerificationFailed = false;
+    },
+    forgetPasswordVerificationSuccess: (state) => {
+      state.isforgetPassword.isVerifying = false;
+      state.isforgetPassword.activeStep += 1;
+    },
+    forgetPasswordVerificationFailed: (state, action) => {
+      state.isforgetPassword.isVerifying = false;
+      state.isforgetPassword.isVerificationFailed = true;
+      state.isforgetPassword.isVerificationFailedMessage = action.payload;
+    },
+    resetForgetPasswordVerification:(state)=>{
+      state.isforgetPassword.activeStep = 0;
+      state.isforgetPassword.email = "";
+    }
   },
 });
 
@@ -193,4 +220,9 @@ export const {
   profileDeletingFailed,
   profileDeletingStarted,
   profileDeletingSuccess,
+  forgetPasswordVerificationStarted,
+  forgetPasswordVerificationSuccess,
+  forgetPasswordVerificationFailed,
+  setForgetPasswordVerificationEmail,
+  resetForgetPasswordVerification
 } = authSlice.actions;

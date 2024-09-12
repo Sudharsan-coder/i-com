@@ -9,6 +9,8 @@ import MainpageLoading from "../Components/Loading/MainpageLoading.jsx";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Counter from "../Components/Profile/Counter.jsx";
+import { resetMyPosts } from "../Redux/Slices/ProfileSlice.js";
+import { resetMessageList } from "../Redux/Slices/messageSlice.js";
 
 const Profile_page = () => {
   const { isGettingProfile, isGettingMyPosts, myposts, profile } = useSelector(
@@ -19,12 +21,18 @@ const Profile_page = () => {
   const id = params.id;
 
   useEffect(() => {
-    fetchProfile();
-    dispatch({
-      type: "GET_MY_POST",
-      data: { page: 1, totalPages: 1, userId: id },
-    });
-  }, [id]);
+    // Reset posts first
+    dispatch(resetMessageList())
+    dispatch(resetMyPosts());
+  }, [id, dispatch]);
+
+  useEffect(() => {
+    // Fetch profile and posts only after posts are reset
+    if (myposts.data.length === 0) {
+      fetchProfile();
+      fetchMyPosts();
+    }
+  }, [myposts.data.length, id, dispatch]);
 
   const fetchProfile = () => {
     dispatch({ type: "GET_PROFILE", data: { userId: id } });
@@ -59,7 +67,7 @@ const Profile_page = () => {
             hasmore={myposts.more}
           />
         ) : (
-          <h1>No Data</h1>
+          <h1 className="noData" style={{textAlign:'center'}}>No Post</h1>
         )}
       </Content>
     </Container>

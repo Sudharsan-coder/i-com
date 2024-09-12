@@ -39,7 +39,7 @@ router.get("/user/:userId/posts", async (req, res) => {
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .sort({ createdAt: -1 })
-      .populate("user", "userName profilePicUrl");
+      .populate("user", "userName profilePicUrl userBio firstName lastName");
 
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (error) {
@@ -64,7 +64,7 @@ router.get("/", async (req, res) => {
       posts = await Post.find({ title: { $regex: search, $options: "i" } })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .populate("user", "userName profilePicUrl")
+        .populate("user", "userName profilePicUrl userBio firstName lastName")
         .sort({ $natural: -1 });
     } else if (tag) {
       totalCount = await Post.countDocuments({
@@ -76,7 +76,7 @@ router.get("/", async (req, res) => {
       })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .populate("user", "userName profilePicUrl")
+        .populate("user", "userName profilePicUrl userBio firstName lastName")
         .sort({ $natural: -1 });
     } else {
       totalCount = await Post.countDocuments();
@@ -85,7 +85,7 @@ router.get("/", async (req, res) => {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .sort({ $natural: -1 })
-        .populate("user", "userName profilePicUrl");
+        .populate("user", "userName profilePicUrl userBio firstName lastName");
     }
 
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
@@ -103,11 +103,11 @@ router.get("/followingPost", TokenVerify, async (req, res) => {
   const pageSize = parseInt(req.query.pageSize) || 10;
   try {
     const user = await User.findById(userId).populate("followings");
-    console.log(user);
+    // console.log(user);
 
     const followingIds = user.followings.map((following) => following._id);
     // const followingIds = [userId,userId2];
-    console.log(followingIds);
+    // console.log(followingIds);
 
     const totalCount = await Post.countDocuments({
       user: { $in: followingIds },
@@ -118,7 +118,7 @@ router.get("/followingPost", TokenVerify, async (req, res) => {
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .sort({ $natural: -1 })
-      .populate("user", "userName profilePicUrl");
+      .populate("user", "userName profilePicUrl userBio firstName lastName");
 
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (err) {
@@ -133,7 +133,7 @@ router.get("/:postid", async (req, res) => {
   try {
     const postdetails = await Post.findById(postid).populate(
       "user",
-      "userName profilePicUrl"
+      "userName profilePicUrl userBio firstName lastName"
     );
     res.status(200).send(postdetails);
   } catch (err) {}
@@ -397,10 +397,10 @@ router.delete("/delete/:postid", TokenVerify, async (req, res) => {
           },
         }
       );
-      res.status(200).send("Deleted successfully");
-    } else res.status(500).send("Your not authorizated user");
+      res.status(200).json({message:"Post Deleted successfully"});
+    } else res.status(500).json({message:"Your not authorizated user"});
   } catch (err) {
-    res.status(500).send("Not deleted");
+    res.status(500).json({message:"Some went wrong. Please try again."});
   }
 });
 

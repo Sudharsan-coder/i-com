@@ -6,19 +6,33 @@ import { useParams } from "react-router-dom";
 import PostdisplayLoading from "../Components/Loading/PostdisplayLoading.jsx";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getSinglePostStarted, setSinglePost } from "../Redux/Slices/publicPostsSlice.js";
+import {
+  getSinglePostStarted,
+  resetPost,
+  setSinglePost,
+} from "../Redux/Slices/publicPostsSlice.js";
+import ProfileCard from "../Components/Profile/ProfileCard.jsx";
 const Post_page_display = () => {
   const params = useParams();
   const postid = params.id;
   const { isGettingSinglePost, post, allPost } = useSelector(
     (state) => state.publicPosts
   );
+  const { mypost } = useSelector((state) => state.profile);
+  const { searchPosts } = useSelector((state) => state.search);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getSinglePostStarted())
-    if (allPost.length !== 0) {
-      const posts = allPost.find((data) => data._id == postid);
-      dispatch(setSinglePost(posts));
+    dispatch(resetPost());
+    const inAllPost = allPost?.find((data) => data._id === postid);
+    const inMyPost = mypost?.data?.find((data) => data._id === postid);
+    const inSearchPost = searchPosts?.find((data) => data._id === postid);
+
+    if (inAllPost) {
+      dispatch(setSinglePost(inAllPost));
+    } else if (inMyPost) {
+      dispatch(setSinglePost(inMyPost));
+    } else if (inSearchPost) {
+      dispatch(setSinglePost(inSearchPost));
     } else {
       dispatch({
         type: "VIEW_POST",
@@ -27,21 +41,22 @@ const Post_page_display = () => {
         },
       });
     }
-    if(post.comments.page==1)
+    
       dispatch({ type: "GET_POST_COMMENTS", data: { id: postid } });
   }, []);
   return (
     <Container>
-      {isGettingSinglePost ? (  
+      {isGettingSinglePost ? (
         <PostdisplayLoading />
       ) : (
-      <>
-        <Like_pallet {...post.data} />
-        <Post
-          post={post.data}
-          commentArray={post.comments.data}
-        />
-      </>
+        <>
+          <Like_pallet {...post.data} />
+          <Post
+            post={post.data}
+            commentArray={post.comments.data}
+          />
+          <ProfileCard userDetail={post.data.user} />
+        </>
       )}
     </Container>
   );
@@ -53,4 +68,5 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: 0.3fr 3fr 1fr;
   background: rgb(245, 245, 245);
+  
 `;
