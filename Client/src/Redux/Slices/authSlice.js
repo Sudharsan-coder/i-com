@@ -20,6 +20,7 @@ const initialState = {
     isVerificationFailed: false,
     isVerificationFailedMessage: "",
   },
+  checkUserNameMessage:"",
 };
 
 const authSlice = createSlice({
@@ -92,6 +93,9 @@ const authSlice = createSlice({
         color: "red",
       });
     },
+    setCheckUserNameMessage:(state,action)=>{
+      state.checkUserNameMessage = action.payload;
+    },
     signOffSuccess: (state) => {
       state.isAuth = false;
       state.user = { _id: null };
@@ -132,11 +136,11 @@ const authSlice = createSlice({
         color: "green",
       });
     },
-    profileUpdatingFailed: (state) => {
+    profileUpdatingFailed: (state,action) => {
       state.isProfileUpdating = false;
       notifications.update({
         title: "Something went wrong",
-        message: "Your profile is not updated",
+        message:action.payload ,
         color: "red",
         id: "load-data",
       });
@@ -224,5 +228,6 @@ export const {
   forgetPasswordVerificationSuccess,
   forgetPasswordVerificationFailed,
   setForgetPasswordVerificationEmail,
-  resetForgetPasswordVerification
+  resetForgetPasswordVerification,
+  setCheckUserNameMessage
 } = authSlice.actions;

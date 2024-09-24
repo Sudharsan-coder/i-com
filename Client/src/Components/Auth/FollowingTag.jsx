@@ -38,6 +38,7 @@ const FollowingTag = () => {
               <Badge
                 component='a'
                 size='xl'
+                style={{boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.07)"}}
               >
                 {data} +
               </Badge>
@@ -54,18 +55,17 @@ export default FollowingTag;
 const Container = styled.div`
   padding: 20px;
   grid-column: 2;
+  /* grid-row: 1; */
   .carousel {
     cursor: grabbing;
   }
   .mantine-Badge-root {
-    border: 1px solid black;
-    color: black;
     background-color: white;
+    border: 1px solid var(--primary_color);
     &:hover {
       cursor: pointer;
-      background-color: #adabab;
+      background-color: var(--primary_color);
       color: white;
-      border: none;
     }
   }
   overflow: hidden;

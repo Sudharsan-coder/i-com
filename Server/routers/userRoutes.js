@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
-const TokenVerify = require("./verifyToken");
+const {TokenVerify,verifyTokenAndAuthorization} = require("./verifyToken");
 const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
 
@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 });
 
 //Update User profile
-router.put("/updateProfile", TokenVerify, async (req, res) => {
+router.put("/updateProfile/:userId", verifyTokenAndAuthorization, async (req, res) => {
   if (req.body.password || req.body.hashedPassword) {
     req.body.password = CryptoJS.AES.encrypt(
       req.body.hashedPassword,
@@ -36,12 +36,12 @@ router.put("/updateProfile", TokenVerify, async (req, res) => {
     const user = await User.find({ _id: req.user._id });
     res.status(200).json(user);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({message:"Your profile is not updated"});
   }
 });
 
 //delete User Account
-router.delete("/delete", TokenVerify, async (req, res) => {
+router.delete("/delete/:userId", verifyTokenAndAuthorization, async (req, res) => {
   try {
     await User.deleteOne({ _id: req.user._id });
     res.status(200).json("Your account is deleted");
@@ -126,7 +126,7 @@ router.post("/send-otp", async (req, res) => {
 
     await transporter.sendMail({
       from: {
-        name: "pradeep",
+        name: "Nothing's New",
         address: "pkumar24rk@gmail.com",
       },
       to: email,
@@ -156,7 +156,7 @@ router.post("/send-otp", async (req, res) => {
 
 router.post("/verify-otp", async (req, res) => {
   const { email, enteredOTP } = req.body;
-
+  
   // Retrieve stored OTP from MongoDB
   const user = await User.findOne({ emailId: email });
   const storedOTP = user ? user.otp : "";
@@ -179,7 +179,7 @@ router.get("/following", async (req, res) => {
     const followingIds = user.followings.map((following) => following._id);
     const totalCount = user.followings.length;
     const totalPages = Math.ceil(totalCount / pageSize);
-
+    
     const followUsers = await User.find(
       { _id: { $in: followingIds } },
       { userName: 1, profilePicUrl: 1 }
@@ -187,8 +187,8 @@ router.get("/following", async (req, res) => {
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .sort({ $natural: -1 });
-
-    res
+      
+      res
       .status(200)
       .json({ totalCount, totalPages, page, pageSize, followUsers });
   } catch (err) {
@@ -216,10 +216,10 @@ router.get("/follower", async (req, res) => {
       .limit(pageSize)
       .sort({ $natural: -1 });
 
-    res
+      res
       .status(200)
       .json({ totalCount, totalPages, page, pageSize, followUsers });
-  } catch (err) {
+    } catch (err) {
     console.log(err);
     res.status(404).json({ message: "Not found" });
   }

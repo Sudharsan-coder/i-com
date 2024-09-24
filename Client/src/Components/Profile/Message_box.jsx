@@ -43,7 +43,7 @@ const Message_box = (props) => {
         >
           {props.userName}
         </Avatar>
-        <Text>{props.userName}</Text>
+        <Text size={"xl"}>{props.userName}</Text>
       </Header>
       <Body className='chat-body'>
         <ScrollToBottom className='.message-container'>
@@ -99,13 +99,15 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  border: 1px solid black;
+  /* border: 1px solid black; */
   border-radius: 10px;
   padding: 10px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   gap: 20px;
+  background-color: var(--primary_color);
+  color: white;
 `;
 const Body = styled.div`
   flex: 1;
@@ -134,7 +136,7 @@ const Body = styled.div`
   }
 
   .message-content {
-    background-color: #43a047;
+    background-color: var(--primary_color);
     color: white;
     border-radius: 5px;
     padding: 10px;
@@ -155,7 +157,7 @@ const Body = styled.div`
   }
 
   #you .message-content {
-    background-color: #43a047;
+    background-color: var(--primary_color);
   }
 
   #you .message-meta {
@@ -169,7 +171,8 @@ const Body = styled.div`
   }
 
   #other .message-content {
-    background-color: cornflowerblue;
+    background-color: #d7d8d8;
+    color: #6a6b6b;
   }
 
   #other .message-meta {

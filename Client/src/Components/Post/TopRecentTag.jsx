@@ -34,7 +34,7 @@ const TopRecentTag = () => {
           borderRadius: 10,
         }}
       >
-        <Title order={3}>Top Hash Tag</Title>
+        <Title order={3}>Popular Hash Tags</Title>
 
         <Text
           size='sm'
@@ -56,4 +56,5 @@ export default TopRecentTag;
 
 const Container = styled.div`
   grid-column: 3;
+  grid-row: 2;
 `;

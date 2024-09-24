@@ -1,10 +1,11 @@
 import io from 'socket.io-client';
 
 let socket;
-
+const baseURL = "https://icom-okob.onrender.com";
+// const baseURL = "http://localhost:5010";
 export const initiateSocketConnetion=()=>{
     if(!socket)
-        socket = io("http://localhost:5010");
+        socket = io(baseURL);
     return socket
 }
 

@@ -1,33 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { styled } from "styled-components";
-import { Input, LoadingOverlay, MultiSelect } from "@mantine/core";
+import { Avatar, Input, LoadingOverlay, MultiSelect } from "@mantine/core";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Content from "./Content";
-import 'prismjs/themes/prism.css';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-javascript';
+import { setCreatePost } from "../../Redux/Slices/publicPostsSlice";
 
 const Post_create_box = () => {
-  const { isCreatingPost } = useSelector((state) => state.publicPosts);
+  const { isCreatingPost, postModelType, createPost } = useSelector(
+    (state) => state.publicPosts
+  );
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const [postUpload, setPostUpload] = useState({
-    title: "",
-    content: "",
-    tags: [],
-    bannerPic: "",
-  });
-
-  const { tags, ...others } = postUpload;
 
   const imagetobase64 = (e) => {
     var reader = new FileReader();
     reader.readAsDataURL(e.target.files[0]);
     reader.onload = () => {
-      setPostUpload({
-        ...postUpload,
+      setCreatePost({
+        ...createPost,
         bannerPic: typeof reader.result === "string" ? reader.result : "",
       });
     };
@@ -37,19 +30,24 @@ const Post_create_box = () => {
   };
 
   const [data, setData] = useState([
-    { value: "react", label: "React" },
-    { value: "ng", label: "Angular" },
+    "React",
+    "Angular",
+    "Vue",
+    "Svelte",
+    ...createPost.tags,
   ]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPostUpload({ ...postUpload, [name]: value });
+    dispatch(setCreatePost({ ...createPost, [name]: value }));
   };
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch({ type: "CREATE_POST", data: postUpload });
+    if (postModelType === "CREATE_POST")
+      dispatch({ type: "CREATE_POST", data: createPost });
+    else if (postModelType === "EDIT_POST")
+      dispatch({ type: "EDIT_POST", data: { _id: user._id, createPost } });
   };
 
   const toolbarOptions = [
@@ -79,9 +77,13 @@ const Post_create_box = () => {
   return (
     <Container>
       <Left>
-        <LoadingOverlay visible={isCreatingPost} overlayBlur={2} />
+        <LoadingOverlay
+          visible={isCreatingPost}
+          overlayBlur={2}
+        />
         <BOX onSubmit={handleSubmit}>
           <label>Banner Picture</label>
+          <Avatar src={createPost.bannerPic} />
           <input
             type='file'
             id='images'
@@ -93,7 +95,7 @@ const Post_create_box = () => {
             className='title'
             placeholder='Title of the Your Post'
             type='text'
-            value={postUpload.title}
+            value={createPost.title}
             name='title'
             onChange={handleChange}
             required
@@ -101,6 +103,7 @@ const Post_create_box = () => {
           <label>Tags</label>
           <MultiSelect
             data={data}
+            defaultValue={createPost.tags}
             placeholder='Select Tags'
             searchable
             creatable
@@ -114,7 +117,7 @@ const Post_create_box = () => {
             rightSectionWidth={1}
             maxDropdownHeight={160}
             onChange={(value) => {
-              setPostUpload({ ...postUpload, tags: value });
+              dispatch(setCreatePost({ ...createPost, tags: value }));
             }}
           />
           <label>Description</label>
@@ -122,15 +125,21 @@ const Post_create_box = () => {
             className='post_content'
             theme='snow'
             modules={module}
-            value={postUpload.content}
-            onChange={(e) => setPostUpload({ ...postUpload, content: e })}
+            value={createPost.content}
+            onChange={(e) =>
+              dispatch(setCreatePost({ ...createPost, content: e }))
+            }
           />
-          <input className='submit' type='submit' value='Publish' />
+          <input
+            className='submit'
+            type='submit'
+            value={postModelType === "EDIT_POST" ? "Edit Post" : "Publish"}
+          />
         </BOX>
       </Left>
       <Right>
-      <h1>Description Preview</h1>
-        <Content {...postUpload} />
+        <h1>Description Preview</h1>
+        <Content {...createPost} />
       </Right>
     </Container>
   );
@@ -160,7 +169,7 @@ const BOX = styled.form`
   .post_content {
     flex: 1;
   }
-  .ql-editor{
+  .ql-editor {
     /* background-color: red; */
     min-height: 200px;
   }
@@ -173,7 +182,7 @@ const BOX = styled.form`
     padding: 10px 20px;
     color: white;
     cursor: pointer;
-    &:hover{
+    &:hover {
       background: #5f5ff0;
     }
   }

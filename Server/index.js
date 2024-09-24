@@ -4,6 +4,7 @@ const cors=require('cors');
 const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
 const http = require("http");
+const path = require('path');
 
 dotenv.config();
 const app = express();
@@ -35,6 +36,11 @@ app.use('/post',postRoute);
 app.use('/follow',followRoute);
 app.use('/user',userRoute);
 
+app.use(express.static(path.join(__dirname, 'Client/build')));
+// Catch-all route to serve the React app (BrowserRouter handles client-side routing)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build/index.html'));
+});
 
 socketHandler(server);
 server.listen(5010, () => {

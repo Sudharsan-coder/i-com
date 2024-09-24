@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Buttons from "./Buttons";
 
-const ProfileCard = ({ userDetail }) => {
+const ProfileCard = ({ userDetail, gridColumn, gridRow }) => {
   const navigate = useNavigate();
   // console.log(userDetail);
   
@@ -23,6 +23,7 @@ const {user} = useSelector((state)=>state.auth);
           flexDirection: "column",
           alignContent: "center",
           justifyContent: "center",
+          borderRadius:15,
         }}
       >
         <div
@@ -70,7 +71,9 @@ const {user} = useSelector((state)=>state.auth);
 export default ProfileCard;
 
 const Container = styled.div`
-  grid-column: 3;
+  grid-column: ${(props)=>(props.children._owner.memoizedProps.gridColumn)};
+  grid-row: ${(props)=>(props.children._owner.memoizedProps.gridRow)
+  };
 `;
 
 const FollowButton = styled.div`

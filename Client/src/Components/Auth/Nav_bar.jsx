@@ -1,5 +1,5 @@
 import Log_in from "./Log_in_button.jsx";
-import Logo from "../../assets/I_com_Logo_no_background.png";
+// import Logo from "../../assets/I_com_Logo_no_background.png";
 import { styled } from "styled-components";
 import { BsSearch } from "react-icons/Bs";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,19 +7,21 @@ import { useDispatch } from "react-redux";
 import { setSearch } from "../../Redux/Slices/searchSlice.js";
 import { useState } from "react";
 import React from "react";
+import Logo from "../Logo.jsx";
 const Nav_bar = () => {
   const [searchtxt, setSearchtxt] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   return (
     <Container>
-      <Link to={"/"}>
-        <img
+      <LogoLink to={"/"}>
+        {/* <img
           src={Logo}
           alt='logo'
           className='logo'
-        />
-      </Link>
+        /> */}
+        <Logo/>
+      </LogoLink>
       <form
         className='search_bar'
         onSubmit={(e) =>{
@@ -82,6 +84,11 @@ const Container = styled.div`
     align-items: center;
   }
 `;
+
+const LogoLink = styled(Link) `
+  text-decoration: none;
+    
+`
 const S_Icon = styled.button`
   all:unset;
   padding: 3px;

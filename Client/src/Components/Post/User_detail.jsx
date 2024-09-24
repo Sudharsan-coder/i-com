@@ -2,15 +2,20 @@ import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import React from "react";
+import { Popover } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
 const UserDetail = ({ user, createdAt }) => {
   const navigate = useNavigate();
-  
+  const [opened, { close, open }] = useDisclosure(false);
+
   // Ensure createdAt is valid
-  const relativeTime = createdAt ? formatDistanceToNow(new Date(createdAt), { addSuffix: true }) : "unknown time";
+  const relativeTime = createdAt
+    ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
+    : "unknown time";
 
   // Ensure user object is valid
-  const { userName, profilePicUrl,_id } = user || {};
+  const { userName, profilePicUrl, _id } = user || {};
 
   const handleProfileClick = () => {
     if (_id) {
@@ -20,17 +25,36 @@ const UserDetail = ({ user, createdAt }) => {
 
   return (
     <Container>
-      <div className="frame">
+      <div className='frame'>
         <img
           src={profilePicUrl || "/path/to/default-image.jpg"} // Fallback image
           alt={`${userName}'s profile`}
           onClick={handleProfileClick}
         />
-        <div className="frame_content">
-          <div className="user_name" onClick={handleProfileClick}>
-            {userName || "Unknown User"}
-          </div>
-          <div className="date">{relativeTime}</div>
+        <div className='frame_content'>
+          <Popover
+          width={350}
+            position='bottom'
+            withArrow
+            shadow='md'
+            opened={opened}
+          >
+            <Popover.Target>
+              <div
+                className='user_name'
+                onClick={handleProfileClick}
+                onMouseEnter={open}
+                onMouseLeave={close}
+              >
+                {userName || "Unknown User"}
+              </div>
+            </Popover.Target>
+            <Popover.Dropdown style={{ pointerEvents: "none" }} display={"none"}>
+              
+            </Popover.Dropdown>
+          </Popover>
+
+          <div className='date'>{relativeTime}</div>
         </div>
       </div>
     </Container>

@@ -1,18 +1,14 @@
 import { Menu, Avatar } from "@mantine/core";
 import {
-  IconMessageCircle,
   IconTrash,
   IconUser,
   IconLogout2,
   IconUserEdit,
-  IconCircleCheckFilled,
-  IconChevronRight,
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import React from "react";
 import { RiLockPasswordFill } from "react-icons/ri";
-import { TbActivity } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
 
 const User = () => {
@@ -25,7 +21,7 @@ const User = () => {
   const DeleteAccount = () => {
     var result = confirm("Are you sure to delete the Account?");
     if (result) {
-      dispatch({ type: "DELETE_ACCOUNT" });
+      dispatch({ type: "DELETE_ACCOUNT",data:user._id});
     }
   };
   return (
@@ -66,14 +62,13 @@ const User = () => {
         >
           Change Password
         </Menu.Item>
-
         <Menu.Item
           icon={<IconLogout2 size={14} />}
           onClick={signOff}
         >
           Logout
         </Menu.Item>
-
+        <Menu.Divider />
         <Menu.Item
           color='red'
           icon={<IconTrash size={14} />}

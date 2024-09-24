@@ -30,6 +30,7 @@ export default Single_user_card;
 
 const Container = styled.div`
   margin-top: 1rem;
+  box-shadow: 10px 5px 14px rgba(0, 0, 0, 0.07);
 `;
 const Wrap = styled.div`
   display: flex;

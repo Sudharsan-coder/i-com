@@ -14,7 +14,10 @@ const Post = (props) => {
         <Heading {...props.post} />
         <Content {...props.post} />
         <hr></hr>
-        <Comment postid = {props.post._id} commentArray = {props.commentArray} />
+        <Comment
+          postid={props.post._id}
+          commentArray={props.commentArray}
+        />
       </div>
     </Container>
   );
@@ -29,17 +32,14 @@ const Container = styled.div`
   margin: 3% 1%;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow:
-  0px 0.3px 2.2px rgba(0, 0, 0, 0.02),
-  0px 0.8px 5.3px rgba(0, 0, 0, 0.028),
-  0px 1.5px 10px rgba(0, 0, 0, 0.035),
-  0px 2.7px 17.9px rgba(0, 0, 0, 0.042),
-  0px 5px 33.4px rgba(0, 0, 0, 0.05),
-  0px 12px 80px rgba(0, 0, 0, 0.07)
-;
+  box-shadow: 0px 0.3px 2.2px rgba(0, 0, 0, 0.02),
+    0px 0.8px 5.3px rgba(0, 0, 0, 0.028), 0px 1.5px 10px rgba(0, 0, 0, 0.035),
+    0px 2.7px 17.9px rgba(0, 0, 0, 0.042), 0px 5px 33.4px rgba(0, 0, 0, 0.05),
+    0px 12px 80px rgba(0, 0, 0, 0.07);
   .banner {
+    display: ${(props) => (props.banner !== "" ? "block" : "none")};
     background: ${(props) =>
-      props !== undefined ? `url(${props.banner})` : "black"};
+      props.banner !== "" ? `url(${props.banner})` : "black"};
     background-size: cover;
     background-repeat: no-repeat;
     height: 50vh;

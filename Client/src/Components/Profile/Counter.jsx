@@ -111,9 +111,7 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  box-shadow:
-10px 10px 24px rgba(0, 0, 0, 0.07)
-;
+  box-shadow: 10px 10px 24px rgba(0, 0, 0, 0.07);
   div {
     display: flex;
     justify-content: start;

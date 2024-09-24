@@ -55,7 +55,7 @@ const Post_page_display = () => {
             post={post.data}
             commentArray={post.comments.data}
           />
-          <ProfileCard userDetail={post.data.user} />
+          <ProfileCard userDetail={post.data.user} gridColumn={3} gridRow={1} />
         </>
       )}
     </Container>

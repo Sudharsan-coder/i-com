@@ -32,6 +32,14 @@ const initialState = {
   },
   iscreatingPost: false,
   createPostModel: false,
+  isEditingPost : false,
+  postModelType: "",
+  createPost: {
+    title: "",
+    content: "",
+    tags: [],
+    bannerPic: "",
+  },
 };
 
 const publicPostsSlice = createSlice({
@@ -162,6 +170,50 @@ const publicPostsSlice = createSlice({
     closeCreatePostModel: (state) => {
       state.createPostModel = false;
     },
+    editingPostStarted: (state) => {
+      state.isEditingPost = true;
+      notifications.show({
+        title: "Editing post",
+        message: "Please wait...",
+        color: "green",
+        loading: true,
+        id: "editing_post",
+      });
+    },
+    editingPostSuccess: (state,action) => {
+      const {_id} = action.payload;
+      state.isEditingPost = false;
+      state.allPost = state.allPost.map((post) =>
+        post._id === _id ? { ...post,...action.payload } : post
+      );
+      
+      notifications.update({
+        title: "Editing post",
+        message: "Your Post Successfully edited",
+        color: "green",
+        id: "editing_post",
+      });
+    },
+    editingPostFailed: (state, action) => {
+      notifications.update({
+        title: "editing post",
+        message: action.payload || "Your Post is not edit. Please try again.",
+        color: "red",
+        id: "editing_post",
+      });
+    },
+    setPostModelType: (state, action) => {
+      state.postModelType = action.payload;
+    },
+    setCreatePost: (state, action) => {
+      state.createPost = action.payload;
+    },
+    resetCreatePost:(state) =>{
+      state.createPost.title = "",
+      state.createPost.bannerPic="",
+      state.createPost.content="",
+      state.createPost.tags=[]
+    },
     deleteUserPost: (state, action) => {
       const filterData = state.allPost.filter(
         (post) => post._id !== action.payload
@@ -171,10 +223,28 @@ const publicPostsSlice = createSlice({
     reportToPostStarted: (state) => {
       notifications.show({
         title: "Reporting Post",
-        message: "Your Report to post is sent Successfully",
+        message: "Please wait your message is sending.",
         color: "green",
+        loading: true,
+        id:"report_post"
       });
     },
+    reportToPostSuccess: (state) => {
+      notifications.update({
+        title: "Reporting Post",
+        message: "Your Report to post is sent Successfully",
+        color: "green",
+        id:"report_post"
+      });
+    },
+    reportToPostFailed:(state,action)=>{
+      notifications.update({
+        title: "Reporting Post",
+        message: action.payload,
+        color: "red",
+        id:"report_post"
+      });
+    }
   },
 });
 
@@ -197,5 +267,13 @@ export const {
   openCreatePostModel,
   closeCreatePostModel,
   reportToPostStarted,
+  reportToPostFailed,
+  reportToPostSuccess,
   resetPost,
+  setPostModelType,
+  editingPostFailed,
+  editingPostStarted,
+  editingPostSuccess,
+  resetCreatePost,
+  setCreatePost,
 } = publicPostsSlice.actions;

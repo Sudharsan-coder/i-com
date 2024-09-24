@@ -62,7 +62,7 @@ const EditProfile = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch({type:"UPDATE_PROFILE",data:profiledetails})
+    dispatch({type:"UPDATE_PROFILE",data:{profiledetails,_id:user._id}})
   };
 
   return (

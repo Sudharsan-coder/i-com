@@ -5,7 +5,11 @@ import { Input, LoadingOverlay, PasswordInput } from "@mantine/core";
 import { IconAt, IconLock, IconUserCircle } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { setCheckUserNameMessage } from "../Redux/Slices/authSlice";
 const Sign_up = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [reg, setreg] = useState({
     first: "",
     last: "",
@@ -13,17 +17,104 @@ const Sign_up = () => {
     username: "",
     password: "",
   });
-  const { isSigningUp, isAuth } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [regError, setregError] = useState({
+    first: "",
+    last: "",
+    emailid: "",
+    password: "",
+  });
+
+  const { isSigningUp, isAuth, checkUserNameMessage } = useSelector(
+    (state) => state.auth
+  );
+
   useEffect(() => {
     if (isAuth) navigate("/sign_in");
   }, [isAuth]);
+  
+  useEffect(()=>{
+    dispatch(setCheckUserNameMessage(""))
+  },[])
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d).{8,}$/;
+    return passwordRegex.test(password);
+  };
+
+  const validateName = (name) => {
+    const nameRegex = /^(?=.*[A-Z a-z])$/;
+    return nameRegex.test(name);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch({ type: "SIGN_UP", data: reg });
+
+    // Start with a blank regError object
+    setregError({
+      first: "",
+      last: "",
+      emailid: "",
+      password: "",
+    });
+
+    // Using let since we'll update the errors directly in the state
+    let hasError = false;
+
+    if (reg.first.length === 0) {
+      setregError((prev) => ({ ...prev, first: "First name is required" }));
+      hasError = true;
+    } else if (!validateName(reg.first)) {
+      setregError((prev) => ({ ...prev, first: "Please use only alphabet" }));
+      hasError = true;
+    }
+
+    if (reg.last.length === 0) {
+      setregError((prev) => ({ ...prev, last: "Last name is required" }));
+      hasError = true;
+    } else if (!validateName(reg.last)) {
+      setregError((prev) => ({ ...prev, last: "Please use only alphabet" }));
+      hasError = true;
+    }
+
+    if (reg.username.length === 0) {
+      dispatch(setCheckUserNameMessage("User name is required"));
+      hasError = true;
+    }
+
+    if (reg.emailid.length === 0) {
+      setregError((prev) => ({ ...prev, emailid: "Email is required" }));
+      hasError = true;
+    } else if (!validateEmail(reg.emailid)) {
+      setregError((prev) => ({
+        ...prev,
+        emailid: "Please enter a valid email",
+      }));
+      hasError = true;
+    }
+
+    if (reg.password.length === 0) {
+      setregError((prev) => ({ ...prev, password: "Password is required" }));
+      hasError = true;
+    } else if (!validatePassword(reg.password)) {
+      setregError((prev) => ({
+        ...prev,
+        password:
+          "Password must contain at least 1 uppercase letter, 1 special character, 1 number, and be at least 8 characters long.",
+      }));
+      hasError = true;
+    }
+
+    // If no errors, dispatch the signup action
+    if (!hasError && checkUserNameMessage.length === 0) {
+      dispatch({ type: "SIGN_UP", data: reg });
+    }
   };
+
   return (
     <Container>
       <Left>
@@ -44,6 +135,7 @@ const Sign_up = () => {
             <Input.Wrapper
               label='First Name'
               withAsterisk
+              error={regError.first}
             >
               <Input
                 placeholder='Your First Name'
@@ -57,6 +149,7 @@ const Sign_up = () => {
             <Input.Wrapper
               label='Last Name'
               withAsterisk
+              error={regError.last}
             >
               <Input
                 placeholder='Your Last Name'
@@ -71,6 +164,7 @@ const Sign_up = () => {
           <Input.Wrapper
             label='UserName'
             withAsterisk
+            error={checkUserNameMessage}
           >
             <Input
               icon={<IconUserCircle />}
@@ -79,12 +173,16 @@ const Sign_up = () => {
               value={reg.username}
               onChange={(e) => {
                 setreg({ ...reg, username: e.target.value });
+                setTimeout(() => {
+                  dispatch({ type: "CHECK_USER_NAME", data: reg.username });
+                }, 2000);
               }}
             />
           </Input.Wrapper>
           <Input.Wrapper
             label='Email ID'
             withAsterisk
+            error={regError.emailid}
           >
             <Input
               icon={<IconAt />}
@@ -99,6 +197,7 @@ const Sign_up = () => {
           <Input.Wrapper
             label='Password'
             withAsterisk
+            error={regError.password}
           >
             <PasswordInput
               placeholder='Your password'
@@ -146,10 +245,10 @@ const WrapContainer = styled.form`
 const Heading = styled.div`
   text-align: center;
   .welcome {
-      font-size: 25px;
-      span {
-          font-size: 45px;
-        
+    font-size: 25px;
+    span {
+      font-size: 45px;
+
       color: var(--primary_color);
     }
   }

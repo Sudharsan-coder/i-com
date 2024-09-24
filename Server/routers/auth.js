@@ -2,7 +2,7 @@ const User = require("../models/User");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
-const TokenVerify = require("./verifyToken");
+const {TokenVerify} = require("./verifyToken");
 
 //Register Endpoint
 router.post("/register", async (req, res) => {
@@ -19,7 +19,8 @@ router.post("/register", async (req, res) => {
 
   try {
     const savedUser = await newUser.save();
-    const accessToken = jwt.sign(savedUser, process.env.ACCESS_TOKEN_SEC, {
+    // console.log(savedUser);
+    const accessToken = jwt.sign({_id:savedUser._id,isAdmin:savedUser.isAdmin}, process.env.ACCESS_TOKEN_SEC, {
       expiresIn: "1d",
     });
     res.status(201).json({ ...savedUser, accessToken });
@@ -40,7 +41,7 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ emailId: req.body.emailid });
 
     if (!user) {
-      return res.status(401).send({ message: "Wrong Credentials" });
+      return res.status(401).send({ message: "Email is Not exists" });
     }
 
     const hashedPassword = CryptoJS.AES.decrypt(
@@ -49,13 +50,13 @@ router.post("/login", async (req, res) => {
     ).toString(CryptoJS.enc.Utf8);
 
     if (hashedPassword !== req.body.password) {
-      return res.status(401).json({ message: "Wrong Credentials" });
+      return res.status(401).json({ message: "Incorrect Password" });
     }
 
     const { password, ...others } = user._doc;
 
     const accessToken = jwt.sign(
-      { _id: user._doc._id },
+      { _id: user._doc._id ,isAdmin: user._doc.isAdmin},
       process.env.ACCESS_TOKEN_SEC,
       {
         expiresIn: "1d",
@@ -81,7 +82,7 @@ router.get("/validateUser", TokenVerify, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     const accessToken = jwt.sign(
-      { _id: user._doc._id },
+      { _id: user._doc._id,isAdmin: user._doc.isAdmin },
       process.env.ACCESS_TOKEN_SEC,
       {
         expiresIn: "1d",
@@ -122,5 +123,18 @@ router.put("/changePassword", async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+router.post("/checkUserName",async (req,res)=>{
+  try {
+    const {userName} = req.body
+    const user = await User.findOne({userName});
+    if (user) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+    return res.status(200).json({ message: 'Username is available' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error' });
+  }
+})
 
 module.exports = router;

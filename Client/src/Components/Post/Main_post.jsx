@@ -31,6 +31,7 @@ export default Main_post;
 
 const Container = styled.div`
   grid-column: 2;
+  /* grid-row: 1; */
   height: 90vh;
   /* padding: 3%; */
   /* background-color: red; */

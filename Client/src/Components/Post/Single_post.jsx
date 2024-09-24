@@ -6,6 +6,7 @@ import Heading from "./Heading.jsx";
 import { Link } from "react-router-dom";
 import Post_menu from "./Post_menu.jsx";
 import React from "react";
+import Save_post from "./Save_post.jsx";
 
 const Single_post = (props) => {
   // console.log(props);
@@ -14,11 +15,12 @@ const Single_post = (props) => {
       <Block>
       <Header>
         <User_detail {...props} />
-        <Post_menu userId={props.user._id} postId={props._id}/>
+        <Post_menu {...props}/>
       </Header>
         <Heading {...props} />
         <div className='icons'>
           <Likes {...props} />
+          <Save_post/>
         </div>
       </Block>
     </Container>
@@ -38,14 +40,19 @@ const Container = styled.div`
 const Block = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 5% 2%;
+  padding: 3% 2%;
   .heading {
     font-size: 1.8em;
-    margin-left: 65px;
+    margin: 0 65px;
     padding: 15px 0px;
+    
   }
   .icons {
     margin-left: 65px;
+    margin-right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 `;
 

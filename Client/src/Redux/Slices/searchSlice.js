@@ -63,6 +63,12 @@ const searchSlice = createSlice({
           : post
       );
     },
+    editingSearchPostSuccess:(state,action) =>{
+      const {_id} = action.payload;
+      state.searchPosts = state.searchPosts.map((post) =>
+        post._id === _id ? { ...post,...action.payload } : post
+      );
+    }
   },
 });
 
@@ -78,4 +84,5 @@ export const {
   resetSearch,
   addLikeToSearchListPost,
   unLikeToSearchListPost,
+  editingSearchPostSuccess,
 } = searchSlice.actions;

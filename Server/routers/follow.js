@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const router = require("express").Router();
-const TokenVerify = require("./verifyToken");
+const {TokenVerify} = require("./verifyToken");
 
 //followService
 router.put("/",TokenVerify, async (req, res) => {

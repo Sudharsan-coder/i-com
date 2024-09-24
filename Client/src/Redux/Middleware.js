@@ -8,8 +8,15 @@ import {
   creatingPostStarted,
   creatingPostSuccess,
   deleteUserPost,
+  editingPostFailed,
+  editingPostStarted,
+  editingPostSuccess,
   getAllPostsStarted,
   getSinglePostStarted,
+  openCreatePostModel,
+  reportToPostFailed,
+  reportToPostStarted,
+  reportToPostSuccess,
   resetAllPosts,
   setAllPosts,
   setNoMore,
@@ -20,6 +27,7 @@ import {
 import axios from "axios";
 import {
   addLikeToSearchListPost,
+  editingSearchPostSuccess,
   getSearchPostStarted,
   getSearchUserStarted,
   setNoMorePost,
@@ -51,12 +59,14 @@ import {
   forgetPasswordVerificationStarted,
   forgetPasswordVerificationSuccess,
   forgetPasswordVerificationFailed,
+  setCheckUserNameMessage,
 } from "./Slices/authSlice";
 import {
   addLikeToProfilePost,
   deletePostFailed,
   deletePostStarted,
   deletePostSuccess,
+  editingMyPostSuccess,
   followersStarted,
   getFollowUsersStarted,
   getFollowUsersSuccess,
@@ -80,6 +90,7 @@ import {
 // const baseURL = "https://icom-okob.onrender.com";
 const baseURL = "http://localhost:5010";
 
+//#region Account Service
 function* signIn(action) {
   try {
     yield put(signInStarted());
@@ -103,7 +114,7 @@ function* signUp(action) {
     yield put(signUpSuccess(res.data));
   } catch (err) {
     console.log(err);
-    yield put(signUpFailed(err.response.message));
+    yield put(signUpFailed(err.response.data.message));
   }
 }
 
@@ -126,6 +137,17 @@ function* validateUser(action) {
   }
 }
 
+function* checkUserName(action) {
+  try {
+    const res = yield call(axios.post, `${baseURL}/auth/checkUserName`, {
+      userName: action.data,
+    });
+    yield put(setCheckUserNameMessage(""));
+  } catch (err) {
+    yield put(setCheckUserNameMessage(err.response.data.message));
+  }
+}
+
 function* signOff() {
   Cookies.remove("auth_Token");
   yield put(signOffSuccess());
@@ -136,11 +158,15 @@ function* deleteAccount(action) {
   try {
     yield put(profileDeletingStarted());
     const token = Cookies.get("auth_Token");
-    const res = yield call(axios.delete, `${baseURL}/user/delete`, {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const res = yield call(
+      axios.delete,
+      `${baseURL}/user/delete/${action.data._id}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
     Cookies.remove("auth_Token");
     yield put(profileDeletingSuccess());
   } catch (err) {
@@ -148,6 +174,8 @@ function* deleteAccount(action) {
     yield put(profileDeletingFailed());
   }
 }
+
+//#region Main Page Post
 function* getAllPosts(action) {
   const { page, totalPages, allPost } = action.data;
   if (page <= totalPages) {
@@ -170,6 +198,7 @@ function* getAllPosts(action) {
     yield put(setNoMore());
   }
 }
+
 function* getFollingPosts(action) {
   const { page, totalPages, allPost } = action.data;
   if (page <= totalPages) {
@@ -196,16 +225,7 @@ function* getFollingPosts(action) {
   }
 }
 
-function* viewPost(action) {
-  try {
-    yield put(getSinglePostStarted());
-    const res = yield call(axios.get, `${baseURL}/post/${action.data.id}`);
-    yield put(setSinglePost(res.data));
-  } catch (err) {
-    console.log(err);
-  }
-}
-
+//#region Post Creation and Edit
 function* createPost(action) {
   try {
     yield put(creatingPostStarted());
@@ -229,39 +249,48 @@ function* createPost(action) {
   }
 }
 
-function* getPostCommments(action) {
+function* editPost(action) {
   try {
+    yield put(editingPostStarted());
+    const auth_token = Cookies.get("auth_Token");
     const res = yield call(
-      axios.get,
-      `${baseURL}/post/${action.data.id}/comments`
-    );
-    yield put(setSinglePostComments(res.data));
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-function* commentPost(action) {
-  const { commentdesc, postId } = action.data;
-  try {
-    yield put(addCommentToPost(action.data));
-    const token = Cookies.get("auth_Token");
-    const res = yield call(
-      axios.post,
-      `${baseURL}/post/${postId}/comment`,
-      { ...commentdesc },
+      axios.put,
+      `${baseURL}/post/editPost/${action.data._id}`,
+      action.data.createPost,
       {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: "Bearer " + auth_token,
+        },
+        params: {
+          postId: action.data.createPost._id,
         },
       }
     );
-    console.log("Commented Successfully");
+    yield put(editingPostSuccess(action.data.createPost));
+    yield put(editingMyPostSuccess(action.data.createPost));
+    yield put(editingSearchPostSuccess(action.data.createPost));
+    yield put(closeCreatePostModel());
   } catch (err) {
     console.log(err);
+    yield put(editingPostFailed(err.response.data.message));
   }
 }
 
+function* reportPost(action) {
+  try {
+    yield put(reportToPostStarted());
+    const res = yield call(
+      axios.post,
+      `${baseURL}/post/reportPost`,
+      action.data
+    );
+    yield put(reportToPostSuccess());
+  } catch (err) {
+    yield put(reportToPostFailed(err.response.data.message));
+  }
+}
+
+//#region Search
 function* getSearchUser(action) {
   const { page, totalPages } = action.data;
   if (page <= totalPages) {
@@ -299,6 +328,50 @@ function* getSearchPost(action) {
     }
   } else {
     yield put(setNoMorePost());
+  }
+}
+
+//#region Display
+function* viewPost(action) {
+  try {
+    yield put(getSinglePostStarted());
+    const res = yield call(axios.get, `${baseURL}/post/${action.data.id}`);
+    yield put(setSinglePost(res.data));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function* getPostCommments(action) {
+  try {
+    const res = yield call(
+      axios.get,
+      `${baseURL}/post/${action.data.id}/comments`
+    );
+    yield put(setSinglePostComments(res.data));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function* commentPost(action) {
+  const { commentdesc, postId } = action.data;
+  try {
+    yield put(addCommentToPost(action.data));
+    const token = Cookies.get("auth_Token");
+    const res = yield call(
+      axios.post,
+      `${baseURL}/post/${postId}/comment`,
+      { ...commentdesc },
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+    console.log("Commented Successfully");
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -364,6 +437,7 @@ function* unlikePost(action) {
   }
 }
 
+//#region Profile
 function* getMyPost(action) {
   const { page, totalPages, userId } = action.data;
   if (page <= totalPages) {
@@ -439,8 +513,8 @@ function* updateProfile(action) {
     const auth_token = Cookies.get("auth_Token");
     const res = yield call(
       axios.put,
-      `${baseURL}/user/updateProfile`,
-      action.data,
+      `${baseURL}/user/updateProfile/${action.data._id}`,
+      action.data.profiledetails,
       {
         headers: {
           Authorization: "Bearer " + auth_token,
@@ -450,7 +524,7 @@ function* updateProfile(action) {
     yield put(profileUpdatingSuccess(res.data[0]));
   } catch (err) {
     console.log(err);
-    yield put(profileUpdatingFailed());
+    yield put(profileUpdatingFailed(err.response.data.message));
   }
 }
 
@@ -514,6 +588,7 @@ function* deletePost(action) {
   }
 }
 
+//#region Forget Password Service
 function* sendOTP(action) {
   try {
     yield put(forgetPasswordVerificationStarted());
@@ -563,7 +638,11 @@ function* changePassword(action) {
   }
 }
 
+//#region Message Service
 function createSocketChannel(socket) {
+  //The eventChannel takes a function as its argument. Inside this function, you define how the channel should react to external events. Specifically, the function listens to the Socket.IO events and calls the emit function to pass the data to the saga.
+
+  //emit is like a bridge to send data from the external event (like Socket.IO messages) to your saga, which will then handle it within Redux.
   return eventChannel((emit) => {
     socket.on("new_message", (message) => {
       emit({ type: "NEW_MESSAGE", playload: message });
@@ -578,11 +657,13 @@ function* initSocket() {
   try {
     const socket = yield call(initiateSocketConnetion);
     const socketChannel = yield call(createSocketChannel, socket);
-    
+
     while (true) {
+      //The take(socketChannel) effect pauses the saga and waits until the channel emits something (i.e., a newMessage event).
+      //When the server sends the newMessage, it resumes the saga by assigning the emitted value ({ type: 'NEW_MESSAGE', payload: message }) to the action variable.
       const action = yield take(socketChannel);
       console.log(action);
-      
+
       yield put(newMessage(action.playload));
     }
   } catch (err) {
@@ -609,8 +690,11 @@ function* joinMessageRoom(action) {
     console.log(err);
   }
 }
+
+//#region root
 function* rootSaga() {
   yield fork(initSocket); //start socket connection
+  //fork instead of call. fork is a non-blocking effect, meaning that it will allow other effects to run in parallel without waiting for initSocket to complete.
   yield takeLatest("GET_ALL_POSTS", getAllPosts);
   yield takeLatest("GET_FOLLOWING_POSTS", getFollingPosts);
   yield takeLatest("VIEW_POST", viewPost);
@@ -620,10 +704,13 @@ function* rootSaga() {
   yield takeLatest("SIGN_IN", signIn);
   yield takeLatest("SIGN_UP", signUp);
   yield takeLatest("VALIDATE_USER", validateUser);
+  yield takeLatest("CHECK_USER_NAME", checkUserName);
   yield takeLatest("SIGN_OFF", signOff);
   yield takeLatest("COMMENT_POST", commentPost);
   yield takeLatest("LIKE_POST", likePost);
   yield takeLatest("UNLIKE_POST", unlikePost);
+  yield takeLatest("EDIT_POST", editPost);
+  yield takeLatest("REPORT_POST", reportPost);
   yield takeLatest("GET_MY_POST", getMyPost);
   yield takeLatest("GET_PROFILE", getProfile);
   yield takeLatest("FOLLOW_PROFILE", followProfile);
@@ -636,7 +723,7 @@ function* rootSaga() {
   yield takeLatest("SEND_OTP", sendOTP);
   yield takeLatest("VERIFY_OTP", verifyOTP);
   yield takeLatest("CHANGE_PASSWORD", changePassword);
-  yield takeLatest("JOIN_MESSAGE_ROOM",joinMessageRoom);
+  yield takeLatest("JOIN_MESSAGE_ROOM", joinMessageRoom);
   yield takeLatest("SEND_MESSAGE_REQUEST", sendMessage);
 }
 

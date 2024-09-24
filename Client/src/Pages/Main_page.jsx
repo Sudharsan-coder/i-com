@@ -8,12 +8,13 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetAllPosts } from "../Redux/Slices/publicPostsSlice";
 import FollowingTag from "../Components/Auth/FollowingTag";
+import Log_in_card from "../Components/Auth/Log_in_card";
 const Main_page = () => {
   const dispatch = useDispatch();
   const { allPost, page, isGettingAllPost, totalPages, more } = useSelector(
     (state) => state.publicPosts
   );
-  const { isAuth } = useSelector((state) => state.auth);
+  const { isAuth,user } = useSelector((state) => state.auth);
 
   // Fetch posts when page or isAuth changes
   useEffect(() => {
@@ -37,7 +38,7 @@ const Main_page = () => {
   return (
     <>
       <Container>
-        {/* <ProfileCard /> */}
+        {isAuth ? <ProfileCard userDetail={user} gridColumn={1} gridRow={2} /> : <Log_in_card/>}
         {isGettingAllPost ? (
           <MainpageLoading />
         ) : allPost.length !== 0 ? (
@@ -47,15 +48,15 @@ const Main_page = () => {
             allPost={allPost}
             fetchData={fetchAllPosts}
             hasmore={more}
-          />
+            />
           </>
         ) : isAuth ? (
           <NotFound>
-            <h1>No Data</h1>
+            <h1>Follow the Peoples</h1>
           </NotFound>
         ) : (
           <NotFound>
-            <h1>Follow the Peoples</h1>
+            <h1>No Data</h1>
           </NotFound>
         )}
         <TopRecentTag />
@@ -75,6 +76,7 @@ const Container = styled.div`
 
 const NotFound = styled.div`
   grid-column: 2;
+  grid-row: 2;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -5,26 +5,50 @@ import { Input, LoadingOverlay, PasswordInput } from "@mantine/core";
 import { IconLock, IconUserCircle } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import Logo from "../Components/Logo";
 const Sign_in = () => {
   const [log, setLog] = useState({ emailid: "", password: "" });
   const { isSigningIn, isAuth } = useSelector((state) => state.auth);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
     if (isAuth) navigate("/");
   }, [isAuth]);
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d).{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch({ type: "SIGN_IN", data: log });
+    setEmailError("");
+    setPasswordError("");
+    if (!validateEmail(log.emailid) || log.emailid.length == 0) {
+      setEmailError("Invalid Email Address");
+    } else if (!validatePassword(log.password) || log.password.length == 0) {
+      setEmailError("");
+      setPasswordError("Invalid Password");
+    } else {
+      setEmailError("");
+      setPasswordError("");
+      dispatch({ type: "SIGN_IN", data: log });
+    }
   };
   return (
     <Container>
       <Left>
         <Heading>
-          <span className='welcome'>
-            Welcome to <span>iCom!</span>
-          </span>
+          
+          <Logo/>
+          
         </Heading>
         <WrapContainer onSubmit={handleSubmit}>
           <LoadingOverlay
@@ -37,6 +61,7 @@ const Sign_in = () => {
           <Input.Wrapper
             label='Email ID'
             withAsterisk
+            error={emailError}
           >
             <Input
               icon={<IconUserCircle />}
@@ -49,8 +74,9 @@ const Sign_in = () => {
             />
           </Input.Wrapper>
           <Input.Wrapper
-            label='Password'
+             label='Password'
             withAsterisk
+            error={passwordError}
           >
             <PasswordInput
               placeholder='Your password'
@@ -64,7 +90,7 @@ const Sign_in = () => {
           <LoginBtn type='submit'>Login</LoginBtn>
           <div>
             <ForgetPassword>
-              <Link to={"/forgetPassword"}>Forget Password?</Link>
+              <Link to={"/forgetPassword"} replace = {true}>Forget Password?</Link>
             </ForgetPassword>
             <Signup>
               If you don't have a account{" "}
@@ -105,14 +131,7 @@ const WrapContainer = styled.form`
 `;
 const Heading = styled.div`
   text-align: center;
-  .welcome {
-    font-size: 25px;
-    span {
-      font-size: 45px;
-
-      color: var(--primary_color);
-    }
-  }
+  font-size: 45px;
   .title {
     font-size: 28px;
   }

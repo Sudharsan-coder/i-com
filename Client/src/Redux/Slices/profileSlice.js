@@ -30,6 +30,7 @@ const initialState = {
     totalPages: 1,
     more: true,
   },
+  isEditingPost:false,
 };
 
 const profileSlice = createSlice({
@@ -112,6 +113,7 @@ const profileSlice = createSlice({
       state.followUsers.totalPages = 1;
       state.followUsers.more = true;
     },
+    
     deletePostStarted: (state) => {
       notifications.show({
         title: "Deleting Post",
@@ -144,6 +146,12 @@ const profileSlice = createSlice({
         id: "delete post",
       });
     },
+    editingMyPostSuccess:(state,action) =>{
+      const {_id} = action.payload;
+      state.myposts.data = state.myposts.data.map((post) =>
+        post._id === _id ? { ...post,...action.payload } : post
+      );
+    }
   },
 });
 
@@ -167,4 +175,5 @@ export const {
   deletePostFailed,
   deletePostStarted,
   addLikeToProfilePost,
+  editingMyPostSuccess,
 } = profileSlice.actions;

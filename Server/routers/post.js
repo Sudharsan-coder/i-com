@@ -1,7 +1,20 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
-const TokenVerify = require("./verifyToken");
+const { TokenVerify, verifyTokenAndAuthorization } = require("./verifyToken");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.example.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASSWORD,
+  },
+  tls: { rejectUnauthorized: false },
+});
 
 //Add Post
 router.post("/create", TokenVerify, async (req, res) => {
@@ -14,7 +27,10 @@ router.post("/create", TokenVerify, async (req, res) => {
     let post = await newPost.save();
 
     // Populate the 'user' field with the necessary fields
-    post = await Post.findById(post._id).populate("user", "userName profilePicUrl");
+    post = await Post.findById(post._id).populate(
+      "user",
+      "userName profilePicUrl"
+    );
 
     // Add the post id to the user's collection using updateOne
     await User.updateOne({ _id: userId }, { $push: { posts: post._id } });
@@ -24,7 +40,6 @@ router.post("/create", TokenVerify, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 //Get Specific User Posts
 router.get("/user/:userId/posts", async (req, res) => {
@@ -47,6 +62,46 @@ router.get("/user/:userId/posts", async (req, res) => {
     res.status(500).json({ message: "Error fetching user posts" });
   }
 });
+
+//Edit Post Endpoint
+router.put(
+  "/editPost/:userId",
+  verifyTokenAndAuthorization,
+  async (req, res) => {
+    const { postId } = req.query;
+    try {
+      const updatedPost = await Post.findByIdAndUpdate(postId, {
+        $set: req.body,
+      });
+      if (!updatedPost) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+      res.status(200).json({ message: "Post updated successfully" });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Some thing went wrong. Please try again" });
+    }
+  }
+);
+
+//Save Post Endpoint
+router.post(
+  "/savePost/:userId",
+  verifyTokenAndAuthorization,
+  async (req, res) => {
+    try {
+      const savePost = await User.findByIdAndUpdate(req.user._id, {
+        $addToSet: { savePost: req.params.postId },
+      });
+      res.status(200).json({ message: "Post saved successfully" });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Some thing went wrong. Please try again" });
+    }
+  }
+);
 
 //Get all post(Main page) && Search post Endpoint
 router.get("/", async (req, res) => {
@@ -397,10 +452,32 @@ router.delete("/delete/:postid", TokenVerify, async (req, res) => {
           },
         }
       );
-      res.status(200).json({message:"Post Deleted successfully"});
-    } else res.status(500).json({message:"Your not authorizated user"});
+      res.status(200).json({ message: "Post Deleted successfully" });
+    } else res.status(500).json({ message: "Your not authorizated user" });
   } catch (err) {
-    res.status(500).json({message:"Some went wrong. Please try again."});
+    res.status(500).json({ message: "Some went wrong. Please try again." });
+  }
+});
+
+// Report the Post Endpoint
+router.post("/reportPost", async (req, res) => {
+  const { message, postUrl } = req.body;
+
+  try {
+    await transporter.sendMail({
+      from: {
+        name: "Nothing's New",
+        address: "pkumar24rk@gmail.com",
+      },
+      to: "pradeepkumar24rk@gmail.com",
+      subject: "Report Post Notification",
+      html: `<h5>Post URL: ${postUrl}</h5><p>New report received with the following message:</p><p>${message}</p>`,
+    });
+
+    res.status(200).json({ message: "Report successfully sent!" });
+  } catch (err) {
+    console.error("Error while sending email:", err);
+    res.status(500).json({ message: "Something went wrong. Please try again" });
   }
 });
 
