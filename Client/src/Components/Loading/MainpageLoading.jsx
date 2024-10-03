@@ -17,8 +17,6 @@ const MainpageLoading = () => {
 export default MainpageLoading
 
 const Loading=styled.div`
-  grid-column:2;
-  grid-row: 2;
   margin-top: 20px;
     display: flex;
     flex-direction: column;

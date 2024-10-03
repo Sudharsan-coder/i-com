@@ -2,7 +2,7 @@ import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import React from "react";
-import { Popover } from "@mantine/core";
+import { Avatar, Popover } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 const UserDetail = ({ user, createdAt }) => {
@@ -26,10 +26,11 @@ const UserDetail = ({ user, createdAt }) => {
   return (
     <Container>
       <div className='frame'>
-        <img
+        <Avatar
           src={profilePicUrl || "/path/to/default-image.jpg"} // Fallback image
           alt={`${userName}'s profile`}
           onClick={handleProfileClick}
+          radius="xl"
         />
         <div className='frame_content'>
           <Popover
@@ -69,9 +70,6 @@ const Container = styled.div`
     align-items: center;
 
     img {
-      height: 50px;
-      width: 50px;
-      border-radius: 50%;
       cursor: pointer;
     }
 

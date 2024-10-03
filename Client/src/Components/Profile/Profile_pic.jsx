@@ -1,15 +1,15 @@
+import { Avatar } from '@mantine/core'
 import pic from '../../assets/I_com_Logo.png'
 import { styled } from 'styled-components'
 
 const Profile_pic = (props) => {
   return (
-    <Block profile={props.profilePicUrl}>
-    </Block>
+    <Block src={props.profilePicUrl}/>
   )
 }
 export default Profile_pic
 
-const Block=styled.div`
+const Block=styled(Avatar)`
     position: relative;
     top:-50px;
     margin: 0 auto;
@@ -17,7 +17,4 @@ const Block=styled.div`
     height: 110px;
     border-radius: 100%;
     border: 10px solid black;
-    background-image:url( ${({profile})=>(profile)});
-    background-size: cover;
-    background-position: center;
 `

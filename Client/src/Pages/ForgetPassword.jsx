@@ -7,6 +7,7 @@ import VerifyEmail from "../Components/ForgetPassword/VerifyEmail";
 import ChangePassword from "../Components/ForgetPassword/ChangePassword";
 import { useNavigate } from "react-router-dom";
 import { resetForgetPasswordVerification } from "../Redux/Slices/authSlice";
+import Logo from "../Components/Logo";
 
 const ForgetPassword = () => {
   const { isforgetPassword } = useSelector((state) => state.auth);
@@ -17,6 +18,9 @@ const ForgetPassword = () => {
   }, []);
   return (
     <Container>
+      <Heading>
+        <Logo />
+      </Heading>
       <Wrapper>
         <Stepper
           active={isforgetPassword.activeStep}
@@ -74,6 +78,8 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  gap: 30px;
   height: 100vh;
   width: 100vw;
 `;
@@ -87,5 +93,13 @@ const Wrapper = styled.div`
     0px 24px 80px rgba(0, 0, 0, 0.07);
   .mantine-Stepper-content {
     padding: 30px;
+  }
+`;
+
+const Heading = styled.div`
+  text-align: center;
+  font-size: 45px;
+  .title {
+    font-size: 28px;
   }
 `;

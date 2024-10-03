@@ -5,6 +5,7 @@ import { IconSend } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Avatar } from "@mantine/core";
 
 const Comments = (props) => {
   const commentArray = [...props.commentArray].reverse();   
@@ -51,8 +52,8 @@ const Comments = (props) => {
         Commands
       </div>
       <Comment onSubmit={handleSubmit}>
-        <img
-          src={user.profilePicUrl? user.profilePicUrl:"https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"}
+        <Avatar radius={"xl"} size={50}
+          src={user.profilePicUrl}
           alt='me'
         />
          <textarea
@@ -90,12 +91,6 @@ const Comment = styled.form`
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  img {
-    background: black;
-    height: 45px;
-    width: 50px;
-    border-radius: 100%;
-  }
   textarea {
     width: 90%;
     height: 50px;

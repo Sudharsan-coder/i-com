@@ -25,9 +25,10 @@ const Message_box = (props) => {
         userId2: props._id,
         message: currentMessage,
         time:
-          new Date(Date.now()).getHours() +
-          " : " +
-          new Date(Date.now()).getMinutes(),
+          new Date().toLocaleString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        })
       };
 
       dispatch({ type: "SEND_MESSAGE_REQUEST", data: messageData });
@@ -46,7 +47,7 @@ const Message_box = (props) => {
         <Text size={"xl"}>{props.userName}</Text>
       </Header>
       <Body className='chat-body'>
-        <ScrollToBottom className='.message-container'>
+        <ScrollToBottom className='message-container'>
           {messageList.map((data, index) => {
             return (
               <div

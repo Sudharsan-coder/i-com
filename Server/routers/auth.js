@@ -59,7 +59,7 @@ router.post("/login", async (req, res) => {
       { _id: user._doc._id ,isAdmin: user._doc.isAdmin},
       process.env.ACCESS_TOKEN_SEC,
       {
-        expiresIn: "1d",
+        expiresIn: "7d",
       }
     );
     const refreshToken = jwt.sign(user._doc, process.env.REFRESH_TOKEN_SEC, {
@@ -85,7 +85,7 @@ router.get("/validateUser", TokenVerify, async (req, res) => {
       { _id: user._doc._id,isAdmin: user._doc.isAdmin },
       process.env.ACCESS_TOKEN_SEC,
       {
-        expiresIn: "1d",
+        expiresIn: "7d",
       }
     );
     const { password, ...others } = user._doc;

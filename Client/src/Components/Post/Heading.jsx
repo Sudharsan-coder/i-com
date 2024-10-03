@@ -1,20 +1,18 @@
 import React, { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 
 const Heading = ({ tags = [], _id = "", title = "", type = "DISPLAY" }) => {
   const navigate = useNavigate();
-
-  const nav = useCallback(() => {
-    navigate(`/post/${_id}`);
-  }, [_id, navigate]);
-
+  const tagClickHandler=(tagValue)=>{
+    navigate(`/search?tag=${tagValue}`)
+  }
   return (
     <div className='heading'>
       <Title
         type={type}
-        onClick={nav}
+        to={`/post/${_id}`}
       >
         {title}
       </Title>
@@ -23,6 +21,7 @@ const Heading = ({ tags = [], _id = "", title = "", type = "DISPLAY" }) => {
           <div
             className='tag'
             key={index}
+            onClick={()=>tagClickHandler(data)}
           >
             #{data}
           </div>
@@ -55,11 +54,13 @@ const Tag = styled.div`
   }
 `;
 
-const Title = styled.div`
+const Title = styled(Link)`
   text-transform: capitalize;
   font-size: ${({ type }) => (type === "DISPLAY" ? "38px" : "30px")};
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-weight: 800;
+  color: black;
+  text-decoration: none;
   &:hover {
     cursor: pointer;
     color: blue;

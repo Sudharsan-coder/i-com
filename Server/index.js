@@ -21,6 +21,8 @@ const postRoute = require("./routers/post");
 const followRoute = require("./routers/follow");
 const userRoute = require("./routers/userRoutes");
 const socketHandler = require("./routers/socket");
+const categoryPostRoutes = require("./routers/categoryPost");
+const imageRouters = require("./routers/image")
 
 //connect the DB
 mongoose
@@ -39,6 +41,8 @@ app.use("/auth", authRoute);
 app.use("/post", postRoute);
 app.use("/follow", followRoute);
 app.use("/user", userRoute);
+app.use("/categoryPost",categoryPostRoutes);
+app.use("/image",imageRouters)
 
 // Catch-all route to serve the React app (BrowserRouter handles client-side routing)
 app.use(express.static(path.join(__dirname, "Client/build")));

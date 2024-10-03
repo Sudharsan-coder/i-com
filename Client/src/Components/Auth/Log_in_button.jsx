@@ -44,7 +44,7 @@ const Log_in_button = () => {
       <Group position='center'>
         {isAuth ? (
           <Log>
-            <Button
+            {/* <Button
               variant='default'
               style={{ border: "none" }}
             >
@@ -55,13 +55,13 @@ const Log_in_button = () => {
               style={{ border: "none" }}
             >
               <FaChalkboardTeacher size={20} />
-            </Button>
+            </Button> */}
             <User />
             <Button
               leftIcon={<IconSquareRoundedPlus />}
               onClick={openModel}
             >
-              Create Post
+              Create Blog
             </Button>
           </Log>
         ) : (

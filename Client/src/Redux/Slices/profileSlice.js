@@ -82,6 +82,26 @@ const profileSlice = createSlice({
         post._id === postId ? { ...post, likes: [...post.likes, userId] } : post
       );
     },
+    unLikeToProfilePost:(state,action)=>{
+      const { userId, postId } = action.payload;
+      state.myposts.data = state.myposts.data.filter((post) =>
+        post._id === postId
+          ? { ...post, likes: post.likes.filter((id) => id !== userId) }
+          : post)
+    },
+    addSaveToProfilePost:(state,action)=>{
+      const { userId, postId } = action.payload;
+      state.myposts.data = state.myposts.data.map((post) =>
+        post._id === postId ? { ...post, savedUser: [...post.savedUser, userId] } : post
+      );
+    },
+    unSaveToProfilePost:(state,action)=>{
+      const { userId, postId } = action.payload;
+      state.myposts.data = state.myposts.data.filter((post) =>
+        post._id === postId
+          ? { ...post, savedUser: post.savedUser.filter((id) => id !== userId) }
+          : post)
+    },
     followersStarted: (state, action) => {
       state.profile.followers.push(action.payload);
     },
@@ -113,7 +133,6 @@ const profileSlice = createSlice({
       state.followUsers.totalPages = 1;
       state.followUsers.more = true;
     },
-    
     deletePostStarted: (state) => {
       notifications.show({
         title: "Deleting Post",
@@ -175,5 +194,8 @@ export const {
   deletePostFailed,
   deletePostStarted,
   addLikeToProfilePost,
+  unLikeToProfilePost,
+  addSaveToProfilePost,
+  unSaveToProfilePost,
   editingMyPostSuccess,
 } = profileSlice.actions;

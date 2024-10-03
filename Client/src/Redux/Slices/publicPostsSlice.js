@@ -32,7 +32,7 @@ const initialState = {
   },
   iscreatingPost: false,
   createPostModel: false,
-  isEditingPost : false,
+  isEditingPost: false,
   postModelType: "",
   createPost: {
     title: "",
@@ -40,6 +40,10 @@ const initialState = {
     tags: [],
     bannerPic: "",
   },
+  isGettingPopularPosts: false,
+  popularPosts: [],
+  isGettingPopularTags: false,
+  popularTags: [],
 };
 
 const publicPostsSlice = createSlice({
@@ -107,6 +111,30 @@ const publicPostsSlice = createSlice({
       state.allPost = state.allPost.map((post) =>
         post._id === postId
           ? { ...post, likes: post.likes.filter((id) => id !== userId) }
+          : post
+      );
+    },
+    addSaveToPost: (state, action) => {
+      const { userId, postId } = action.payload;
+      if (state.post.data._id === postId) {
+        state.post.data.savedUser.push(userId);
+      }
+      state.allPost = state.allPost.map((post) =>
+        post._id === postId
+          ? { ...post, savedUser: [...post.savedUser, userId] }
+          : post
+      );
+    },
+    unSaveToPost: (state, action) => {
+      const { userId, postId } = action.payload;
+      if (state.post.data._id === postId) {
+        state.post.data.savedUser = state.post.data.savedUser.filter(
+          (id) => id !== userId
+        );
+      }
+      state.allPost = state.allPost.map((post) =>
+        post._id === postId
+          ? { ...post, savedUser: post.savedUser.filter((id) => id !== userId) }
           : post
       );
     },
@@ -180,13 +208,13 @@ const publicPostsSlice = createSlice({
         id: "editing_post",
       });
     },
-    editingPostSuccess: (state,action) => {
-      const {_id} = action.payload;
+    editingPostSuccess: (state, action) => {
+      const { _id } = action.payload;
       state.isEditingPost = false;
       state.allPost = state.allPost.map((post) =>
-        post._id === _id ? { ...post,...action.payload } : post
+        post._id === _id ? { ...post, ...action.payload } : post
       );
-      
+
       notifications.update({
         title: "Editing post",
         message: "Your Post Successfully edited",
@@ -208,11 +236,11 @@ const publicPostsSlice = createSlice({
     setCreatePost: (state, action) => {
       state.createPost = action.payload;
     },
-    resetCreatePost:(state) =>{
-      state.createPost.title = "",
-      state.createPost.bannerPic="",
-      state.createPost.content="",
-      state.createPost.tags=[]
+    resetCreatePost: (state) => {
+      (state.createPost.title = ""),
+        (state.createPost.bannerPic = ""),
+        (state.createPost.content = ""),
+        (state.createPost.tags = []);
     },
     deleteUserPost: (state, action) => {
       const filterData = state.allPost.filter(
@@ -226,7 +254,7 @@ const publicPostsSlice = createSlice({
         message: "Please wait your message is sending.",
         color: "green",
         loading: true,
-        id:"report_post"
+        id: "report_post",
       });
     },
     reportToPostSuccess: (state) => {
@@ -234,17 +262,49 @@ const publicPostsSlice = createSlice({
         title: "Reporting Post",
         message: "Your Report to post is sent Successfully",
         color: "green",
-        id:"report_post"
+        id: "report_post",
       });
     },
-    reportToPostFailed:(state,action)=>{
+    reportToPostFailed: (state, action) => {
       notifications.update({
         title: "Reporting Post",
         message: action.payload,
         color: "red",
-        id:"report_post"
+        id: "report_post",
       });
-    }
+    },
+    getPopularPostsStarted: (state) => {
+      state.isGettingPopularPosts = true;
+    },
+    getPopularPostsSuccess: (state, action) => {
+      state.isGettingPopularPosts = false;
+      state.popularPosts = action.payload;
+    },
+    getPopularPostsFailed: (state, action) => {
+      state.isGettingPopularPosts = false;
+      notifications.update({
+        title: "Popular Post Failed",
+        message: action.payload,
+        color: "red",
+        id: "popular_posts",
+      });
+    },
+    getPopularTagsStarted: (state) => {
+      state.isGettingPopularTags = true;
+    },
+    getPopularTagsSuccess: (state, action) => {
+      state.isGettingPopularTags = false;
+      state.popularTags = action.payload;
+    },
+    getPopularTagsFailed: (state, action) => {
+      state.isGettingPopularTags = false;
+      notifications.update({
+        title: "Popular Tags Failed",
+        message: action.payload,
+        color: "red",
+        id: "popular_Tags",
+      });
+    },
   },
 });
 
@@ -259,6 +319,8 @@ export const {
   resetAllPosts,
   addLikeToPost,
   unlikeToPost,
+  addSaveToPost,
+  unSaveToPost,
   addCommentToPost,
   creatingPostFailed,
   creatingPostStarted,
@@ -276,4 +338,10 @@ export const {
   editingPostSuccess,
   resetCreatePost,
   setCreatePost,
+  getPopularPostsFailed,
+  getPopularPostsStarted,
+  getPopularPostsSuccess,
+  getPopularTagsFailed,
+  getPopularTagsStarted,
+  getPopularTagsSuccess,
 } = publicPostsSlice.actions;

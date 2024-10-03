@@ -20,7 +20,7 @@ const Single_post = (props) => {
         <Heading {...props} />
         <div className='icons'>
           <Likes {...props} />
-          <Save_post/>
+          <Save_post postDetail={props}/>
         </div>
       </Block>
     </Container>
@@ -32,15 +32,17 @@ export default Single_post;
 const Container = styled.div`
   background: white;
   height: fit-content;
-  border-radius: 15px;
   margin-bottom: 20px;
-  box-shadow: 10px 5px 14px rgba(0, 0, 0, 0.07);
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  border: 0.0625rem solid #dee2e6;
+  box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 0.625rem 0.9375rem -0.3125rem, rgba(0, 0, 0, 0.04) 0 0.4375rem 0.4375rem -0.3125rem;
+  padding: 1.25rem
 `;
 
 const Block = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 3% 2%;
   .heading {
     font-size: 1.8em;
     margin: 0 65px;

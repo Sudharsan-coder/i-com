@@ -1,8 +1,10 @@
 import {
   Avatar,
   Box,
+  Button,
   Input,
   Loader,
+  Modal,
   MultiSelect,
   Textarea,
   Title,
@@ -13,11 +15,15 @@ import { styled } from "styled-components";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Change_pic from "../Components/Profile/Change_pic";
+import { picUpdatingModal } from "../Redux/Slices/authSlice";
 
 const EditProfile = () => {
-  const {user, isProfileUpdating,isAuth} = useSelector((state)=>state.auth)
+  const { user, isAuth, isChangingPicUrl, changedPicUrl } =
+    useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const [profiledetails, setProfileDetails] = useState({
     firstName: "",
     lastName: "",
@@ -31,17 +37,30 @@ const EditProfile = () => {
   });
 
   useEffect(() => {
-  // console.log("hello");
-  
-    if(!isAuth)
-      navigate('/sign_in');
-    setProfileDetails(user)
+    if (!isAuth) navigate("/sign_in");
+    setProfileDetails(user);
   }, [user._id]);
+
+  useEffect(() => {
+    if (changedPicUrl) {
+      setProfileDetails((prevDetails) => ({
+        ...prevDetails,
+        profilePicUrl: changedPicUrl,
+      }));
+    }
+  }, [changedPicUrl]);
+
+  const openUpdatingProfilePicModal = () => {
+    dispatch(picUpdatingModal(true));
+  };
+
+  const closeUpdatingProfilePicModal = () => {
+    dispatch(picUpdatingModal(false));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfileDetails({ ...profiledetails, [name]: value });
-    console.log(profiledetails);
   };
 
   const [data, setData] = useState([
@@ -49,123 +68,121 @@ const EditProfile = () => {
     { value: "ng", label: "Angular" },
   ]);
 
-  const imagetobase64 = (e) => {
-    var read = new FileReader();
-    read.readAsDataURL(e.target.files[0]);
-    read.onload = () => {
-      setProfileDetails({ ...profiledetails, profilePicUrl: read.result });
-    };
-    read.onerror = (err) => {
-      console.log(err);
-    };
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch({type:"UPDATE_PROFILE",data:{profiledetails,_id:user._id}})
+    dispatch({
+      type: "UPDATE_PROFILE",
+      data: { profiledetails, _id: user._id },
+    });
   };
 
   return (
     <Container>
-        <Form onSubmit={handleSubmit}>
-          <Boxs
-            bg={"white"}
-            p={30}
-            w={380}
-          >
-            <Title order={1}>User</Title>
-            <Name>
-              <Input.Wrapper
-                label='First Name'
-                withAsterisk
-              >
-                <Input
-                  placeholder='Your First Name'
-                  radius='md'
-                  value={profiledetails.firstName}
-                  onChange={handleChange}
-                  name='firstName'
-                />
-              </Input.Wrapper>
-              <Input.Wrapper
-                label='Last Name'
-                withAsterisk
-              >
-                <Input
-                  placeholder='Your Last Name'
-                  radius='md'
-                  value={profiledetails.lastName}
-                  onChange={handleChange}
-                  name='lastName'
-                />
-              </Input.Wrapper>
-            </Name>
+      <Modal  
+        opened={isChangingPicUrl}
+        onClose={closeUpdatingProfilePicModal}
+        title='Change Profile Picture'
+      >
+        <Change_pic />
+      </Modal>
+      <Form onSubmit={handleSubmit}>
+        <Boxs
+          bg={"white"}
+          p={30}
+          w={380}
+        >
+          <Title order={1}>User</Title>
+          <Name>
             <Input.Wrapper
-              label='Username'
+              label='First Name'
               withAsterisk
             >
               <Input
-                placeholder='Username'
+                placeholder='Your First Name'
                 radius='md'
-                name = "UserName"
-                value={profiledetails.userName}
-                disabled
-              />
-            </Input.Wrapper>
-            <Input.Wrapper label='Email ID'>
-              <Input
-                placeholder='Email id'
-                radius='md'
-                value={profiledetails.emailId}
+                value={profiledetails.firstName}
                 onChange={handleChange}
-                name='emailId'
+                name='firstName'
               />
             </Input.Wrapper>
-            <Input.Wrapper label='Profile Image'>
-              <Profile>
-                <Avatar
-                  src={profiledetails.profilePicUrl}
-                  alt="it's me"
-                />
-                <input
-                  type='file'
-                  id='images'
-                  accept='image/*'
-                  onChange={imagetobase64}
-                />
-              </Profile>
-            </Input.Wrapper>
-          </Boxs>
-
-          <Boxs
-            bg={"white"}
-            p={30}
-            w={380}
-          >
-            <Title order={1}>Personal Information</Title>
             <Input.Wrapper
-              label='Location'
+              label='Last Name'
               withAsterisk
             >
               <Input
-                placeholder='India, TamilNadu, Chennai'
+                placeholder='Your Last Name'
                 radius='md'
-                value={profiledetails.location}
+                value={profiledetails.lastName}
                 onChange={handleChange}
-                name='location'
+                name='lastName'
               />
             </Input.Wrapper>
-
-            <Textarea
-              label='Bio'
-              placeholder='A short bio'
-              autosize
-              minRows={2}
-              maxRows={4}
-              name='userBio'
-              value={profiledetails.userBio}
-              onChange={handleChange}
+          </Name>
+          <Input.Wrapper
+            label='Username'
+            withAsterisk
+          >
+            <Input
+              placeholder='Username'
+              radius='md'
+              name='UserName'
+              value={profiledetails.userName}
+              disabled
             />
+          </Input.Wrapper>
+          <Input.Wrapper
+            label='Email ID'
+            withAsterisk
+          >
+            <Input
+              placeholder='Email id'
+              radius='md'
+              value={profiledetails.emailId}
+              onChange={handleChange}
+              name='emailId'
+            />
+          </Input.Wrapper>
+          <Input.Wrapper label='Profile Image'>
+            <Profile>
+              <Avatar
+                src={profiledetails.profilePicUrl}
+                alt="it's me"
+                size={100}
+              />
+
+              <Button onClick={openUpdatingProfilePicModal}>
+                Change Profile
+              </Button>
+            </Profile>
+          </Input.Wrapper>
+        </Boxs>
+
+        <Boxs
+          bg={"white"}
+          p={30}
+          w={380}
+        >
+          <Title order={1}>Personal Information</Title>
+          <Input.Wrapper label='Location'>
+            <Input
+              placeholder='India, TamilNadu, Chennai'
+              radius='md'
+              value={profiledetails.location}
+              onChange={handleChange}
+              name='location'
+            />
+          </Input.Wrapper>
+
+          <Textarea
+            label='Bio'
+            placeholder='A short bio'
+            autosize
+            minRows={2}
+            maxRows={4}
+            name='userBio'
+            value={profiledetails.userBio}
+            onChange={handleChange}
+          />
 
           <DateInput
             valueFormat='YYYY MMM DD'
@@ -174,41 +191,44 @@ const EditProfile = () => {
             value={profiledetails.DOB ? new Date(profiledetails.DOB) : null}
             name='DOB'
             onChange={(val) => {
-              setProfileDetails({ ...profiledetails, DOB: val?.toDateString()||"" });
+              setProfileDetails({
+                ...profiledetails,
+                DOB: val?.toDateString() || "",
+              });
             }}
           />
 
-            <MultiSelect
-              label='Skills'
-              data={data}
-              placeholder='Add Skills'
-              searchable
-              creatable
-              name="skills"
-              getCreateLabel={(query) => `+ Create ${query}`}
-              onCreate={(query) => {
-                const item = { value: query, label: query };
-                setData((current) => [...current, item]);
-                return item;
-              }}
-              onChange={(value) => {
-                setProfileDetails({ ...profiledetails, skills: value });
-              }}
-            />
-          </Boxs>
+          <MultiSelect
+            label='Skills'
+            data={data}
+            placeholder='Add Skills'
+            searchable
+            creatable
+            name='skills'
+            getCreateLabel={(query) => `+ Create ${query}`}
+            onCreate={(query) => {
+              const item = { value: query, label: query };
+              setData((current) => [...current, item]);
+              return item;
+            }}
+            onChange={(value) => {
+              setProfileDetails({ ...profiledetails, skills: value });
+            }}
+          />
+        </Boxs>
 
-          <Boxs
-            bg={"white"}
-            p={30}
-            w={380}
-            mb={20}
-          >
-            <SubmitBtn
-              type='submit'
-              value='Save Information'
-            />
-          </Boxs>
-        </Form>
+        <Boxs
+          bg={"white"}
+          p={30}
+          w={380}
+          mb={20}
+        >
+          <SubmitBtn
+            type='submit'
+            value='Save Information'
+          />
+        </Boxs>
+      </Form>
       {/* {isProfileUpdating ? ( <Loading variant='bars' />): (
       )} */}
     </Container>

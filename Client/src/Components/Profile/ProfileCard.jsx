@@ -5,16 +5,17 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Buttons from "./Buttons";
 
-const ProfileCard = ({ userDetail, gridColumn, gridRow }) => {
+const ProfileCard = ({ userDetail }) => {
   const navigate = useNavigate();
   // console.log(userDetail);
-  
-const {user} = useSelector((state)=>state.auth);
+
+  const { user } = useSelector((state) => state.auth);
   return (
     <Container>
       <Card
         shadow='sm'
         display={"flex"}
+        withBorder
         style={{
           minWidth: 300,
           margin: "30px",
@@ -23,7 +24,7 @@ const {user} = useSelector((state)=>state.auth);
           flexDirection: "column",
           alignContent: "center",
           justifyContent: "center",
-          borderRadius:15,
+          borderRadius: 15,
         }}
       >
         <div
@@ -35,7 +36,7 @@ const {user} = useSelector((state)=>state.auth);
           }}
         >
           <Avatar
-            size={80}
+            size={100}
             radius='xl'
             src={userDetail.profilePicUrl}
             alt={"pradeep"}
@@ -46,7 +47,9 @@ const {user} = useSelector((state)=>state.auth);
           order={3}
           style={{ marginBottom: 5 }}
         >
-          {userDetail.userName ? userDetail.firstName + " " + userDetail.lastName : ""}
+          {userDetail.userName
+            ? userDetail.firstName + " " + userDetail.lastName
+            : ""}
         </Title>
         <Text
           size='sm'
@@ -60,10 +63,13 @@ const {user} = useSelector((state)=>state.auth);
         >
           {userDetail.userBio ? `${userDetail.userBio}` : ""}
         </Text>
-        {(user._id!==userDetail._id)&&<FollowButton>
-          <Buttons {...userDetail} />
-        </FollowButton>}
+        {user._id !== userDetail._id && (
+          <FollowButton>
+            <Buttons {...userDetail} />
+          </FollowButton>
+        )}
       </Card>
+      
     </Container>
   );
 };
@@ -71,9 +77,7 @@ const {user} = useSelector((state)=>state.auth);
 export default ProfileCard;
 
 const Container = styled.div`
-  grid-column: ${(props)=>(props.children._owner.memoizedProps.gridColumn)};
-  grid-row: ${(props)=>(props.children._owner.memoizedProps.gridRow)
-  };
+ 
 `;
 
 const FollowButton = styled.div`

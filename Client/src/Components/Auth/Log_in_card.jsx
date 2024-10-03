@@ -1,13 +1,12 @@
 import { Button, Card, Text } from "@mantine/core";
 import React from "react";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const Log_in_card = () => {
   return (
     <Container>
       <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Text fw={700}>
+        <Text fw={700} color="var(--primary_color)">
           Nothing's New is a community of 2,097,187 amazing developers
         </Text>
         <Text c='dimmed'>
@@ -27,7 +26,6 @@ const Container = styled.div`
   grid-column: 1;
   grid-row: 2;
   .mantine-Card-root{
-    color: var(--primary_color);
     margin: 30px;
   }
   /* a{

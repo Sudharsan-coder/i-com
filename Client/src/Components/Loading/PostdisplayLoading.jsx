@@ -1,4 +1,5 @@
 import { Skeleton } from '@mantine/core'
+import React from 'react'
 import { styled } from 'styled-components'
 
 const PostdisplayLoading = () => {

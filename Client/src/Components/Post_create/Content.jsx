@@ -22,6 +22,11 @@ const Container = styled.div`
     font-weight: 400;
     font-size: 20px;
   }
+  img{
+    width: 500px;
+    height:400px;
+    object-fit: contain;
+  }
   pre {
     background-color: #343333;
     color: aliceblue;

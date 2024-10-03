@@ -10,17 +10,21 @@ import Sign_in from "./Pages/Sign_in.jsx";
 import Sign_up from "./Pages/Sign_up.jsx";
 import Nav_bar from "./Components/Auth/Nav_bar.jsx";
 import { useEffect } from "react";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import React from "react";
 import ForgetPassword from "./Pages/ForgetPassword.jsx";
+import Your_activity from "./Pages/Your_activity.jsx";
+import Footer from "./Components/Footer.jsx";
+import FollowTagsModal from "./Components/Auth/FollowTagsModal.jsx";
 
 const MainLayout = () => (
   <>
+    <FollowTagsModal/>
     <Nav_bar />
     <Routes>
       <Route
         path='/'
-        element={<Main_page/>}
+        element={<Main_page />}
       />
       <Route
         path='/profile/:id'
@@ -39,46 +43,49 @@ const MainLayout = () => (
         element={<Search />}
       />
       <Route
+        path='/your_activity/:activity_type'
+        element={<Your_activity />}
+      />
+      <Route
         path='*'
         element={<NothingFoundBackground />}
       />
     </Routes>
+    <Footer />
   </>
 );
 function App() {
-
-  const {isAuth} = useSelector((state)=>state.auth)
+  const { isAuth } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  useEffect(()=>{
-  if(!isAuth){
-    const token = Cookies.get('auth_Token')
-    if(token){
-      dispatch({type:"VALIDATE_USER",data:token})
+  useEffect(() => {
+    if (!isAuth) {
+      const token = Cookies.get("auth_Token");
+      if (token) {
+        dispatch({ type: "VALIDATE_USER", data: token });
+      }
     }
-  }
-  },[isAuth])
+  }, [isAuth]);
   return (
-    
-        <BrowserRouter>
-          <Routes>
-            <Route
-              path='/sign_in'
-              element={<Sign_in />}
-            />
-            <Route
-              path='/sign_up'
-              element={<Sign_up />}
-            />
-            <Route
-              path='/forgetPassword'
-              element={<ForgetPassword />}
-            />
-            <Route
-              path='/*'
-              element={<MainLayout />}
-            />
-          </Routes>
-        </BrowserRouter>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path='/sign_in'
+          element={<Sign_in />}
+        />
+        <Route
+          path='/sign_up'
+          element={<Sign_up />}
+        />
+        <Route
+          path='/forgetPassword'
+          element={<ForgetPassword />}
+        />
+        <Route
+          path='/*'
+          element={<MainLayout />}
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -94,7 +94,7 @@ const Sign_in = () => {
             </ForgetPassword>
             <Signup>
               If you don't have a account{" "}
-              <Link to={"/sign_up"}>Create it.</Link>
+              <Link to={"/sign_up"} replace>Create it.</Link>
             </Signup>
           </div>
         </WrapContainer>

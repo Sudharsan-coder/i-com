@@ -44,21 +44,39 @@ router.post("/create", TokenVerify, async (req, res) => {
 //Get Specific User Posts
 router.get("/user/:userId/posts", async (req, res) => {
   const { userId } = req.params;
+  const { type } = req.query;
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
   try {
-    let posts, totalCount, totalPages;
-    totalCount = await Post.countDocuments({ user: userId });
+    let posts, totalCount, totalPages, postIds;
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: "User notfound" });
+    }
+    switch (type) {
+      case "myPost":
+        postIds = user.posts;
+        break;
+      case "savedPost":
+        postIds = user.savedPost;
+        break;
+      case "commentedPost":
+        postIds = user.commented;
+        break;
+      case "likedPost":
+        postIds = user.liked;
+        break;
+    }
+    totalCount = postIds.length;
     totalPages = Math.ceil(totalCount / pageSize);
-    posts = await Post.find({ user: userId })
+    posts = await Post.find({ _id: { $in: postIds } })
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .sort({ createdAt: -1 })
       .populate("user", "userName profilePicUrl userBio firstName lastName");
-
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (error) {
-    console.error("Error fetching user posts:", error);
+    // console.error("Error fetching user posts:", error);
     res.status(500).json({ message: "Error fetching user posts" });
   }
 });
@@ -87,12 +105,20 @@ router.put(
 
 //Save Post Endpoint
 router.post(
-  "/savePost/:userId",
+  "/savePost/:userId/:postId",
   verifyTokenAndAuthorization,
   async (req, res) => {
+    const { postId } = req.params;
+    const userId = req.user._id;
     try {
+      const post = await Post.findById(postId);
+      if (post.savedUser.includes(userId)) {
+        return res.status(400).json({ message: "Post already saved" });
+      }
+      post.savedUser.push(userId);
+      await post.save();
       const savePost = await User.findByIdAndUpdate(req.user._id, {
-        $addToSet: { savePost: req.params.postId },
+        $addToSet: { savedPost: postId },
       });
       res.status(200).json({ message: "Post saved successfully" });
     } catch (error) {
@@ -103,7 +129,39 @@ router.post(
   }
 );
 
-//Get all post(Main page) && Search post Endpoint
+//UnSave Post Endpoint
+router.post(
+  "/unsavePost/:userId/:postId",
+  verifyTokenAndAuthorization,
+  async (req, res) => {
+    const { postId } = req.params;
+    const userId = req.user._id;
+    try {
+      const post = await Post.findById(postId);
+      if (!post.savedUser.includes(userId)) {
+        return res.status(400).json({ message: "Post not liked" });
+      }
+      post.savedUser = post.savedUser.filter(
+        (savedId) => savedId.toString() !== userId
+      );
+      await post.save();
+      await User.updateOne(
+        { _id: userId },
+        {
+          $pull: {
+            savedPost: postId,
+          },
+        }
+      );
+      res.json({ message: "Post unsaved successfully" });
+    } catch (error) {
+      console.error("Error unsaved post:", error);
+      res.status(500).json({ error: "Error unsaved post" });
+    }
+  }
+);
+
+//Get All Post(Main page) && Search Post Endpoint && Tag Post Endpoint
 router.get("/", async (req, res) => {
   const tag = req.query.tag;
   const search = req.query.search;
@@ -123,11 +181,25 @@ router.get("/", async (req, res) => {
         .sort({ $natural: -1 });
     } else if (tag) {
       totalCount = await Post.countDocuments({
-        tag: { $in: [tag] },
+        tags: { $in: [tag] },
       });
       totalPages = Math.ceil(totalCount / pageSize);
       posts = await Post.find({
-        tag: { $in: [tag] },
+        tags: { $in: [tag] },
+      })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate("user", "userName profilePicUrl userBio firstName lastName")
+        .sort({ $natural: -1 });
+    } else if(search && tag) {
+      totalCount = await Post.countDocuments({
+        title: { $regex: search, $options: "i" },
+        tags: { $in: [tag] },
+      });
+      totalPages = Math.ceil(totalCount / pageSize);
+      posts = await Post.find({
+        title: { $regex: search, $options: "i" },
+        tags: { $in: [tag] },
       })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
@@ -149,32 +221,23 @@ router.get("/", async (req, res) => {
   }
 });
 
-//Get Following Post Endpoint
+//Get Following Users Post and Following Tags Endpoint
 router.get("/followingPost", TokenVerify, async (req, res) => {
   const userId = req.user._id;
-  // const userid2 = "65aca91a243715df848816b7";
-  // console.log(userid2);
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
   try {
     const user = await User.findById(userId).populate("followings");
-    // console.log(user);
-
     const followingIds = user.followings.map((following) => following._id);
-    // const followingIds = [userId,userId2];
-    // console.log(followingIds);
-
     const totalCount = await Post.countDocuments({
       user: { $in: followingIds },
     });
     const totalPages = Math.ceil(totalCount / pageSize);
-
     const posts = await Post.find({ user: { $in: followingIds } })
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .sort({ $natural: -1 })
       .populate("user", "userName profilePicUrl userBio firstName lastName");
-
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (err) {
     console.error(err);
@@ -192,22 +255,6 @@ router.get("/:postid", async (req, res) => {
     );
     res.status(200).send(postdetails);
   } catch (err) {}
-});
-
-//Get Top 10 Category
-router.get("/topCategory", async (req, res) => {
-  try {
-    const last7Days = new Date();
-    last7Days.setDate(last7Days.getDate() - 7);
-
-    const posts = await Post.find({
-      createdAt: { $gte: last7Days },
-    });
-
-    res.status(200).json(posts);
-  } catch (err) {
-    res.status(500).send(err);
-  }
 });
 
 // Add comment

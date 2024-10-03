@@ -3,12 +3,14 @@ body {
   margin: 0px;
   background-color: rgb(245, 245, 245);
   box-sizing: border-box;
+  
 }
 * {
   font-family: "-apple-system";
 }
 :root {
   --primary_color: #1c7ed6;
+  --seconday_color: #d6e7f886;
 }
 
 /* Mantine ui */

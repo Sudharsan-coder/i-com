@@ -1,32 +1,43 @@
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
-import { Avatar, Input, LoadingOverlay, MultiSelect } from "@mantine/core";
+import {
+  Avatar,
+  Button,
+  Input,
+  LoadingOverlay,
+  Modal,
+  MultiSelect,
+} from "@mantine/core";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Content from "./Content";
 import { setCreatePost } from "../../Redux/Slices/publicPostsSlice";
+import { picUpdatingModal } from "../../Redux/Slices/authSlice";
+import Change_pic from "../Profile/Change_pic";
 
 const Post_create_box = () => {
   const { isCreatingPost, postModelType, createPost } = useSelector(
     (state) => state.publicPosts
   );
-  const { user } = useSelector((state) => state.auth);
+  const { user, isChangingPicUrl, changedPicUrl } = useSelector(
+    (state) => state.auth
+  );
   const dispatch = useDispatch();
 
-  const imagetobase64 = (e) => {
-    var reader = new FileReader();
-    reader.readAsDataURL(e.target.files[0]);
-    reader.onload = () => {
-      setCreatePost({
-        ...createPost,
-        bannerPic: typeof reader.result === "string" ? reader.result : "",
-      });
-    };
-    reader.onerror = (err) => {
-      console.log(err);
-    };
+  useEffect(() => {
+    if (changedPicUrl) {
+      dispatch(setCreatePost({...createPost,bannerPic:changedPicUrl}));
+    }
+  }, [changedPicUrl]);
+
+  const openUpdatingBannerPicModal = () => {
+    dispatch(picUpdatingModal(true));
+  };
+
+  const closeUpdatingBannerPicModal = () => {
+    dispatch(picUpdatingModal(false));
   };
 
   const [data, setData] = useState([
@@ -76,6 +87,13 @@ const Post_create_box = () => {
 
   return (
     <Container>
+      <Modal
+        opened={isChangingPicUrl}
+        onClose={closeUpdatingBannerPicModal}
+        title='Change Banner Picture'
+      >
+        <Change_pic />
+      </Modal>
       <Left>
         <LoadingOverlay
           visible={isCreatingPost}
@@ -83,13 +101,13 @@ const Post_create_box = () => {
         />
         <BOX onSubmit={handleSubmit}>
           <label>Banner Picture</label>
-          <Avatar src={createPost.bannerPic} />
-          <input
-            type='file'
-            id='images'
-            accept='image/*'
-            onChange={imagetobase64}
-          />
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            <Avatar
+              src={createPost.bannerPic}
+              size={80}
+            />
+            <Button onClick={openUpdatingBannerPicModal}>Upload Banner</Button>
+          </div>
           <label>Title</label>
           <Input
             className='title'

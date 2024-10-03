@@ -29,7 +29,7 @@ const Sign_up = () => {
   );
 
   useEffect(() => {
-    if (isAuth) navigate("/sign_in");
+    if (isAuth) navigate("/");
   }, [isAuth]);
   
   useEffect(()=>{

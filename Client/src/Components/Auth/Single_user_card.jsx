@@ -30,18 +30,20 @@ export default Single_user_card;
 
 const Container = styled.div`
   margin-top: 1rem;
-  box-shadow: 10px 5px 14px rgba(0, 0, 0, 0.07);
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  background-color: white;
+  border: 0.0625rem solid #dee2e6;
+  box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 0.625rem 0.9375rem -0.3125rem, rgba(0, 0, 0, 0.04) 0 0.4375rem 0.4375rem -0.3125rem;
+  padding: 1.25rem;
 `;
 const Wrap = styled.div`
   display: flex;
   gap: 40px;
-  /* align-items: center; */
 `;
 const Boxs = styled(Box)`
   display: flex;
   align-items: center;
-  padding: 20px;
-  border-radius: 10px;
   text-transform: capitalize;
 `;
 const Username = styled(Title)`

@@ -36,17 +36,19 @@ const Container = styled.div`
     0px 0.8px 5.3px rgba(0, 0, 0, 0.028), 0px 1.5px 10px rgba(0, 0, 0, 0.035),
     0px 2.7px 17.9px rgba(0, 0, 0, 0.042), 0px 5px 33.4px rgba(0, 0, 0, 0.05),
     0px 12px 80px rgba(0, 0, 0, 0.07);
+
   .banner {
-    display: ${(props) => (props.banner !== "" ? "block" : "none")};
-    background: ${(props) =>
-      props.banner !== "" ? `url(${props.banner})` : "black"};
+    display: ${(props) => (props.banner ? "block" : "none")};
+    background-image: ${(props) => `url("${props.banner}")`};
     background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
     height: 50vh;
-    /* margin: 0px -50px; */
   }
+
   .main {
     padding: 15px 50px;
+
     .heading {
       font-size: 2em;
     }

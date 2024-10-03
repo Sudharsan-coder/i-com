@@ -5,6 +5,7 @@ import {
   IconLogout2,
   IconUserEdit,
 } from "@tabler/icons-react";
+import { TbActivity } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import React from "react";
@@ -57,8 +58,14 @@ const User = () => {
           Edit Profile
         </Menu.Item>
         <Menu.Item
+          icon={<TbActivity size={14} />}
+          onClick={() => navigate("/your_activity/likedPost",{replace:true})}
+        >
+          Your Activity
+        </Menu.Item>
+        <Menu.Item
           icon={<RiLockPasswordFill size={14} />}
-          onClick={() => navigate("/forgetPassword")}
+          onClick={() => navigate("/forgetPassword",{replace:true})}
         >
           Change Password
         </Menu.Item>

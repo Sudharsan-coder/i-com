@@ -3,6 +3,7 @@ import { eventChannel } from "redux-saga";
 import {
   addCommentToPost,
   addLikeToPost,
+  addSaveToPost,
   closeCreatePostModel,
   creatingPostFailed,
   creatingPostStarted,
@@ -12,8 +13,13 @@ import {
   editingPostStarted,
   editingPostSuccess,
   getAllPostsStarted,
+  getPopularPostsFailed,
+  getPopularPostsStarted,
+  getPopularPostsSuccess,
+  getPopularTagsFailed,
+  getPopularTagsStarted,
+  getPopularTagsSuccess,
   getSinglePostStarted,
-  openCreatePostModel,
   reportToPostFailed,
   reportToPostStarted,
   reportToPostSuccess,
@@ -23,10 +29,12 @@ import {
   setSinglePost,
   setSinglePostComments,
   unlikeToPost,
+  unSaveToPost,
 } from "./Slices/publicPostsSlice";
 import axios from "axios";
 import {
   addLikeToSearchListPost,
+  addSaveToSearchListPost,
   editingSearchPostSuccess,
   getSearchPostStarted,
   getSearchUserStarted,
@@ -35,6 +43,7 @@ import {
   setSearchPost,
   setSearchUser,
   unLikeToSearchListPost,
+  unSaveToSearchListPost,
 } from "./Slices/searchSlice";
 import Cookies from "js-cookie";
 import {
@@ -60,9 +69,18 @@ import {
   forgetPasswordVerificationSuccess,
   forgetPasswordVerificationFailed,
   setCheckUserNameMessage,
+  picUpdatingSuccess,
+  picUpdatingStarted,
+  picUpdatingFailed,
+  addLikedToUserPost,
+  unlikedToUserPost,
+  addSavedToUserPost,
+  unSavedToUserPost,
+  setFollowTagsModal,
 } from "./Slices/authSlice";
 import {
   addLikeToProfilePost,
+  addSaveToProfilePost,
   deletePostFailed,
   deletePostStarted,
   deletePostSuccess,
@@ -79,6 +97,8 @@ import {
   setNoMoreFollowUsers,
   setNoMoreMyPost,
   setProfile,
+  unLikeToProfilePost,
+  unSaveToProfilePost,
 } from "./Slices/ProfileSlice";
 import { getSocket, initiateSocketConnetion } from "./Socket";
 import {
@@ -87,8 +107,8 @@ import {
   sendMessageSuccess,
 } from "./Slices/messageSlice";
 
-// const baseURL = "https://icom-okob.onrender.com";
-const baseURL = "http://localhost:5010";
+const baseURL =
+  import.meta.env.VITE_LOCAL_BASE_API_URL || import.meta.env.BASE_API_URL;
 
 //#region Account Service
 function* signIn(action) {
@@ -96,7 +116,7 @@ function* signIn(action) {
     yield put(signInStarted());
     const res = yield call(axios.post, `${baseURL}/auth/login`, action.data);
     const token = res.data.accessToken;
-    Cookies.set("auth_Token", token);
+    Cookies.set("auth_Token", token, { expires: 7 });
     yield put(signInSuccess(res.data));
     yield put(resetAllPosts());
   } catch (err) {
@@ -112,6 +132,7 @@ function* signUp(action) {
     const token = res.data.accessToken;
     Cookies.set("auth_Token", token);
     yield put(signUpSuccess(res.data));
+    yield put(setFollowTagsModal(true));
   } catch (err) {
     console.log(err);
     yield put(signUpFailed(err.response.data.message));
@@ -127,7 +148,7 @@ function* validateUser(action) {
       },
     });
     const token = res.data.accessToken;
-    Cookies.set("auth_Token", token);
+    Cookies.set("auth_Token", token, { expires: 7 });
     yield put(authenticationSucess(res.data));
     yield put(resetAllPosts());
   } catch (err) {
@@ -222,6 +243,26 @@ function* getFollingPosts(action) {
     }
   } else {
     yield put(setNoMore());
+  }
+}
+
+function* getPopularPosts(action) {
+  try {
+    yield put(getPopularPostsStarted());
+    const res = yield call(axios.get, `${baseURL}/categoryPost/topLikedPosts`);
+    yield put(getPopularPostsSuccess(res.data));
+  } catch (err) {
+    yield put(getPopularPostsFailed(err.response.data.message));
+  }
+}
+function* getPopularTags(action) {
+  try {
+    yield put(getPopularTagsStarted());
+    const res = yield call(axios.get, `${baseURL}/categoryPost/topCategory`);
+    
+    yield put(getPopularTagsSuccess(res.data));
+  } catch (err) {
+    yield put(getPopularTagsFailed(err.response.data.message));
   }
 }
 
@@ -320,6 +361,7 @@ function* getSearchPost(action) {
         params: {
           search: action.data.value,
           page: page,
+          tag:action.data.tag,
         },
       });
       yield put(setSearchPost(res.data));
@@ -377,6 +419,7 @@ function* commentPost(action) {
 
 function* likePost(action) {
   try {
+    addLikedToUserPost(action.data.postId);
     yield put(
       addLikeToPost({ userId: action.data.userId, postId: action.data.postId })
     );
@@ -411,11 +454,18 @@ function* likePost(action) {
 
 function* unlikePost(action) {
   try {
+    yield put(unlikedToUserPost(action.data.postId));
     yield put(
       unlikeToPost({ userId: action.data.userId, postId: action.data.postId })
     );
     yield put(
       unLikeToSearchListPost({
+        userId: action.data.userId,
+        postId: action.data.postId,
+      })
+    );
+    yield put(
+      unLikeToProfilePost({
         userId: action.data.userId,
         postId: action.data.postId,
       })
@@ -437,9 +487,57 @@ function* unlikePost(action) {
   }
 }
 
+function* savePost(action) {
+  const { userId, postId } = action.data;
+  try {
+    yield put(addSavedToUserPost(postId));
+    yield put(addSaveToProfilePost({ userId, postId }));
+    yield put(addSaveToSearchListPost({ userId, postId }));
+    yield put(addSaveToPost({ userId, postId }));
+    const auth_token = Cookies.get("auth_Token");
+    const res = yield call(
+      axios.post,
+      `${baseURL}/post/savePost/${userId}/${postId}`,
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + auth_token,
+        },
+      }
+    );
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function* unsavePost(action) {
+  const { userId, postId } = action.data;
+  try {
+    yield put(unSavedToUserPost(postId));
+    yield put(unSaveToProfilePost({ userId, postId }));
+    yield put(unSaveToSearchListPost({ userId, postId }));
+    yield put(unSaveToPost({ userId, postId }));
+    const auth_token = Cookies.get("auth_Token");
+    const res = yield call(
+      axios.post,
+      `${baseURL}/post/unsavePost/${userId}/${postId}`,
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + auth_token,
+        },
+      }
+    );
+    console.log(res);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 //#region Profile
 function* getMyPost(action) {
-  const { page, totalPages, userId } = action.data;
+  const { page, totalPages, userId, type } = action.data;
   if (page <= totalPages) {
     try {
       if (page === 1) yield put(getMyPostsStarted());
@@ -449,6 +547,7 @@ function* getMyPost(action) {
         {
           params: {
             page: page,
+            type: type,
           },
         }
       );
@@ -504,6 +603,27 @@ function* followProfile(action) {
     yield put(followingSuccess(res.data.message));
   } catch (err) {
     console.log(err);
+  }
+}
+
+function* updataPic(action) {
+  yield put(picUpdatingStarted());
+  try {
+    const formData = new FormData();
+    formData.append("file", action.data.file);
+
+    const res = yield call(axios.post, `${baseURL}/image/upload`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    yield put(picUpdatingSuccess(res.data.imageUrl));
+    console.log(res);
+  } catch (err) {
+    const errResponse = err.response ? err.response.data.message : err.message;
+    console.log(errResponse);
+    yield put(picUpdatingFailed(errResponse));
   }
 }
 
@@ -696,6 +816,8 @@ function* rootSaga() {
   yield fork(initSocket); //start socket connection
   //fork instead of call. fork is a non-blocking effect, meaning that it will allow other effects to run in parallel without waiting for initSocket to complete.
   yield takeLatest("GET_ALL_POSTS", getAllPosts);
+  yield takeLatest("GET_POPULAR_POST", getPopularPosts);
+  yield takeLatest("GET_POPULAR_TAGS", getPopularTags);
   yield takeLatest("GET_FOLLOWING_POSTS", getFollingPosts);
   yield takeLatest("VIEW_POST", viewPost);
   yield takeLatest("GET_POST_COMMENTS", getPostCommments);
@@ -709,12 +831,15 @@ function* rootSaga() {
   yield takeLatest("COMMENT_POST", commentPost);
   yield takeLatest("LIKE_POST", likePost);
   yield takeLatest("UNLIKE_POST", unlikePost);
+  yield takeLatest("SAVE_POST", savePost);
+  yield takeLatest("UNSAVE_POST", unsavePost);
   yield takeLatest("EDIT_POST", editPost);
   yield takeLatest("REPORT_POST", reportPost);
   yield takeLatest("GET_MY_POST", getMyPost);
   yield takeLatest("GET_PROFILE", getProfile);
   yield takeLatest("FOLLOW_PROFILE", followProfile);
   yield takeLatest("UPDATE_PROFILE", updateProfile);
+  yield takeLatest("UPDATE_PIC", updataPic);
   yield takeLatest("DELETE_ACCOUNT", deleteAccount);
   yield takeLatest("CREATE_POST", createPost);
   yield takeLatest("GET_FOLLOWER_USERS", getFollowerUser);
