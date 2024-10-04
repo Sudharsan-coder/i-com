@@ -71,7 +71,7 @@ const Post_menu = (props) => {
   };
 
   // const postURL = `https://icom-okob.onrender.com/post/${postId}`;
-  const postURL = `http://localhost:5173/post/${props._id}`;
+  const postURL = `${import.meta.env.VITE_BASE_API_URL}/post/${props._id}`;
   return (
     <>
       <Modal

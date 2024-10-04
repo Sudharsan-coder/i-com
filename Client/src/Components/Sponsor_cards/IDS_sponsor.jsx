@@ -1,5 +1,6 @@
 import { Card, Image, Text, Badge, Button, Group } from '@mantine/core';
 import React from 'react'
+import IDS from '../../assets/IDS_sponsor.png'
 
 const IDS_sponsor = () => {
   return (
@@ -19,7 +20,7 @@ const IDS_sponsor = () => {
       }}>
       <Card.Section >
         <Image
-          src="http://localhost:5010/user/profilePic/1727938070319-Nothing's-New-IDS.jpeg"
+          src={IDS}
           height={160}
           alt="Norway"
         />

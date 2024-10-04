@@ -107,8 +107,7 @@ import {
   sendMessageSuccess,
 } from "./Slices/messageSlice";
 
-const baseURL =
-  import.meta.env.VITE_LOCAL_BASE_API_URL || import.meta.env.BASE_API_URL;
+const baseURL = import.meta.env.VITE_BASE_API_URL;
 
 //#region Account Service
 function* signIn(action) {

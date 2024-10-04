@@ -12,7 +12,7 @@ router.post("/upload", upload.single("file"), (req, res) => {
     .status(200)
     .json({
       message: "File uploaded successfully",
-      imageUrl: `http://localhost:5010/image/${req.file.filename}`,
+      imageUrl: `https://icom-okob.onrender.com/image/${req.file.filename}`,
     });
 });
 
