@@ -16,6 +16,7 @@ import ForgetPassword from "./Pages/ForgetPassword.jsx";
 import Your_activity from "./Pages/Your_activity.jsx";
 import Footer from "./Components/Footer.jsx";
 import FollowTagsModal from "./Components/Auth/FollowTagsModal.jsx";
+import Auth_google_success from "./Pages/Auth_google_success.jsx";
 
 const MainLayout = () => (
   <>
@@ -80,6 +81,11 @@ function App() {
           path='/forgetPassword'
           element={<ForgetPassword />}
         />
+        <Route
+          path='/auth/google/success'
+          element={<Auth_google_success />}
+        />
+        
         <Route
           path='/*'
           element={<MainLayout />}

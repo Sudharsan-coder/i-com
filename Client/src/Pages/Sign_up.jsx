@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import sign_up_img from "../assets/sign_up.webp";
-import { Input, LoadingOverlay, PasswordInput } from "@mantine/core";
+import { Button, Divider, Input, LoadingOverlay, PasswordInput } from "@mantine/core";
 import { IconAt, IconLock, IconUserCircle } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { setCheckUserNameMessage } from "../Redux/Slices/authSlice";
+import { FaGoogle } from "react-icons/fa";
+import Logo from "../Components/Logo";
 const Sign_up = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -40,14 +42,14 @@ const Sign_up = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-
+  
   const validatePassword = (password) => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d).{8,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
     return passwordRegex.test(password);
   };
 
   const validateName = (name) => {
-    const nameRegex = /^(?=.*[A-Z a-z])$/;
+    const nameRegex = /^[A-Za-z\s]+$/;
     return nameRegex.test(name);
   };
 
@@ -114,14 +116,16 @@ const Sign_up = () => {
       dispatch({ type: "SIGN_UP", data: reg });
     }
   };
+  
+  const handleGoogleLogin = () => {
+    window.open("http://localhost:5010/auth/google", "_self");
+  };
 
   return (
     <Container>
       <Left>
         <Heading>
-          <span className='welcome'>
-            Welcome to <span>iCom!</span>
-          </span>
+          <Logo/>
         </Heading>
         <WrapContainer onSubmit={handleSubmit}>
           <LoadingOverlay
@@ -131,6 +135,22 @@ const Sign_up = () => {
           <Heading>
             <span className='title'>Sign up</span>
           </Heading>
+        <Oauth>
+            <GoogleOauth
+              variant='outline'
+              fullWidth
+              onClick={handleGoogleLogin}
+            >
+              Sign up with Google
+              <Icon>
+                <FaGoogle size={20} />
+              </Icon>
+            </GoogleOauth>
+          </Oauth>
+          
+          <OR>
+          <Divider my="xs" label="Or" labelPosition="center" />
+          </OR>
           <Name>
             <Input.Wrapper
               label='First Name'
@@ -244,14 +264,7 @@ const WrapContainer = styled.form`
 `;
 const Heading = styled.div`
   text-align: center;
-  .welcome {
-    font-size: 25px;
-    span {
-      font-size: 45px;
-
-      color: var(--primary_color);
-    }
-  }
+  font-size: 45px;
   .title {
     font-size: 28px;
   }
@@ -276,3 +289,13 @@ const Name = styled.div`
   display: flex;
   gap: 20px;
 `;
+
+const Oauth = styled.div``;
+const GoogleOauth = styled(Button)``;
+const Icon = styled.div`
+  margin-left: 10px;
+`;
+
+const OR = styled.div`
+  
+`

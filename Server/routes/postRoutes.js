@@ -1,20 +1,11 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
-const { TokenVerify, verifyTokenAndAuthorization } = require("./verifyToken");
-const nodemailer = require("nodemailer");
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.example.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASSWORD,
-  },
-  tls: { rejectUnauthorized: false },
-});
+const {
+  TokenVerify,
+  verifyTokenAndAuthorization,
+} = require("../Middleware/authMiddleware");
+const { sendMail } = require("../services/emailService");
 
 //Add Post
 router.post("/create", TokenVerify, async (req, res) => {
@@ -29,7 +20,7 @@ router.post("/create", TokenVerify, async (req, res) => {
     // Populate the 'user' field with the necessary fields
     post = await Post.findById(post._id).populate(
       "user",
-      "userName profilePicUrl"
+      "userName profilePicUrl firstName lastName userBio"
     );
 
     // Add the post id to the user's collection using updateOne
@@ -191,7 +182,7 @@ router.get("/", async (req, res) => {
         .limit(pageSize)
         .populate("user", "userName profilePicUrl userBio firstName lastName")
         .sort({ $natural: -1 });
-    } else if(search && tag) {
+    } else if (search && tag) {
       totalCount = await Post.countDocuments({
         title: { $regex: search, $options: "i" },
         tags: { $in: [tag] },
@@ -511,16 +502,11 @@ router.post("/reportPost", async (req, res) => {
   const { message, postUrl } = req.body;
 
   try {
-    await transporter.sendMail({
-      from: {
-        name: "Nothing's New",
-        address: "pkumar24rk@gmail.com",
-      },
-      to: "pradeepkumar24rk@gmail.com",
-      subject: "Report Post Notification",
-      html: `<h5>Post URL: ${postUrl}</h5><p>New report received with the following message:</p><p>${message}</p>`,
-    });
-
+    await sendMail(
+      "pradeepkumar24rk@gmail.com",
+      "Report Post Notification",
+      `<h5>Post URL: ${postUrl}</h5><p>New report received with the following message:</p><p>${message}</p>`
+    );
     res.status(200).json({ message: "Report successfully sent!" });
   } catch (err) {
     console.error("Error while sending email:", err);

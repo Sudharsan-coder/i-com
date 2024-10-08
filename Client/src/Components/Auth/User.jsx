@@ -22,8 +22,11 @@ const User = () => {
   const DeleteAccount = () => {
     var result = confirm("Are you sure to delete the Account?");
     if (result) {
-      dispatch({ type: "DELETE_ACCOUNT",data:user._id});
+      dispatch({ type: "DELETE_ACCOUNT", data: user._id });
     }
+  };
+  const handleRightClick = (e) => {
+    e.preventDefault();
   };
   return (
     <Menus
@@ -32,9 +35,12 @@ const User = () => {
     >
       <Menu.Target>
         <Avatar
+          onContextMenu={handleRightClick}
           src={user.profilePicUrl}
           alt={user.userName}
-        />
+        >
+          {user.userName[0] + user.userName[user.userName.length - 1]}
+        </Avatar>
       </Menu.Target>
 
       <Menu.Dropdown>
@@ -59,16 +65,21 @@ const User = () => {
         </Menu.Item>
         <Menu.Item
           icon={<TbActivity size={14} />}
-          onClick={() => navigate("/your_activity/likedPost",{replace:true})}
+          onClick={() =>
+            navigate("/your_activity/likedPost", { replace: true })
+          }
         >
           Your Activity
         </Menu.Item>
-        <Menu.Item
-          icon={<RiLockPasswordFill size={14} />}
-          onClick={() => navigate("/forgetPassword",{replace:true})}
-        >
-          Change Password
-        </Menu.Item>
+        {!user.googleId && (
+          <Menu.Item
+            icon={<RiLockPasswordFill size={14} />}
+            onClick={() => navigate("/forgetPassword", { replace: true })}
+          >
+            Change Password
+          </Menu.Item>
+        )}
+
         <Menu.Item
           icon={<IconLogout2 size={14} />}
           onClick={signOff}

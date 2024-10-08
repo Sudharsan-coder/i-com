@@ -27,7 +27,7 @@ const Main_page = () => {
 
   useEffect(() => {
     dispatch({ type: "GET_POPULAR_POST" });
-    dispatch({type:"GET_POPULAR_TAGS"});
+    dispatch({ type: "GET_POPULAR_TAGS" });
   }, []);
 
   const fetchAllPosts = () => {
@@ -50,20 +50,18 @@ const Main_page = () => {
           <IDS_sponsor />
           <Main_page_footer />
         </LeftColumn>
-        <MiddleColumn isfollingTagsAvailable={user.followingHashTags!==0}>
+        <MiddleColumn isfollingTagsAvailable={user.followingHashTags !== 0}>
           {isGettingAllPost ? (
             <MainpageLoading />
           ) : (
             <>
-              {isAuth && user?.followingHashTags!==0 && <FollowingTag />}
+              {isAuth && user?.followingHashTags !== 0 && <FollowingTag />}
               {allPost.length !== 0 ? (
-                
-                  <Main_post
-                    allPost={allPost}
-                    fetchData={fetchAllPosts}
-                    hasmore={more}
-                  />
-                
+                <Main_post
+                  allPost={allPost}
+                  fetchData={fetchAllPosts}
+                  hasmore={more}
+                />
               ) : isAuth ? (
                 <NotFound>
                   <h1>Follow the Peoples</h1>
@@ -101,7 +99,7 @@ const LeftColumn = styled.div`
 
 const MiddleColumn = styled.div`
   grid-column: 2;
-  display: ${(props)=>props.isfollingTagsAvailable?"block":"grid"};
+  display: ${(props) => (props.isfollingTagsAvailable ? "block" : "grid")};
   grid-template-rows: 90px auto;
 `;
 

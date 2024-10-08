@@ -14,7 +14,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Content from "./Content";
 import { setCreatePost } from "../../Redux/Slices/publicPostsSlice";
-import { picUpdatingModal } from "../../Redux/Slices/authSlice";
+import { picUpdatingModal, resetChangedPicUrl } from "../../Redux/Slices/authSlice";
 import Change_pic from "../Profile/Change_pic";
 
 const Post_create_box = () => {
@@ -25,6 +25,10 @@ const Post_create_box = () => {
     (state) => state.auth
   );
   const dispatch = useDispatch();
+  
+  useEffect(()=>{
+    dispatch(resetChangedPicUrl());
+  },[])
 
   useEffect(() => {
     if (changedPicUrl) {

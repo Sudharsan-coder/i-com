@@ -105,7 +105,15 @@ const authSlice = createSlice({
     },
     signOffSuccess: (state) => {
       state.isAuth = false;
-      state.user = { _id: null };
+      state.user = {
+        _id: null,
+        followings: [],
+        tags: [],
+        profilePicUrl: "",
+        liked: [],
+        savedPost: [],
+        followingHashTags: [],
+      };
       notifications.show({
         title: "Sign Off Successfully",
         message: "You have been logged out successfully.",
@@ -151,6 +159,9 @@ const authSlice = createSlice({
         color: "red",
         id: "load-data",
       });
+    },
+    resetChangedPicUrl: (state) => {
+      state.changedPicUrl = "";
     },
     picUpdatingModal: (state, action) => {
       state.isChangingPicUrl = action.payload;
@@ -202,17 +213,15 @@ const authSlice = createSlice({
       };
       notifications.update({
         id: "delete-account",
-        loading: true,
+        color: "green",
         title: "Deleted",
         message: "Account Deleted Successfully",
-        autoClose: false,
-        withCloseButton: false,
       });
     },
     profileDeletingFailed: (state) => {
       notifications.update({
         id: "delete-account",
-        loading: true,
+        color: "red",
         title: "Deleting Account",
         message: "Deleting Account Failed",
         autoClose: false,
@@ -297,4 +306,5 @@ export const {
   unSavedToUserPost,
   unlikedToUserPost,
   setFollowTagsModal,
+  resetChangedPicUrl,
 } = authSlice.actions;

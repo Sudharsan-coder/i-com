@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
-const { TokenVerify, verifyTokenAndAuthorization } = require("./verifyToken");
+const { TokenVerify, verifyTokenAndAuthorization } = require("../Middleware/authMiddleware");
 
 // Get Top 10 Most Used Categories (Tags) in Last 7 Days
 router.get("/topCategory", async (req, res) => {

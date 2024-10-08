@@ -8,6 +8,9 @@ import Buttons from "./Buttons";
 const ProfileCard = ({ userDetail }) => {
   const navigate = useNavigate();
   // console.log(userDetail);
+  const handleRightClick = (e) => {
+    e.preventDefault();
+  };
 
   const { user } = useSelector((state) => state.auth);
   return (
@@ -36,11 +39,13 @@ const ProfileCard = ({ userDetail }) => {
           }}
         >
           <Avatar
+            onContextMenu={handleRightClick}
             size={100}
             radius='xl'
             src={userDetail.profilePicUrl}
-            alt={"pradeep"}
-          />
+          >
+          {userDetail.userName[0] + userDetail.userName[userDetail.userName.length-1]}
+          </Avatar>
         </div>
 
         <Title

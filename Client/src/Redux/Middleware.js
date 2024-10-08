@@ -130,7 +130,7 @@ function* signUp(action) {
     const res = yield call(axios.post, `${baseURL}/auth/register`, action.data);
     const token = res.data.accessToken;
     Cookies.set("auth_Token", token);
-    yield put(signUpSuccess(res.data));
+    yield put(signUpSuccess(res.data._doc));
     yield put(setFollowTagsModal(true));
   } catch (err) {
     console.log(err);
@@ -169,9 +169,20 @@ function* checkUserName(action) {
 }
 
 function* signOff() {
+  try {
   Cookies.remove("auth_Token");
+  const params = new URLSearchParams(window.location.search);
+  params.delete('token');
+  window.history.replaceState({}, '', `${window.location.pathname}`);
   yield put(signOffSuccess());
   yield put(resetAllPosts());
+    const res = yield call(axios.get,`${baseURL}/auth/google/logout`)
+    console.log(res);
+    
+  } catch (err) {
+    console.log(err);
+    
+  }
 }
 
 function* deleteAccount(action) {
@@ -180,7 +191,7 @@ function* deleteAccount(action) {
     const token = Cookies.get("auth_Token");
     const res = yield call(
       axios.delete,
-      `${baseURL}/user/delete/${action.data._id}`,
+      `${baseURL}/user/delete/${action.data}`,
       {
         headers: {
           Authorization: "Bearer " + token,
@@ -192,6 +203,24 @@ function* deleteAccount(action) {
   } catch (err) {
     console.log();
     yield put(profileDeletingFailed());
+  }
+}
+
+function* googleAuth(action) {
+  try {
+    const res = yield call(axios.get,`${baseURL}/auth/google/success`,{
+     withCredentials:true, 
+     headers:{
+      Authorization:"Bearer "+action.data.token
+     }
+    });
+    Cookies.set("auth_Token", res.data.accessToken);
+    yield put(signUpSuccess(res.data._doc));
+    if(res.data.isNewUser)
+      yield put(setFollowTagsModal(true));
+  } catch (err) {
+    console.log(err);
+    yield put(signUpFailed(err.response.data.message));
   }
 }
 
@@ -827,6 +856,7 @@ function* rootSaga() {
   yield takeLatest("VALIDATE_USER", validateUser);
   yield takeLatest("CHECK_USER_NAME", checkUserName);
   yield takeLatest("SIGN_OFF", signOff);
+  yield takeLatest("GOOGLE_AUTH",googleAuth);
   yield takeLatest("COMMENT_POST", commentPost);
   yield takeLatest("LIKE_POST", likePost);
   yield takeLatest("UNLIKE_POST", unlikePost);

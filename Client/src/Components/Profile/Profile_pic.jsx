@@ -1,13 +1,23 @@
 import { Avatar } from '@mantine/core'
-import pic from '../../assets/I_com_Logo.png'
 import { styled } from 'styled-components'
 
 const Profile_pic = (props) => {
+  const handleRightClick = (e) => {
+    e.preventDefault();
+  };
   return (
-    <Block src={props.profilePicUrl}/>
+  <Contianer onContextMenu={handleRightClick}>
+    <Block src={props.profilePicUrl} size={100}>
+      {props.userName[0]+props.userName[props.userName.length-1]}
+    </Block>
+  </Contianer>
   )
 }
 export default Profile_pic
+
+const Contianer = styled.div `
+  
+`
 
 const Block=styled(Avatar)`
     position: relative;
@@ -17,4 +27,5 @@ const Block=styled(Avatar)`
     height: 110px;
     border-radius: 100%;
     border: 10px solid black;
+    /* pointer-events: none; */
 `

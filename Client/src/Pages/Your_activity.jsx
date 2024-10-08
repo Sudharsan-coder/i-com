@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import Your_activity_menus from "../Components/YourActivity/Your_activity_menus";
 import Your_activity_post from "../Components/YourActivity/Your_activity_post";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const Your_activity = () => {
+  const{isAuth} = useSelector((state)=>state.auth)
+  const navigate = useNavigate();
+  useEffect(()=>{
+    if(!isAuth)
+      navigate('/')
+  },[isAuth])
   return (
     <Container>
       <MiddleColumn>

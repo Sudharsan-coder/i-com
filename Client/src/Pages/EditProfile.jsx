@@ -16,7 +16,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Change_pic from "../Components/Profile/Change_pic";
-import { picUpdatingModal } from "../Redux/Slices/authSlice";
+import { picUpdatingModal, resetChangedPicUrl } from "../Redux/Slices/authSlice";
 
 const EditProfile = () => {
   const { user, isAuth, isChangingPicUrl, changedPicUrl } =
@@ -35,7 +35,11 @@ const EditProfile = () => {
     skills: [],
     profilePicUrl: "",
   });
-
+  
+  useEffect(()=>{
+    dispatch(resetChangedPicUrl());
+  },[])
+  
   useEffect(() => {
     if (!isAuth) navigate("/sign_in");
     setProfileDetails(user);

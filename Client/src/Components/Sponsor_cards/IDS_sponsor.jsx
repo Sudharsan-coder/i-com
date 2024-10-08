@@ -27,7 +27,7 @@ const IDS_sponsor = () => {
       </Card.Section>
       <Group style={{justifyContent:"space-between"}} mt="md" mb="xs">
         <Text fw={500}>IDS</Text>
-        <Badge color="red">Sponser</Badge>
+        <Badge color="red">Sponsor</Badge>
       </Group>
 
 

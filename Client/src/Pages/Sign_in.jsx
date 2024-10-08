@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import sign_in_img from "../assets/sign_in.jpeg";
-import { Input, LoadingOverlay, PasswordInput } from "@mantine/core";
+import {
+  Button,
+  Divider,
+  Input,
+  LoadingOverlay,
+  PasswordInput,
+} from "@mantine/core";
 import { IconLock, IconUserCircle } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { FaGoogle } from "react-icons/fa";
 import Logo from "../Components/Logo";
+
 const Sign_in = () => {
   const [log, setLog] = useState({ emailid: "", password: "" });
   const { isSigningIn, isAuth } = useSelector((state) => state.auth);
@@ -42,13 +50,16 @@ const Sign_in = () => {
       dispatch({ type: "SIGN_IN", data: log });
     }
   };
+  
+  const handleGoogleLogin = () => {
+    window.open("http://localhost:5010/auth/google", "_self");
+  };
+  
   return (
     <Container>
       <Left>
         <Heading>
-          
-          <Logo/>
-          
+          <Logo />
         </Heading>
         <WrapContainer onSubmit={handleSubmit}>
           <LoadingOverlay
@@ -58,6 +69,28 @@ const Sign_in = () => {
           <Heading>
             <span className='title'>Sign in</span>
           </Heading>
+
+          <Oauth>
+            <GoogleOauth
+              variant='outline'
+              fullWidth
+              onClick={handleGoogleLogin}
+            >
+              Sign in with Google
+              <Icon>
+                <FaGoogle size={20} />
+              </Icon>
+            </GoogleOauth>
+          </Oauth>
+
+          <OR>
+            <Divider
+              my='xs'
+              label='Or'
+              labelPosition='center'
+            />
+          </OR>
+
           <Input.Wrapper
             label='Email ID'
             withAsterisk
@@ -74,7 +107,7 @@ const Sign_in = () => {
             />
           </Input.Wrapper>
           <Input.Wrapper
-             label='Password'
+            label='Password'
             withAsterisk
             error={passwordError}
           >
@@ -90,11 +123,21 @@ const Sign_in = () => {
           <LoginBtn type='submit'>Login</LoginBtn>
           <div>
             <ForgetPassword>
-              <Link to={"/forgetPassword"} replace = {true}>Forget Password?</Link>
+              <Link
+                to={"/forgetPassword"}
+                replace={true}
+              >
+                Forget Password?
+              </Link>
             </ForgetPassword>
             <Signup>
               If you don't have a account{" "}
-              <Link to={"/sign_up"} replace>Create it.</Link>
+              <Link
+                to={"/sign_up"}
+                replace
+              >
+                Create it.
+              </Link>
             </Signup>
           </div>
         </WrapContainer>
@@ -110,12 +153,14 @@ const Container = styled.div`
   display: flex;
   height: 100vh;
 `;
+
 const Left = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
 `;
+
 const WrapContainer = styled.form`
   display: flex;
   flex-direction: column;
@@ -129,6 +174,7 @@ const WrapContainer = styled.form`
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
 `;
+
 const Heading = styled.div`
   text-align: center;
   font-size: 45px;
@@ -136,6 +182,17 @@ const Heading = styled.div`
     font-size: 28px;
   }
 `;
+
+const Oauth = styled.div``;
+
+const GoogleOauth = styled(Button)``;
+
+const Icon = styled.div`
+  margin-left: 10px;
+`;
+
+const OR = styled.div``;
+
 const LoginBtn = styled.button`
   padding: 0.6rem;
   color: white;
@@ -148,7 +205,9 @@ const LoginBtn = styled.button`
   }
 `;
 const ForgetPassword = styled.p``;
+
 const Signup = styled.p``;
+
 const Right = styled.div`
   flex: 1;
   background: lightblue url(${sign_in_img}) no-repeat center center/cover;

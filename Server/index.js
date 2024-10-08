@@ -6,23 +6,41 @@ const cookieParser = require("cookie-parser");
 const http = require("http");
 const path = require("path");
 const { GridFSBucket } = require("mongodb");
+const passport = require("passport");
+const session = require("express-session")
 
 dotenv.config();
 const app = express();
+app.use(
+  session({
+    secret: "PradeepSecret", // This is used to sign the session ID cookie.
+    resave: false, // Prevents resaving session if it's not modified.
+    saveUninitialized: false, // Doesn't save an empty session.
+    cookie: { secure: false }, // For development, set to `false`. For production, set to `true` and use HTTPS.
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // Your frontend URL
+    credentials: true,               // Allow credentials (cookies) to be sent
+  }));
 app.use(express.json({ limit: "3mb" }));
 const server = http.createServer(app);
 let bucket;
 
-//Routers
-const authRoute = require("./routers/auth");
-const postRoute = require("./routers/post");
-const followRoute = require("./routers/follow");
-const userRoute = require("./routers/userRoutes");
-const socketHandler = require("./routers/socket");
-const categoryPostRoutes = require("./routers/categoryPost");
-const imageRouters = require("./routers/image")
+//Routes
+const authRoutes = require("./routes/authRoutes");
+const postRoutes = require("./routes/postRoutes");
+const followRoutes = require("./routes/followRoutes");
+const userRoutes = require("./routes/userRoutes");
+const categoryPostRoutes = require("./routes/categoryPostRoutes");
+const imageRoutes = require("./routes/imageRoutes");
+
+//Services
+const socketService = require("./services/socketService");
+const oauthService = require('./services/oauthService')
 
 //connect the DB
 mongoose
@@ -37,21 +55,17 @@ mongoose
   });
 
 //Endpoint call
-app.use("/auth", authRoute);
-app.use("/post", postRoute);
-app.use("/follow", followRoute);
-app.use("/user", userRoute);
-app.use("/categoryPost",categoryPostRoutes);
-app.use("/image",imageRouters)
+app.use("/auth", authRoutes);
+app.use("/post", postRoutes);
+app.use("/follow", followRoutes);
+app.use("/user", userRoutes);
+app.use("/categoryPost", categoryPostRoutes);
+app.use("/image", imageRoutes);
 
-// Catch-all route to serve the React app (BrowserRouter handles client-side routing)
-app.use(express.static(path.join(__dirname, "Client/build")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client/build/index.html"));
-});
+// Service Call
+socketService(server);
+oauthService(app)
 
-// Message Service
-socketHandler(server);
 
 server.listen(5010, () => {
   console.log("Server is running");

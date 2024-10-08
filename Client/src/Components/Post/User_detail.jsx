@@ -22,16 +22,23 @@ const UserDetail = ({ user, createdAt }) => {
       navigate(`/profile/${_id}`);
     }
   };
+  
+  const handleRightClick = (e) => {
+    e.preventDefault();
+  };
 
   return (
     <Container>
       <div className='frame'>
         <Avatar
-          src={profilePicUrl || "/path/to/default-image.jpg"} // Fallback image
+          onContextMenu={handleRightClick}
+          src={profilePicUrl}
           alt={`${userName}'s profile`}
           onClick={handleProfileClick}
           radius="xl"
-        />
+        >
+          {userName[0] + userName[userName.length-1]}
+        </Avatar>
         <div className='frame_content'>
           <Popover
           width={350}
