@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 app.use(
   session({
-    secret: "PradeepSecret", // This is used to sign the session ID cookie.
+    secret: process.env.SESSION_SECRET, // This is used to sign the session ID cookie.
     resave: false, // Prevents resaving session if it's not modified.
     saveUninitialized: false, // Doesn't save an empty session.
     cookie: { secure: false }, // For development, set to `false`. For production, set to `true` and use HTTPS.

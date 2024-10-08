@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const router = require("express").Router();
-const {TokenVerify} = require("../Middleware/authMiddleware");
+const {TokenVerify} = require("../middleware/authMiddleware");
 
 //followService
 router.put("/",TokenVerify, async (req, res) => {

@@ -2,7 +2,7 @@ const User = require("../models/User");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
-const {TokenVerify} = require("../Middleware/authMiddleware");
+const {TokenVerify} = require("../middleware/authMiddleware");
 
 //Register Endpoint
 router.post("/register", async (req, res) => {

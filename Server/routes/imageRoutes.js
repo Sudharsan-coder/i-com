@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const mongoose = require("mongoose");
-const upload = require("../Middleware/imageStorageMiddleware.js");
+const upload = require("../middleware/imageStorageMiddleware.js");
 const { GridFSBucket } = require("mongodb");
 
 // User Image Upload Endpoint

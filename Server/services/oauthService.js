@@ -1,6 +1,6 @@
 const {passport} = require("../config/oauthConfig");
 const jwt = require("jsonwebtoken");
-const {TokenVerify} = require("../Middleware/authMiddleware");
+const {TokenVerify} = require("../middleware/authMiddleware");
 const User = require("../models/User");
 
 const initializeOAuth = (app) => {

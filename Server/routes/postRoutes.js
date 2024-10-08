@@ -4,7 +4,7 @@ const User = require("../models/User");
 const {
   TokenVerify,
   verifyTokenAndAuthorization,
-} = require("../Middleware/authMiddleware");
+} = require("../middleware/authMiddleware");
 const { sendMail } = require("../services/emailService");
 
 //Add Post

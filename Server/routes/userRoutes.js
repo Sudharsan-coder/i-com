@@ -4,7 +4,7 @@ const CryptoJS = require("crypto-js");
 const {
   TokenVerify,
   verifyTokenAndAuthorization,
-} = require("../Middleware/authMiddleware");
+} = require("../middleware/authMiddleware");
 const otpGenerator = require("otp-generator");
 const mongoose = require("mongoose");
 const { sendMail } = require("../services/emailService");
