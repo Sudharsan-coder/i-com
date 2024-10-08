@@ -8,15 +8,21 @@ const path = require("path");
 const { GridFSBucket } = require("mongodb");
 const passport = require("passport");
 const session = require("express-session")
+const MongoStore = require('connect-mongo');
 
 dotenv.config();
 const app = express();
 app.use(
   session({
-    secret: process.env.SESSION_SECRET, // This is used to sign the session ID cookie.
-    resave: false, // Prevents resaving session if it's not modified.
-    saveUninitialized: false, // Doesn't save an empty session.
-    cookie: { secure: false }, // For development, set to `false`. For production, set to `true` and use HTTPS.
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24,
+    },
   })
 );
 app.use(passport.initialize());
