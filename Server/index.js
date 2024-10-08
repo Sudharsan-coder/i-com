@@ -29,7 +29,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:5173', // Your frontend URL
+    origin: process.env.CLIENT_BASE_URL, // Your frontend URL
     credentials: true,               // Allow credentials (cookies) to be sent
   }));
 app.use(express.json({ limit: "3mb" }));

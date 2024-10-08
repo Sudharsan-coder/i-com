@@ -118,7 +118,7 @@ const Sign_up = () => {
   };
   
   const handleGoogleLogin = () => {
-    window.open("http://localhost:5010/auth/google", "_self");
+    window.open(`${import.meta.env.VITE_BASE_API_URL}/auth/google`, "_self");
   };
 
   return (
