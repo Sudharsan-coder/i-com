@@ -1,4 +1,4 @@
-import { Menu, Avatar } from "@mantine/core";
+import { Menu, Avatar, Indicator } from "@mantine/core";
 import {
   IconTrash,
   IconUser,
@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const User = () => {
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  const { user,onlineUsers } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const signOff = () => {
     dispatch({ type: "SIGN_OFF" });
@@ -28,19 +28,30 @@ const User = () => {
   const handleRightClick = (e) => {
     e.preventDefault();
   };
+  
+  const profilePicName = user.userName.length>1?
+  (user.userName[0] + user.userName[user.userName.length - 1]).toUpperCase():user.userName.toUpperCase();
+  const userIsOnline= onlineUsers.find((data)=>data===user._id)
   return (
     <Menus
       shadow='md'
       width={200}
     >
       <Menu.Target>
-        <Avatar
-          onContextMenu={handleRightClick}
-          src={user.profilePicUrl}
-          alt={user.userName}
+        <Indicator
+          size={10}
+          withBorder
+          processing
+          disabled={!user.isOnline && !userIsOnline}
         >
-          {user.userName[0] + user.userName[user.userName.length - 1]}
-        </Avatar>
+          <Avatar
+            onContextMenu={handleRightClick}
+            src={user.profilePicUrl}
+            alt={user.userName}
+          >
+            {profilePicName}
+          </Avatar>
+        </Indicator>
       </Menu.Target>
 
       <Menu.Dropdown>

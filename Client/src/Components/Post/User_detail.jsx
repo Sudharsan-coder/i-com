@@ -2,12 +2,15 @@ import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import React from "react";
-import { Avatar, Popover } from "@mantine/core";
+import { Avatar, Indicator, Popover } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import Pop_over_user_detail from "./Pop_over_user_detail";
+import { useSelector } from "react-redux";
 
 const UserDetail = ({ user, createdAt }) => {
   const navigate = useNavigate();
   const [opened, { close, open }] = useDisclosure(false);
+  const { onlineUsers } = useSelector((state) => state.auth);
 
   // Ensure createdAt is valid
   const relativeTime = createdAt
@@ -15,33 +18,45 @@ const UserDetail = ({ user, createdAt }) => {
     : "unknown time";
 
   // Ensure user object is valid
-  const { userName, profilePicUrl, _id } = user || {};
+  const { userName = "", profilePicUrl, _id, isOnline } = user || {};
 
   const handleProfileClick = () => {
     if (_id) {
       navigate(`/profile/${_id}`);
     }
   };
-  
+
   const handleRightClick = (e) => {
     e.preventDefault();
   };
 
+  const profilePicName =
+    userName.length > 1
+      ? (userName[0] + userName[userName.length - 1]).toUpperCase()
+      : userName.toUpperCase();
+  const userIsOnline = onlineUsers.find((data) => data === _id);
   return (
     <Container>
       <div className='frame'>
-        <Avatar
-          onContextMenu={handleRightClick}
-          src={profilePicUrl}
-          alt={`${userName}'s profile`}
-          onClick={handleProfileClick}
-          radius="xl"
+        <Indicator
+          size={7}
+          withBorder
+          processing
+          disabled={!isOnline && !userIsOnline}
         >
-          {userName[0] + userName[userName.length-1]}
-        </Avatar>
+          <Avatar
+            onContextMenu={handleRightClick}
+            src={profilePicUrl}
+            alt={`${userName}'s profile`}
+            onClick={handleProfileClick}
+            radius='xl'
+          >
+            {profilePicName}
+          </Avatar>
+        </Indicator>
         <div className='frame_content'>
           <Popover
-          width={350}
+            width={250}
             position='bottom'
             withArrow
             shadow='md'
@@ -57,8 +72,8 @@ const UserDetail = ({ user, createdAt }) => {
                 {userName || "Unknown User"}
               </div>
             </Popover.Target>
-            <Popover.Dropdown style={{ pointerEvents: "none" }} display={"none"}>
-              
+            <Popover.Dropdown style={{ pointerEvents: "none" }}>
+              <Pop_over_user_detail user={user} />
             </Popover.Dropdown>
           </Popover>
 

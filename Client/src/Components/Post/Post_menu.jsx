@@ -70,8 +70,7 @@ const Post_menu = (props) => {
     dispatch(setCreatePost(props));
   };
 
-  // const postURL = `https://icom-okob.onrender.com/post/${postId}`;
-  const postURL = `${import.meta.env.VITE_BASE_API_URL}/post/${props._id}`;
+  const postURL = `https://nothingsnew.netlify.app/post/${props._id}`;
   return (
     <>
       <Modal

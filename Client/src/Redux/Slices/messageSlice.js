@@ -19,6 +19,9 @@ const messageSlice = createSlice({
     sendMessageFailed: (state, action) => {
       state.error = action.payload;
     },
+    setMessageList:(state,action)=>{
+      state.messageList = action.payload;
+    },
     resetMessageList:(state)=>{
       state.messageList=[];
     }

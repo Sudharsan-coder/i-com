@@ -7,8 +7,8 @@ const http = require("http");
 const path = require("path");
 const { GridFSBucket } = require("mongodb");
 const passport = require("passport");
-const session = require("express-session")
-const MongoStore = require('connect-mongo');
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 
 dotenv.config();
 const app = express();
@@ -19,7 +19,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24,
     },
@@ -28,10 +28,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.CLIENT_BASE_URL, // Your frontend URL
-    credentials: true,               // Allow credentials (cookies) to be sent
-  }));
+    credentials: true, // Allow credentials (cookies) to be sent
+  })
+);
 app.use(express.json({ limit: "3mb" }));
 const server = http.createServer(app);
 let bucket;
@@ -43,10 +45,11 @@ const followRoutes = require("./routes/followRoutes");
 const userRoutes = require("./routes/userRoutes");
 const categoryPostRoutes = require("./routes/categoryPostRoutes");
 const imageRoutes = require("./routes/imageRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 
 //Services
-const socketService = require("./services/socketService");
-const oauthService = require('./services/oauthService')
+const { socketHandler } = require("./services/socketService");
+const oauthService = require("./services/oauthService");
 
 //connect the DB
 mongoose
@@ -67,11 +70,10 @@ app.use("/follow", followRoutes);
 app.use("/user", userRoutes);
 app.use("/categoryPost", categoryPostRoutes);
 app.use("/image", imageRoutes);
-
-// Service Call
-socketService(server);
-oauthService(app)
-
+app.use("/message", messageRoutes),
+  // Service Call
+  socketHandler(server);
+oauthService(app);
 
 server.listen(5010, () => {
   console.log("Server is running");

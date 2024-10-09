@@ -1,29 +1,41 @@
-import { Avatar, Box, Text } from "@mantine/core";
+import { Avatar, Box, Indicator, Text } from "@mantine/core";
 import React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 
 const Single_user_card = (props) => {
-
+  const {onlineUsers} = useSelector((state)=>state.auth);
   const navigate = useNavigate();
   const handleRightClick = (e) => {
     e.preventDefault();
   };  
-
+  const {_id,userName="",isOnline} = props.data || {}
+  const profilePicName = userName.length > 1 
+  ? (userName[0] + userName[userName.length - 1]).toUpperCase() 
+  : userName.toUpperCase();
+  const userIsOnline= onlineUsers.find((data)=>data===_id)
   return (
     <Container>
       <Boxs bg={"white"}>
         <Wrap>
+        <Indicator size={10}
+          withBorder
+          processing
+          disabled={!isOnline && !userIsOnline }
+          >
           <Avatar
             onContextMenu={handleRightClick}
             src={props.data.profilePicUrl}
             alt="it's"
             size={"lg"}
-          >{props.data.userName[0]+props.data.userName[props.data.userName.length-1]}</Avatar>
+          >{profilePicName}</Avatar>
+
+        </Indicator>
           <Username
             onClick={() => navigate(`/profile/${props.data._id}`)}
           >
-            {props.data.userName}
+            {userName}
           </Username>
         </Wrap>
       </Boxs>

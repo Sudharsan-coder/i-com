@@ -56,7 +56,7 @@ const MainLayout = () => (
   </>
 );
 function App() {
-  const { isAuth } = useSelector((state) => state.auth);
+  const { isAuth,user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   useEffect(() => {
     if (!isAuth) {
@@ -66,6 +66,11 @@ function App() {
       }
     }
   }, [isAuth]);
+  
+  useEffect(()=>{
+    if(isAuth)
+      dispatch({type:"CONNECTED_USER",data:{userId:user._id}})
+  },[isAuth])
   return (
     <BrowserRouter>
       <Routes>

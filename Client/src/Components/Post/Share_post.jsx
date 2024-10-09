@@ -12,7 +12,7 @@ import {
 import styled from "styled-components";
 const Share_post = (props) => {
   const shareUrl = props.shareURL;
-  const title = "icom - " + props.title;
+  const title = "Nothing's New - " + props.title;
   return (
     <Container>
       <TwitterShareButton

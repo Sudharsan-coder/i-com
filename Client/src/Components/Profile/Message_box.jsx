@@ -1,4 +1,4 @@
-import { Avatar, Button, Text, Textarea } from "@mantine/core";
+import { Avatar, Button, Indicator, Text, Textarea } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
@@ -7,43 +7,56 @@ import ScrollToBottom from "react-scroll-to-bottom";
 
 const Message_box = (props) => {
   const [currentMessage, setCurrentMessage] = useState("");
-  const { user } = useSelector((state) => state.auth);
+  const { user, onlineUsers } = useSelector((state) => state.auth);
   const { messageList } = useSelector((state) => state.message);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch({
       type: "JOIN_MESSAGE_ROOM",
-      data: { userId1: user._id, userId2: props._id },
+      data: { senderId: user._id, receiverId: props._id },
     });
   }, []);
 
   const sendMessage = async (e) => {
     if (currentMessage !== "") {
       const messageData = {
-        userId1: user._id,
-        userId2: props._id,
+        senderId: user._id,
+        receiverId: props._id,
         message: currentMessage,
-        time:
-          new Date().toLocaleString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-        })
+        time: new Date().toLocaleString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       };
 
       dispatch({ type: "SEND_MESSAGE_REQUEST", data: messageData });
       setCurrentMessage("");
     }
   };
+  const { userName = "", isOnline, _id } = props || {};
+  const profilePicName =
+    userName.length > 1
+      ? (userName[0] + userName[userName.length - 1]).toUpperCase()
+      : userName.toUpperCase();
+  const userIsOnline = onlineUsers.find((data) => data === _id);
   return (
     <Container>
       <Header>
-        <Avatar
-          src={props.profilePicUrl}
-          radius='xl'
+        <Indicator
+          size={5}
+          color='teal'
+          withBorder
+          processing
+          disabled={!isOnline && !userIsOnline}
         >
-          {props.userName}
-        </Avatar>
+          <Avatar
+            src={props.profilePicUrl}
+            radius='xl'
+          >
+            {profilePicName}
+          </Avatar>
+        </Indicator>
         <Text size={"xl"}>{props.userName}</Text>
       </Header>
       <Body className='chat-body'>
@@ -52,7 +65,7 @@ const Message_box = (props) => {
             return (
               <div
                 className='message'
-                id={user._id === data.userId1 ? "you" : "other"}
+                id={user._id === data.senderId ? "you" : "other"}
                 key={index}
               >
                 <div>
@@ -60,9 +73,9 @@ const Message_box = (props) => {
                     <p>{data.message}</p>
                   </div>
                   <div className='message-meta'>
-                    <p id='time'>{data.time}</p>
+                    {/* <p id='time'>{data.time}</p>   */}
                     <p id='author'>
-                      {user._id === data.userId1
+                      {user._id === data.senderId
                         ? user.userName
                         : props.userName}
                     </p>
@@ -158,7 +171,7 @@ const Body = styled.div`
   }
 
   #you .message-content {
-    background-color: var(--primary_color);
+    background-color: #01b0b0;
   }
 
   #you .message-meta {
@@ -172,8 +185,8 @@ const Body = styled.div`
   }
 
   #other .message-content {
-    background-color: #d7d8d8;
-    color: #6a6b6b;
+    background-color: var(--primary_color);
+    color: white;
   }
 
   #other .message-meta {

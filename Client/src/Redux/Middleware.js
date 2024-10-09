@@ -77,6 +77,8 @@ import {
   addSavedToUserPost,
   unSavedToUserPost,
   setFollowTagsModal,
+  setOnlineUsers,
+  setOfflineUsers,
 } from "./Slices/authSlice";
 import {
   addLikeToProfilePost,
@@ -100,7 +102,7 @@ import {
   unLikeToProfilePost,
   unSaveToProfilePost,
 } from "./Slices/ProfileSlice";
-import { getSocket, initiateSocketConnetion } from "./Socket";
+import { disconnectSocket, getSocket, initiateSocketConnetion } from "./Socket";
 import {
   newMessage,
   sendMessageFailed,
@@ -792,6 +794,10 @@ function createSocketChannel(socket) {
 
   //emit is like a bridge to send data from the external event (like Socket.IO messages) to your saga, which will then handle it within Redux.
   return eventChannel((emit) => {
+    socket.on('user_status', (data) => {
+      emit({type:"IS_ONLINE",playload:data})
+    });
+    
     socket.on("new_message", (message) => {
       emit({ type: "NEW_MESSAGE", playload: message });
     });
@@ -811,9 +817,22 @@ function* initSocket() {
       //When the server sends the newMessage, it resumes the saga by assigning the emitted value ({ type: 'NEW_MESSAGE', payload: message }) to the action variable.
       const action = yield take(socketChannel);
       console.log(action);
-
-      yield put(newMessage(action.playload));
+      if(action.type==="NEW_MESSAGE")
+        yield put(newMessage(action.playload));
+      else if(action.type==="IS_ONLINE" && action.playload.isOnline)
+        yield put(setOnlineUsers(action.playload.userId));
+      else if(action.type==="IS_ONLINE" && !action.playload.isOnline)
+        yield put(setOfflineUsers(action.playload.userId))
     }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function* connectedUser(action){
+  try {
+    const socket = yield call(getSocket);
+    socket.emit('user_connected', action.data.userId);
   } catch (err) {
     console.log(err);
   }
@@ -836,6 +855,14 @@ function* joinMessageRoom(action) {
     console.log("Room Joined Successfully");
   } catch (err) {
     console.log(err);
+  }
+}
+
+function* getMessage(action) {
+  try {
+    
+  } catch (err) {
+    
   }
 }
 
@@ -879,6 +906,7 @@ function* rootSaga() {
   yield takeLatest("CHANGE_PASSWORD", changePassword);
   yield takeLatest("JOIN_MESSAGE_ROOM", joinMessageRoom);
   yield takeLatest("SEND_MESSAGE_REQUEST", sendMessage);
+  yield takeLatest("CONNECTED_USER",connectedUser);
 }
 
 export default rootSaga;

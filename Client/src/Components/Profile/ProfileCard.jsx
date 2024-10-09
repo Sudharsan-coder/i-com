@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Avatar, Title, Text } from "@mantine/core";
+import { Card, Avatar, Title, Text, Indicator } from "@mantine/core";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -12,7 +12,12 @@ const ProfileCard = ({ userDetail }) => {
     e.preventDefault();
   };
 
-  const { user } = useSelector((state) => state.auth);
+  const { user,onlineUsers } = useSelector((state) => state.auth);
+  const {userName="",isOnline,_id} = userDetail||{} 
+  const profilePicName = userName.length > 1 
+    ? (userName[0] + userName[userName.length - 1]).toUpperCase() 
+    : userName.toUpperCase();
+    const userIsOnline = onlineUsers.find((data) => data === _id);
   return (
     <Container>
       <Card
@@ -38,14 +43,21 @@ const ProfileCard = ({ userDetail }) => {
             justifyContent: "center",
           }}
         >
+         <Indicator
+        size={10}
+        withBorder
+        processing
+        disabled={!isOnline && !userIsOnline}
+      >
           <Avatar
             onContextMenu={handleRightClick}
             size={100}
             radius='xl'
             src={userDetail.profilePicUrl}
           >
-          {userDetail.userName[0] + userDetail.userName[userDetail.userName.length-1]}
+          {profilePicName}
           </Avatar>
+      </Indicator>
         </div>
 
         <Title

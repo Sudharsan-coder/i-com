@@ -8,7 +8,7 @@ const {
 const otpGenerator = require("otp-generator");
 const mongoose = require("mongoose");
 const { sendMail } = require("../services/emailService");
-
+const {connectedUsers} = require('../services/socketService')
 //Update User profile
 router.put(
   "/updateProfile/:userId",
@@ -239,5 +239,11 @@ router.get("/follower", async (req, res) => {
     res.status(404).json({ message: "Not found" });
   }
 });
+
+router.get('/:userId/status',(req,res)=>{
+  const userId = req.params.userId;
+  const isOnline = connectedUsers.has(userId);
+  res.json({ isOnline });
+})
 
 module.exports = router;

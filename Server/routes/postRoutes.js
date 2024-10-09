@@ -20,7 +20,7 @@ router.post("/create", TokenVerify, async (req, res) => {
     // Populate the 'user' field with the necessary fields
     post = await Post.findById(post._id).populate(
       "user",
-      "userName profilePicUrl firstName lastName userBio"
+      "_id userName profilePicUrl firstName lastName userBio isOnline"
     );
 
     // Add the post id to the user's collection using updateOne
@@ -64,7 +64,10 @@ router.get("/user/:userId/posts", async (req, res) => {
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .sort({ createdAt: -1 })
-      .populate("user", "userName profilePicUrl userBio firstName lastName");
+      .populate(
+        "user",
+        " _id userName profilePicUrl userBio firstName lastName isOnline"
+      );
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (error) {
     // console.error("Error fetching user posts:", error);
@@ -168,7 +171,10 @@ router.get("/", async (req, res) => {
       posts = await Post.find({ title: { $regex: search, $options: "i" } })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .populate("user", "userName profilePicUrl userBio firstName lastName")
+        .populate(
+          "user",
+          " _id userName profilePicUrl userBio firstName lastName isOnline"
+        )
         .sort({ $natural: -1 });
     } else if (tag) {
       totalCount = await Post.countDocuments({
@@ -180,7 +186,10 @@ router.get("/", async (req, res) => {
       })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .populate("user", "userName profilePicUrl userBio firstName lastName")
+        .populate(
+          "user",
+          "_id userName profilePicUrl userBio firstName lastName isOnline"
+        )
         .sort({ $natural: -1 });
     } else if (search && tag) {
       totalCount = await Post.countDocuments({
@@ -194,7 +203,10 @@ router.get("/", async (req, res) => {
       })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .populate("user", "userName profilePicUrl userBio firstName lastName")
+        .populate(
+          "user",
+          "_id userName profilePicUrl userBio firstName lastName isOnline"
+        )
         .sort({ $natural: -1 });
     } else {
       totalCount = await Post.countDocuments();
@@ -203,7 +215,10 @@ router.get("/", async (req, res) => {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .sort({ $natural: -1 })
-        .populate("user", "userName profilePicUrl userBio firstName lastName");
+        .populate(
+          "user",
+          "_id userName profilePicUrl userBio firstName lastName isOnline"
+        );
     }
 
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
@@ -228,7 +243,10 @@ router.get("/followingPost", TokenVerify, async (req, res) => {
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .sort({ $natural: -1 })
-      .populate("user", "userName profilePicUrl userBio firstName lastName");
+      .populate(
+        "user",
+        "_id userName profilePicUrl userBio firstName lastName isOnline"
+      );
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (err) {
     console.error(err);
@@ -242,7 +260,7 @@ router.get("/:postid", async (req, res) => {
   try {
     const postdetails = await Post.findById(postid).populate(
       "user",
-      "userName profilePicUrl userBio firstName lastName"
+      "_id userName profilePicUrl userBio firstName lastName isOnline"
     );
     res.status(200).send(postdetails);
   } catch (err) {}
@@ -345,7 +363,7 @@ router.get("/:postId/comments", async (req, res) => {
     const post = await Post.findById(postId)
       .populate({
         path: "comments.user",
-        select: "userName profilePicUrl",
+        select: "_id userName profilePicUrl",
       })
       .sort({ createdAt: -1 });
 

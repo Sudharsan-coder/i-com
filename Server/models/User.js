@@ -5,8 +5,8 @@ const UserSchema = new mongoose.Schema({
   lastName: { type: String, require: true },
   userName: { type: String, unique: true },
   emailId: { type: String, require: true, unique: true },
-  password: { type: String},
-  googleId:{type:String},
+  password: { type: String },
+  googleId: { type: String },
   isAdmin: {
     type: Boolean,
     default: false,
@@ -27,6 +27,7 @@ const UserSchema = new mongoose.Schema({
     default: [],
   },
   otp: { type: String },
+  isOnline: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("User", UserSchema);

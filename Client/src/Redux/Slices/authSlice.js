@@ -12,6 +12,7 @@ const initialState = {
     liked: [],
     savedPost: [],
     followingHashTags: [],
+    isOnline: false,
   },
   isAuthenticationFailed: false,
   isSigningIn: false,
@@ -28,6 +29,7 @@ const initialState = {
   },
   checkUserNameMessage: "",
   followTagsModal: false,
+  onlineUsers: [],
 };
 
 const authSlice = createSlice({
@@ -268,6 +270,14 @@ const authSlice = createSlice({
     setFollowTagsModal: (state, action) => {
       state.followTagsModal = action.payload;
     },
+    setOnlineUsers: (state, action) => {
+      state.onlineUsers.push(action.payload);
+    },
+    setOfflineUsers: (state, action) => {
+      state.onlineUsers = state.onlineUsers.filter((data) => {
+        return data !== action.payload;
+      });
+    },
   },
 });
 
@@ -307,4 +317,6 @@ export const {
   unlikedToUserPost,
   setFollowTagsModal,
   resetChangedPicUrl,
+  setOnlineUsers,
+  setOfflineUsers,
 } = authSlice.actions;
