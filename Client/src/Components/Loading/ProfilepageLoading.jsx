@@ -19,6 +19,7 @@ const Load=styled.div`
   /* border: 1px solid white; */
   padding:3%;
   border-radius: 10px;
-  grid-column: 2;
+  grid-column-start: 2;
+  grid-column-end: 4;
   margin-top: 10px;
 `

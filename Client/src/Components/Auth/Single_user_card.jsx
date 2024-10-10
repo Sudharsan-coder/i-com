@@ -1,58 +1,75 @@
-import { Avatar, Box, Title} from '@mantine/core'
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { styled } from 'styled-components'
-
+import { Avatar, Box, Indicator, Text } from "@mantine/core";
+import React from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { styled } from "styled-components";
 
 const Single_user_card = (props) => {
-console.log(props.User)
-const UserArray=props.User;
-const navigate=useNavigate();
+  const {onlineUsers} = useSelector((state)=>state.auth);
+  const navigate = useNavigate();
+  const handleRightClick = (e) => {
+    e.preventDefault();
+  };  
+  const {_id,userName="",isOnline} = props.data || {}
+  const profilePicName = userName.length > 1 
+  ? (userName[0] + userName[userName.length - 1]).toUpperCase() 
+  : userName.toUpperCase();
+  const userIsOnline= onlineUsers.find((data)=>data===_id)
   return (
-  <Container>
-  {
-    UserArray.map((data)=>(
-
-      <Boxs bg={"white"} key={data._id}>
+    <Container>
+      <Boxs bg={"white"}>
         <Wrap>
-        <Avatar src={data.profilePicUrl} alt="it's" size={"lg"}/>
-        <Username order={1} onClick={()=>navigate(`/profile/${data.userName}`)}>{data.userName}</Username>
+        <Indicator size={10}
+          withBorder
+          processing
+          disabled={!isOnline && !userIsOnline }
+          >
+          <Avatar
+            onContextMenu={handleRightClick}
+            src={props.data.profilePicUrl}
+            alt="it's"
+            size={"lg"}
+          >{profilePicName}</Avatar>
+
+        </Indicator>
+          <Username
+            onClick={() => navigate(`/profile/${props.data._id}`)}
+          >
+            {userName}
+          </Username>
         </Wrap>
       </Boxs>
-      // console.log(data);
-    ))
-  }
+    </Container>
+  );
+};
 
-  </Container>
-  )
-}
+export default Single_user_card;
 
-export default Single_user_card
-
-const Container=styled.div`
-  margin-top: 5vh;
+const Container = styled.div`
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  background-color: white;
+  border: 0.0625rem solid #dee2e6;
+  box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 0.625rem 0.9375rem -0.3125rem, rgba(0, 0, 0, 0.04) 0 0.4375rem 0.4375rem -0.3125rem;
+  padding: 0.5rem;
+  `;
+const Wrap = styled.div`
   display: flex;
-  flex-direction: column;
   gap: 20px;
-`
-const Wrap=styled.div`
-  display: flex;
-  gap: 40px;
-  /* align-items: center; */
-  
-`
-const Boxs=styled(Box)`
+  align-items: center;
+  `;
+const Boxs = styled(Box)`
   display: flex;
   align-items: center;
-  padding: 20px;
-  border-radius: 10px;
   text-transform: capitalize;
-`
-const Username=styled(Title)`
-  &:hover{
+  `;
+const Username = styled(Text)`
+    font-size: 20px ;
+    font-weight: 800;
+  &:hover {
     color: blue;
     text-decoration: underline;
     cursor: pointer;
-    
   }
-`
+`;

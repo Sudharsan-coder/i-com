@@ -1,22 +1,23 @@
 import { styled } from "styled-components";
 import { Link } from "react-router-dom";
-import Like from "../Post/Likes.jsx";
-import im1 from "../../assets/logo.png";
+import React from "react";
+import { formatDistanceToNow } from "date-fns";
 
-const Single_comment = (props) => {
+const Single_comment = (props) => { 
+  const relativeTime = props.createdAt ? formatDistanceToNow(new Date(props.createdAt), { addSuffix: true }) : "unknown time";
   return (
     <Container>
       <div className="frame">
         <Link to="/profile">
-          <img src={props.pic} alt="pic" />
+          <img src={props.user.profilePicUrl} alt="pic" />
         </Link>
         <div className="frame_content">
           <div className="title">
-            <div className="user_name">{props.Name}</div>
-            <div className="date">Posted on 22 Jan</div>
+            <div className="user_name">{props.userName}</div>
+            <div className="date">{relativeTime}</div>
           </div>
           <div className="body">
-            {props.comment}
+            {props.text}
           </div>
         </div>
       </div>
@@ -41,13 +42,14 @@ const Container = styled.div`
       background-color: black;
     }
     .frame_content {
-      /* border: 2px solid rgb(178, 178, 178); */
+      border: 2px solid rgb(178, 178, 178);
+      width: 100%;
+      border-radius: 5px;
       margin-left: 15px;
       padding: 10px;
       box-sizing: border-box;
     }
     .date {
-      margin-left: 20px;
       color: rgb(113, 113, 113);
       font-size: 0.8em;
     }

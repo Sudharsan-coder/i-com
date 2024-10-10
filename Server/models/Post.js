@@ -54,10 +54,16 @@ const PostSchema = new mongoose.Schema(
     ],
     bannerPic: { type: String },
     comments: [commentSchema],
+    savedUser:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },]
   },
   {
     timestamps: true,
   }
 );
+PostSchema.index({ tags: 1 });
+PostSchema.index({ createdAt: 1 });
 
 module.exports = mongoose.model("Post", PostSchema);

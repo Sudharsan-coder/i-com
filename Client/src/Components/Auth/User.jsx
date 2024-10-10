@@ -1,82 +1,117 @@
-import { Menu, Avatar } from '@mantine/core';
-import {  IconMessageCircle, IconTrash, IconUser, IconLogout2, IconUserEdit, IconCircleCheckFilled } from '@tabler/icons-react';
-import { useAuth } from '../../context/auth';
-import { useNavigate } from 'react-router-dom';
-import { styled } from 'styled-components';
-import axios from 'axios';
-import { notifications } from '@mantine/notifications';
-import { AiFillExclamationCircle } from 'react-icons/ai';
+import { Menu, Avatar, Indicator } from "@mantine/core";
+import {
+  IconTrash,
+  IconUser,
+  IconLogout2,
+  IconUserEdit,
+} from "@tabler/icons-react";
+import { TbActivity } from "react-icons/tb";
+import { useNavigate } from "react-router-dom";
+import { styled } from "styled-components";
+import React from "react";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { useDispatch, useSelector } from "react-redux";
 
 const User = () => {
-    const auth = useAuth();
-    const navigate=useNavigate();
-    
-    const DeleteAccount=()=>{
-        var result=confirm("Are you sure to delete the Account?");
-        if(result){
-          notifications.show({
-            id: 'load-data',
-            loading: true,
-            title: 'Deleting your data',
-            message: 'Data will be deleted in 3 seconds, you cannot close this yet',
-            autoClose: false,
-            withCloseButton: false,
-          });
-          axios.delete(`http://localhost:5010/user?username=${auth.user.username}`)
-          .then(()=>{
-            notifications.update({
-              id: 'load-data',
-              title: "Deleted Successfully",
-              message: "Your Account is deleted",
-              color: "green",
-              icon: (
-                <IconCircleCheckFilled
-                  color='green'
-                  size='3rem'
-                />
-              ),
-            });
-            auth.logout();
-          })
-          .catch((err)=>{
-            console.log(err);
-            notifications.update({
-              id: 'load-data',
-              title: "Deletion Failed",
-              message: "Something went wrong. Please try again.",
-              color: "red",
-              icon: (
-                <AiFillExclamationCircle
-                  color='white'
-                  size='3rem'
-                />
-              ),
-            });
-          })
-        }
+  const navigate = useNavigate();
+  const { user,onlineUsers } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const signOff = () => {
+    dispatch({ type: "SIGN_OFF" });
+  };
+  const DeleteAccount = () => {
+    var result = confirm("Are you sure to delete the Account?");
+    if (result) {
+      dispatch({ type: "DELETE_ACCOUNT", data: user._id });
     }
+  };
+  const handleRightClick = (e) => {
+    e.preventDefault();
+  };
+  
+  const profilePicName = user.userName.length>1?
+  (user.userName[0] + user.userName[user.userName.length - 1]).toUpperCase():user.userName.toUpperCase();
+  const userIsOnline= onlineUsers.find((data)=>data===user._id)
   return (
-    <Menus shadow="md" width={200}>
+    <Menus
+      shadow='md'
+      width={200}
+    >
       <Menu.Target>
-      <Avatar src={auth.user.profile} alt={auth.user.username}  />
+        <Indicator
+          size={10}
+          withBorder
+          processing
+          disabled={!user.isOnline && !userIsOnline}
+        >
+          <Avatar
+            onContextMenu={handleRightClick}
+            src={user.profilePicUrl}
+            alt={user.userName}
+          >
+            {profilePicName}
+          </Avatar>
+        </Indicator>
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Label >@{auth.user.username}</Menu.Label>
-        <Menu.Item icon={<IconUser size={14} /> } onClick={()=>{navigate(`/profile/${auth.user.username}`)}}>Profile</Menu.Item>
-        <Menu.Item icon={<IconUserEdit size={14} /> } onClick={()=>{navigate("/editprofile")}}>Edit Profile</Menu.Item>
-        <Menu.Item icon={<IconMessageCircle size={14} />}>Messages</Menu.Item>
-        <Menu.Item icon={<IconLogout2 size={14} /> } onClick={()=>{auth.logout()}}>Logout</Menu.Item>
-        <Menu.Item color="red" icon={<IconTrash size={14} /> } onClick={DeleteAccount}>Delete my account</Menu.Item>
+        <Menu.Label>@{user.userName}</Menu.Label>
+
+        <Menu.Item
+          icon={<IconUser size={14} />}
+          onClick={() => {
+            navigate(`/profile/${user._id}`);
+          }}
+        >
+          Profile
+        </Menu.Item>
+
+        <Menu.Item
+          icon={<IconUserEdit size={14} />}
+          onClick={() => {
+            navigate("/editprofile");
+          }}
+        >
+          Edit Profile
+        </Menu.Item>
+        <Menu.Item
+          icon={<TbActivity size={14} />}
+          onClick={() =>
+            navigate("/your_activity/likedPost", { replace: true })
+          }
+        >
+          Your Activity
+        </Menu.Item>
+        {!user.googleId && (
+          <Menu.Item
+            icon={<RiLockPasswordFill size={14} />}
+            onClick={() => navigate("/forgetPassword", { replace: true })}
+          >
+            Change Password
+          </Menu.Item>
+        )}
+
+        <Menu.Item
+          icon={<IconLogout2 size={14} />}
+          onClick={signOff}
+        >
+          Logout
+        </Menu.Item>
+        <Menu.Divider />
+        <Menu.Item
+          color='red'
+          icon={<IconTrash size={14} />}
+          onClick={DeleteAccount}
+        >
+          Delete my account
+        </Menu.Item>
       </Menu.Dropdown>
     </Menus>
-  )
-}
+  );
+};
 
-export default User
+export default User;
 
-
- const Menus=styled(Menu)`
+const Menus = styled(Menu)`
   cursor: pointer;
-`
-    
+`;

@@ -1,43 +1,164 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
-const TokenVerify = require("./verifyToken");
+const {
+  TokenVerify,
+  verifyTokenAndAuthorization,
+} = require("../middleware/authMiddleware");
+const { sendMail } = require("../services/emailService");
 
 //Add Post
 router.post("/create", TokenVerify, async (req, res) => {
-  const newPost = new Post(req.body);
-  console.log(req.user);
   const userId = req.user._id;
+  const body = { ...req.body, user: userId };
+  const newPost = new Post(body);
 
   try {
-    await newPost.save(); // Save the new post
+    // Save the new post
+    let post = await newPost.save();
+
+    // Populate the 'user' field with the necessary fields
+    post = await Post.findById(post._id).populate(
+      "user",
+      "_id userName profilePicUrl firstName lastName userBio isOnline"
+    );
 
     // Add the post id to the user's collection using updateOne
-    await User.updateOne({ _id: userId }, { $push: { posts: newPost._id } });
+    await User.updateOne({ _id: userId }, { $push: { posts: post._id } });
 
-    res.status(201).json(newPost);
+    res.status(201).json(post);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ message: err.message });
   }
 });
 
 //Get Specific User Posts
 router.get("/user/:userId/posts", async (req, res) => {
   const { userId } = req.params;
-
+  const { type } = req.query;
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
   try {
-    const posts = await Post.find({ user: userId })
+    let posts, totalCount, totalPages, postIds;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User notfound" });
+    }
+    switch (type) {
+      case "myPost":
+        postIds = user.posts;
+        break;
+      case "savedPost":
+        postIds = user.savedPost;
+        break;
+      case "commentedPost":
+        postIds = user.commented;
+        break;
+      case "likedPost":
+        postIds = user.liked;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid post type" });
+        
+    }
+    totalCount = postIds.length;
+    totalPages = Math.ceil(totalCount / pageSize);
+    posts = await Post.find({ _id: { $in: postIds } })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
       .sort({ createdAt: -1 })
-      .populate("user", "userName profilePicUrl");
-
-    res.json({ posts });
+      .populate(
+        "user",
+        " _id userName profilePicUrl userBio firstName lastName isOnline"
+      );
+    res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (error) {
-    console.error("Error fetching user posts:", error);
-    res.status(500).json({ error: "Error fetching user posts" });
+    // console.error("Error fetching user posts:", error);
+    res.status(500).json({ message: "Error fetching user posts" });
   }
 });
 
-//Get all post(Main page) && Search post Endpoint
+//Edit Post Endpoint
+router.put(
+  "/editPost/:userId",
+  verifyTokenAndAuthorization,
+  async (req, res) => {
+    const { postId } = req.query;
+    try {
+      const updatedPost = await Post.findByIdAndUpdate(postId, {
+        $set: req.body,
+      });
+      if (!updatedPost) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+      res.status(200).json({ message: "Post updated successfully" });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Some thing went wrong. Please try again" });
+    }
+  }
+);
+
+//Save Post Endpoint
+router.post(
+  "/savePost/:userId/:postId",
+  verifyTokenAndAuthorization,
+  async (req, res) => {
+    const { postId } = req.params;
+    const userId = req.user._id;
+    try {
+      const post = await Post.findById(postId);
+      if (post.savedUser.includes(userId)) {
+        return res.status(400).json({ message: "Post already saved" });
+      }
+      post.savedUser.push(userId);
+      await post.save();
+      const savePost = await User.findByIdAndUpdate(req.user._id, {
+        $addToSet: { savedPost: postId },
+      });
+      res.status(200).json({ message: "Post saved successfully" });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Some thing went wrong. Please try again" });
+    }
+  }
+);
+
+//UnSave Post Endpoint
+router.post(
+  "/unsavePost/:userId/:postId",
+  verifyTokenAndAuthorization,
+  async (req, res) => {
+    const { postId } = req.params;
+    const userId = req.user._id;
+    try {
+      const post = await Post.findById(postId);
+      if (!post.savedUser.includes(userId)) {
+        return res.status(400).json({ message: "Post not liked" });
+      }
+      post.savedUser = post.savedUser.filter(
+        (savedId) => savedId.toString() !== userId
+      );
+      await post.save();
+      await User.updateOne(
+        { _id: userId },
+        {
+          $pull: {
+            savedPost: postId,
+          },
+        }
+      );
+      res.json({ message: "Post unsaved successfully" });
+    } catch (error) {
+      console.error("Error unsaved post:", error);
+      res.status(500).json({ error: "Error unsaved post" });
+    }
+  }
+);
+
+//Get All Post(Main page) && Search Post Endpoint && Tag Post Endpoint
 router.get("/", async (req, res) => {
   const tag = req.query.tag;
   const search = req.query.search;
@@ -53,19 +174,42 @@ router.get("/", async (req, res) => {
       posts = await Post.find({ title: { $regex: search, $options: "i" } })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .populate("user", "userName profilePicUrl")
+        .populate(
+          "user",
+          " _id userName profilePicUrl userBio firstName lastName isOnline"
+        )
         .sort({ $natural: -1 });
     } else if (tag) {
       totalCount = await Post.countDocuments({
-        tag: { $in: [tag] },
+        tags: { $in: [tag] },
       });
       totalPages = Math.ceil(totalCount / pageSize);
       posts = await Post.find({
-        tag: { $in: [tag] },
+        tags: { $in: [tag] },
       })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .populate("user", "userName profilePicUrl")
+        .populate(
+          "user",
+          "_id userName profilePicUrl userBio firstName lastName isOnline"
+        )
+        .sort({ $natural: -1 });
+    } else if (search && tag) {
+      totalCount = await Post.countDocuments({
+        title: { $regex: search, $options: "i" },
+        tags: { $in: [tag] },
+      });
+      totalPages = Math.ceil(totalCount / pageSize);
+      posts = await Post.find({
+        title: { $regex: search, $options: "i" },
+        tags: { $in: [tag] },
+      })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate(
+          "user",
+          "_id userName profilePicUrl userBio firstName lastName isOnline"
+        )
         .sort({ $natural: -1 });
     } else {
       totalCount = await Post.countDocuments();
@@ -74,43 +218,38 @@ router.get("/", async (req, res) => {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .sort({ $natural: -1 })
-        .populate("user", "userName profilePicUrl");
+        .populate(
+          "user",
+          "_id userName profilePicUrl userBio firstName lastName isOnline"
+        );
     }
 
-    res.status(200).json({totalCount, totalPages, page, pageSize, posts});
+    res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-//Get Following Post Endpoint
+//Get Following Users Post and Following Tags Endpoint
 router.get("/followingPost", TokenVerify, async (req, res) => {
   const userId = req.user._id;
-  const userid2 = "65aca91a243715df848816b7";
-  console.log(userid2);
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
   try {
     const user = await User.findById(userId).populate("followings");
-    console.log(user);
-
-    const followingIds = user.followings.map((following) =>
-      following._id
-    );
-    // const followingIds = [userId,userId2];
-    console.log(followingIds);
-
+    const followingIds = user.followings.map((following) => following._id);
     const totalCount = await Post.countDocuments({
       user: { $in: followingIds },
     });
     const totalPages = Math.ceil(totalCount / pageSize);
-
-    const posts = await Post.find({ user: { $in: followingIds } });
-    // .skip((page - 1) * pageSize)
-    // .limit(pageSize)
-    // .sort({ createdAt: -1 })
-    // .populate("user", "userName profilePicUrl");
-
+    const posts = await Post.find({ user: { $in: followingIds } })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .sort({ $natural: -1 })
+      .populate(
+        "user",
+        "_id userName profilePicUrl userBio firstName lastName isOnline"
+      );
     res.status(200).json({ totalCount, totalPages, page, pageSize, posts });
   } catch (err) {
     console.error(err);
@@ -118,11 +257,14 @@ router.get("/followingPost", TokenVerify, async (req, res) => {
   }
 });
 
-// Get Particular Post Endpoint
+//Get Particular Post Endpoint
 router.get("/:postid", async (req, res) => {
   const postid = req.params.postid;
   try {
-    const postdetails = await Post.findById(postid);
+    const postdetails = await Post.findById(postid).populate(
+      "user",
+      "_id userName profilePicUrl userBio firstName lastName isOnline"
+    );
     res.status(200).send(postdetails);
   } catch (err) {}
 });
@@ -130,7 +272,7 @@ router.get("/:postid", async (req, res) => {
 // Add comment
 router.post("/:postId/comment", TokenVerify, async (req, res) => {
   const { postId } = req.params;
-  const { user, text } = req.body;
+  const { text } = req.body;
   const userId = req.user._id;
   // console.log(req.user);
 
@@ -144,7 +286,7 @@ router.post("/:postId/comment", TokenVerify, async (req, res) => {
 
     // Create a new comment
     const newComment = {
-      user,
+      user: userId,
       text,
     };
 
@@ -163,14 +305,17 @@ router.post("/:postId/comment", TokenVerify, async (req, res) => {
     );
 
     res.status(201).json(post);
-  } catch (error) {
-    console.error("Error adding comment:", error);
-    res.status(500).json({ error: "Error adding comment" });
+  } catch (err) {
+    // console.error("Error adding comment:", error);
+    res.json(err);
   }
 });
 
 // Post Replay Comment Endpoint
-router.post("/:postId/comments/:commentId/replies", TokenVerify, async (req, res) => {
+router.post(
+  "/:postId/comments/:commentId/replies",
+  TokenVerify,
+  async (req, res) => {
     const { postId, commentId } = req.params;
     const { user, text } = req.body;
     const userId = req.user._id;
@@ -218,10 +363,12 @@ router.get("/:postId/comments", async (req, res) => {
     const postId = req.params.postId;
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
-    const post = await Post.findById(postId).populate({
-      path: "comments.user",
-      select: "userName profilePicUrl",
-    });
+    const post = await Post.findById(postId)
+      .populate({
+        path: "comments.user",
+        select: "_id userName profilePicUrl",
+      })
+      .sort({ createdAt: -1 });
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
@@ -232,7 +379,13 @@ router.get("/:postId/comments", async (req, res) => {
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
     const paginatedComments = comments.slice(startIndex, endIndex);
-    res.status(200).json({ comments: paginatedComments,totalCount, totalPages, page, pageSize });
+    res.status(200).json({
+      comments: paginatedComments,
+      totalCount,
+      totalPages,
+      page,
+      pageSize,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -267,7 +420,13 @@ router.get("/:postId/comments/:commentId/replies", async (req, res) => {
 
     const paginatedReplies = comment.replies.slice(startIndex, endIndex);
 
-    res.status(200).json({ replies: paginatedReplies,totalCount, totalPages, page, pageSize });
+    res.status(200).json({
+      replies: paginatedReplies,
+      totalCount,
+      totalPages,
+      page,
+      pageSize,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -340,18 +499,39 @@ router.delete("/delete/:postid", TokenVerify, async (req, res) => {
   const postId = req.params.postid;
   const userId = req.user._id;
   try {
-    await Post.deleteOne({ _id: postId });
-    await User.updateOne(
-      { _id: userId },
-      {
-        $pull: {
-          posts: postId,
-        },
-      }
-    );
-    res.status(200).send("Deleted successfully");
+    const post = await Post.findOne({ _id: postId });
+    console.log(post, post.user, userId);
+    if (post.user == userId) {
+      await Post.deleteOne({ _id: postId });
+      await User.updateOne(
+        { _id: userId },
+        {
+          $pull: {
+            posts: postId,
+          },
+        }
+      );
+      res.status(200).json({ message: "Post Deleted successfully" });
+    } else res.status(500).json({ message: "Your not authorizated user" });
   } catch (err) {
-    res.status(500).send("Not deleted");
+    res.status(500).json({ message: "Some went wrong. Please try again." });
+  }
+});
+
+// Report the Post Endpoint
+router.post("/reportPost", async (req, res) => {
+  const { message, postUrl } = req.body;
+
+  try {
+    await sendMail(
+      "pradeepkumar24rk@gmail.com",
+      "Report Post Notification",
+      `<h5>Post URL: ${postUrl}</h5><p>New report received with the following message:</p><p>${message}</p>`
+    );
+    res.status(200).json({ message: "Report successfully sent!" });
+  } catch (err) {
+    console.error("Error while sending email:", err);
+    res.status(500).json({ message: "Something went wrong. Please try again" });
   }
 });
 
