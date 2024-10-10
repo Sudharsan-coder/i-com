@@ -42,7 +42,7 @@ router.get("/user/:userId/posts", async (req, res) => {
     let posts, totalCount, totalPages, postIds;
     const user = await User.findById(userId);
     if (!user) {
-      res.status(404).json({ message: "User notfound" });
+      return res.status(404).json({ message: "User notfound" });
     }
     switch (type) {
       case "myPost":
@@ -57,6 +57,9 @@ router.get("/user/:userId/posts", async (req, res) => {
       case "likedPost":
         postIds = user.liked;
         break;
+      default:
+        return res.status(400).json({ message: "Invalid post type" });
+        
     }
     totalCount = postIds.length;
     totalPages = Math.ceil(totalCount / pageSize);
