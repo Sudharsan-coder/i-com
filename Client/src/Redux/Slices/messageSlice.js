@@ -11,7 +11,7 @@ const messageSlice = createSlice({
   initialState,
   reducers: {
     newMessage: (state, action) => {
-        state.messageList.push(action.payload);
+      state.messageList.push(action.payload);
     },
     sendMessageSuccess: (state) => {
       state.success = true;
@@ -19,15 +19,20 @@ const messageSlice = createSlice({
     sendMessageFailed: (state, action) => {
       state.error = action.payload;
     },
-    setMessageList:(state,action)=>{
+    setMessageList: (state, action) => {
       state.messageList = action.payload;
     },
-    resetMessageList:(state)=>{
-      state.messageList=[];
-    }
+    resetMessageList: (state) => {
+      state.messageList = [];
+    },
   },
 });
 
 export default messageSlice.reducer;
-export const { newMessage, sendMessageFailed, sendMessageSuccess,resetMessageList } =
-  messageSlice.actions;
+export const {
+  newMessage,
+  sendMessageFailed,
+  sendMessageSuccess,
+  resetMessageList,
+  setMessageList,
+} = messageSlice.actions;

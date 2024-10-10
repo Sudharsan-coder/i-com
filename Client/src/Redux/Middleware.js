@@ -107,6 +107,7 @@ import {
   newMessage,
   sendMessageFailed,
   sendMessageSuccess,
+  setMessageList,
 } from "./Slices/messageSlice";
 
 const baseURL = import.meta.env.VITE_BASE_API_URL;
@@ -859,10 +860,12 @@ function* joinMessageRoom(action) {
 }
 
 function* getMessage(action) {
+  
   try {
-    
+    const res = yield call(axios.get,`${baseURL}/message/${action.data}`)
+    yield put(setMessageList(res.data))
   } catch (err) {
-    
+    console.log(err);
   }
 }
 
@@ -906,6 +909,7 @@ function* rootSaga() {
   yield takeLatest("CHANGE_PASSWORD", changePassword);
   yield takeLatest("JOIN_MESSAGE_ROOM", joinMessageRoom);
   yield takeLatest("SEND_MESSAGE_REQUEST", sendMessage);
+  yield takeLatest("GET_MESSAGE",getMessage);
   yield takeLatest("CONNECTED_USER",connectedUser);
 }
 

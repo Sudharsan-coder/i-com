@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { IoSend } from "react-icons/io5";
 import ScrollToBottom from "react-scroll-to-bottom";
+import { formatDistanceToNow } from "date-fns";
 
 const Message_box = (props) => {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -16,7 +17,15 @@ const Message_box = (props) => {
       type: "JOIN_MESSAGE_ROOM",
       data: { senderId: user._id, receiverId: props._id },
     });
+    dispatch({type:"GET_MESSAGE",data:[user._id,props._id].sort().join("_")})
   }, []);
+
+  const relativeTime =(createdAt)=>{
+
+    return (createdAt
+    ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
+    : "unknown time")
+  } 
 
   const sendMessage = async (e) => {
     if (currentMessage !== "") {
@@ -24,10 +33,7 @@ const Message_box = (props) => {
         senderId: user._id,
         receiverId: props._id,
         message: currentMessage,
-        time: new Date().toLocaleString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        createdAt: new Date().toISOString(),
       };
 
       dispatch({ type: "SEND_MESSAGE_REQUEST", data: messageData });
@@ -73,7 +79,7 @@ const Message_box = (props) => {
                     <p>{data.message}</p>
                   </div>
                   <div className='message-meta'>
-                    {/* <p id='time'>{data.time}</p>   */}
+                    <p id='time'>{relativeTime(data.createdAt)}</p>  
                     <p id='author'>
                       {user._id === data.senderId
                         ? user.userName

@@ -21,7 +21,6 @@ const Profile_page = () => {
   const id = params.id;
 
   useEffect(() => {
-    // Reset posts first
     dispatch(resetMessageList())
     dispatch(resetMyPosts());
   }, [id, dispatch]);
