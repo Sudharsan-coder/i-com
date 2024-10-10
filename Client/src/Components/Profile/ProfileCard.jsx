@@ -1,86 +1,92 @@
 import React from "react";
-import { Card, Avatar, Title, Text, Button } from "@mantine/core";
+import { Card, Avatar, Title, Text, Indicator } from "@mantine/core";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/auth";
-import ProfileCardBtn from "./ProfileCardBtn";
+import { useSelector } from "react-redux";
+import Buttons from "./Buttons";
 
-const ProfileCard = () => {
-  const auth = useAuth();
+const ProfileCard = ({ userDetail }) => {
   const navigate = useNavigate();
+  // console.log(userDetail);
+  const handleRightClick = (e) => {
+    e.preventDefault();
+  };
 
+  const { user,onlineUsers } = useSelector((state) => state.auth);
+  const {userName="",isOnline,_id} = userDetail||{} 
+  const profilePicName = userName.length > 1 
+    ? (userName[0] + userName[userName.length - 1]).toUpperCase() 
+    : userName.toUpperCase();
+    const userIsOnline = onlineUsers.find((data) => data === _id);
   return (
     <Container>
-      {auth.user ? (
-        <Card
-          shadow='sm'
+      <Card
+        shadow='sm'
+        display={"flex"}
+        withBorder
+        style={{
+          minWidth: 300,
+          margin: "30px",
+          marginTop: 40,
+          textAlign: "center",
+          flexDirection: "column",
+          alignContent: "center",
+          justifyContent: "center",
+          borderRadius: 15,
+        }}
+      >
+        <div
           style={{
-            maxWidth: 250,
-            margin: "auto",
-            marginTop: 40,
             textAlign: "center",
+            marginBottom: 15,
+            display: "flex",
+            justifyContent: "center",
           }}
         >
-          <div
-            style={{
-              textAlign: "center",
-              marginBottom: 15,
-              display: "flex",
-              justifyContent: "center",
-            }}
+         <Indicator
+        size={10}
+        withBorder
+        processing
+        disabled={!isOnline && !userIsOnline}
+      >
+          <Avatar
+            onContextMenu={handleRightClick}
+            size={100}
+            radius='xl'
+            src={userDetail.profilePicUrl}
           >
-            <Avatar
-              size={80}
-              radius='xl'
-              src={
-                auth.user.profile
-              }
-              alt={"pradeep"}
-            />
-          </div>
-          
-          <Title
-            order={3}
-            orderMd={2}
-            style={{ marginBottom: 5 }}
-          >
-            {auth.user.username ? auth.user.firstname + " " + auth.user.lastname : ""}
-          </Title>
-          <Text
-            size='sm'
-            style={{ color: "gray", marginBottom: 10 }}
-          >
-            {auth.user.username? (`@${auth.user.username}`) : ""}
-          </Text>
-          {/* <Button
-            variant='light'
-            onClick={() => { auth.user.username ?
-              navigate(`/profile/${auth.user.username}`):navigate();
-            }}
-          >
-            View full Profile
-          </Button> */}
-          <ProfileCardBtn/>
-        </Card>
-      ) : (
-        <Card
-          shadow='sm'
-          style={{
-            maxWidth: 250,
-            margin: "auto",
-            marginTop: 40,
-            textAlign: "center",
-          }}
+          {profilePicName}
+          </Avatar>
+      </Indicator>
+        </div>
+
+        <Title
+          order={3}
+          style={{ marginBottom: 5 }}
         >
-          <Title
-            order={10}
-            orderMd={2}
-            style={{ marginBottom: 5 }}
-          >
-            Need to Login/signUp
-          </Title>
-        </Card>
-      )}
+          {userDetail.userName
+            ? userDetail.firstName + " " + userDetail.lastName
+            : ""}
+        </Title>
+        <Text
+          size='sm'
+          style={{ color: "gray", marginBottom: 10 }}
+        >
+          {userDetail.userName ? `@${userDetail.userName}` : ""}
+        </Text>
+        <Text
+          size='sm'
+          style={{ color: "gray", marginBottom: 10 }}
+        >
+          {userDetail.userBio ? `${userDetail.userBio}` : ""}
+        </Text>
+        {user._id !== userDetail._id && (
+          <FollowButton>
+            <Buttons {...userDetail} />
+          </FollowButton>
+        )}
+      </Card>
+      
     </Container>
   );
 };
@@ -88,5 +94,10 @@ const ProfileCard = () => {
 export default ProfileCard;
 
 const Container = styled.div`
-  grid-column: 1;
+ 
+`;
+
+const FollowButton = styled.div`
+  display: flex;
+  justify-content: center;
 `;

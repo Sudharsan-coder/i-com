@@ -1,81 +1,79 @@
-import { useDisclosure } from "@mantine/hooks";
 import { Modal, Group, Button } from "@mantine/core";
-import { useState } from "react";
-import Login from "./Login";
-import Register from "./Register";
-import { useAuth } from "../../context/auth";
 import { styled } from "styled-components";
 import Post_create_box from "../Post_create/Post_create_box.jsx";
 import User from "./User";
 import { IconSquareRoundedPlus } from "@tabler/icons-react";
+import { AiOutlineMessage } from "react-icons/ai";
+import { FaChalkboardTeacher } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  openCreatePostModel,
+  closeCreatePostModel,
+  setPostModelType,
+  resetCreatePost,
+} from "../../Redux/Slices/publicPostsSlice.js";
 const Log_in_button = () => {
-  const [opened, { open, close }] = useDisclosure(false);
-  const [opened_post, post_obj] = useDisclosure(false);
-  // const [show_post_create,setShow_post_create]=useState(true);
-  const [dis, setdis] = useState(false);
-  const auth = useAuth();
-  const [show_post_box, setShow_post_box] = useState(true);
-  const [showModel, setShowModel] = useState(true);
+  const { isAuth } = useSelector((state) => state.auth);
+  const { createPostModel,postModelType } = useSelector((state) => state.publicPosts);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const openModel = () => {
+    dispatch(openCreatePostModel());
+    dispatch(resetCreatePost())
+    dispatch(setPostModelType("CREATE_POST"));
+    
+  };
+
+  const closeModel = () => {
+    dispatch(closeCreatePostModel());
+  };
   return (
     <>
-      {showModel && (
-        <Modal
-          opened={opened}
-          onClose={close}
-          title='Authentication'
-          centered
-        >
-          {dis ? (
-            <Login close={setShowModel} />
-          ) : (
-            <Register close={setShowModel} />
-          )}
-          <Navbtn onClick={() => setdis((prev) => (prev ? false : true))}>
-            {dis ? (
-              <label>Don&acute;t have an account? Register</label>
-            ) : (
-              <label>Have an account? Login</label>
-            )}
-          </Navbtn>
-        </Modal>
-      )}
-      
-      {show_post_box && (
-        <Modal
-          opened={opened_post}
-          onClose={post_obj.close}
-          size='510px'
-          title='Create Post'
-          centered
-        >
-          <Post_create_box close={setShow_post_box} />
-        </Modal>
-      )}
-      
+      <Modal
+        opened={createPostModel}
+        onClose={closeModel}
+        fullScreen
+        title={postModelType==='CREATE_POST'?'Create Post':'Edit Post'}
+        centered
+      >
+        <Post_create_box/>
+      </Modal>
+
       <Group position='center'>
-        {!auth.user.username ? (
+        {isAuth ? (
+          <Log>
+            {/* <Button
+              variant='default'
+              style={{ border: "none" }}
+            >
+              <AiOutlineMessage size={20} />
+            </Button>
+            <Button
+              variant='default'
+              style={{ border: "none" }}
+            >
+              <FaChalkboardTeacher size={20} />
+            </Button> */}
+            <User />
+            <Button
+              leftIcon={<IconSquareRoundedPlus />}
+              onClick={openModel}
+            >
+              Create Blog
+            </Button>
+          </Log>
+        ) : (
           <Button
             onClick={() => {
-              setShowModel(true);
-              open();
+              navigate("/sign_in");
             }}
             radius={"xl"}
             color='indigo'
           >
             Sign up/ Sign in
           </Button>
-        ) : (
-          <Log>
-            <User />
-            <Button
-            leftIcon={<IconSquareRoundedPlus/>}
-              onClick={() => {
-                post_obj.open();
-              }}
-            >
-              Create Post
-            </Button>
-          </Log>
         )}
       </Group>
       {/* {show_post_box && <Post_create_box setShow={setShow_post_box}/>} */}
@@ -85,16 +83,8 @@ const Log_in_button = () => {
 
 export default Log_in_button;
 
-const Navbtn = styled.button`
-  all: unset;
-  font-size: 12px;
-  &:hover {
-    text-decoration: underline blueviolet;
-  }
-`;
-
-const Log=styled.div`
+const Log = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
-`
+`;

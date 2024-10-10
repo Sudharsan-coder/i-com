@@ -1,69 +1,72 @@
 import { styled } from "styled-components";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Banner from "../Components/Profile/Banner.jsx";
 import Main_profile from "../Components/Profile/Main_profile.jsx";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import Main_post from "../Components/Post/Main_post.jsx";
-import Counter from "../Components/Profile/Counter.jsx";
 import ProfilepageLoading from "../Components/Loading/ProfilepageLoading.jsx";
-import LoadingSkeleton from "../Components/Loading/LoadingSkeleton.jsx";
 import MainpageLoading from "../Components/Loading/MainpageLoading.jsx";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Counter from "../Components/Profile/Counter.jsx";
+import { resetMyPosts } from "../Redux/Slices/ProfileSlice.js";
+import { resetMessageList } from "../Redux/Slices/messageSlice.js";
+
 const Profile_page = () => {
+  const { isGettingProfile, isGettingMyPosts, myposts, profile } = useSelector(
+    (state) => state.profile
+  );
+  const dispatch = useDispatch();
   const params = useParams();
-  const username = params.username;
-  const [profiledetails, setProfileDetails] = useState(null);
-  console.log(username);
+  const id = params.id;
 
-  const [Loading1, setLoading1] = useState(true);
-  const [Loading2, setLoading2] = useState(true);
   useEffect(() => {
-    axios
-      .get(`http://localhost:5010/user?username=${username}`)
-      .then((res) => {
-        setProfileDetails(res.data);
-        console.log(res.data);
-        setLoading1(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [username]);
+    dispatch(resetMessageList())
+    dispatch(resetMyPosts());
+  }, [id, dispatch]);
 
-  const [userpost, setuserpost] = useState([]);
   useEffect(() => {
-    axios
-      .get(`http://localhost:5010/post/UserPostFind?username=${username}`)
-      .then((res) => {
-        setuserpost(res.data);
-        setLoading2(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [username]);
-  console.log(userpost);
-  // console.log(profiledetails.userName);
+    // Fetch profile and posts only after posts are reset
+    if (myposts.data.length === 0) {
+      fetchProfile();
+      fetchMyPosts();
+    }
+  }, [myposts.data.length, id, dispatch]);
+
+  const fetchProfile = () => {
+    dispatch({ type: "GET_PROFILE", data: { userId: id } });
+  };
+
+  const fetchMyPosts = () => {
+    dispatch({
+      type: "GET_MY_POST",
+      data: { page: myposts.page, totalPages: myposts.totalPages, userId: id,type:"myPost" },
+    });
+  };
+
   return (
     <Container>
       <Banner />
-      {Loading1 ? (
+      {isGettingProfile ? (
         <ProfilepageLoading />
       ) : (
-        profiledetails && <Main_profile {...profiledetails} />
+        <>
+          <Main_profile {...profile} />
+          <Counter {...profile} />
+        </>
       )}
 
       <Content>
-        {profiledetails && userpost && (
-          <Counter
-            Post={profiledetails}
-            len={userpost.length}
-          />
-        )}
-        {Loading2 ? (
+        {isGettingMyPosts ? (
           <MainpageLoading />
+        ) : myposts.data.length !== 0 ? ( // Assuming myposts.data is an array
+          <Main_post
+            allPost={myposts.data}
+            fetchData={fetchMyPosts}
+            hasmore={myposts.more}
+          />
         ) : (
-          userpost && <Main_post Post={userpost} />
+          <h1 className="noData" style={{textAlign:'center'}}>No Post</h1>
         )}
       </Content>
     </Container>
@@ -75,12 +78,12 @@ export default Profile_page;
 const Container = styled.div`
   margin-top: 10vh;
   display: grid;
-  grid-template-columns: 0.6fr 2fr 0.6fr;
+  grid-template-columns: 0.6fr 0.5fr 1.5fr 0.6fr;
 `;
 
 const Content = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-row: 2;
+  grid-column-start: 3;
+  grid-column-end: 4;
   gap: 20px;
-  grid-column: 2;
 `;

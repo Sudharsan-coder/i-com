@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const router = require("express").Router();
-const TokenVerify = require("./verifyToken");
+const {TokenVerify} = require("../middleware/authMiddleware");
 
 //followService
 router.put("/",TokenVerify, async (req, res) => {
@@ -12,11 +12,11 @@ router.put("/",TokenVerify, async (req, res) => {
       await User.findByIdAndUpdate(followerId, {
         $addToSet: { followings: followingId },
       });
-      await User.findByIdAndUpdate(followingId, {
+      const follower = await User.findByIdAndUpdate(followingId, {
         $addToSet: { followers: followerId },
       });
       const user = await User.find({ _id: followerId });
-      res.status(200).json(user);
+      res.status(200).json({user,message:`Your started following ${follower.userName}`});
     }
   } catch (err) {
     res.status(500).json(err);

@@ -1,57 +1,60 @@
 import { styled } from "styled-components";
 import { AiFillHeart } from "react-icons/ai";
 import { FaRegCommentDots } from "react-icons/fa";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { IconHeartPlus } from "@tabler/icons-react";
-
+import { useDispatch, useSelector } from "react-redux";
 const Likes = (props) => {
-  const [Liked, setLiked] = useState(false);
-  // console.log(props);
+  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [Liked, setLiked] = useState(
+    user._id? props.likes.includes(user?._id): props.likes.includes("") // Check if user ID is in the likes array
+  );
   
-  const [like,setLike]=useState(props.likeCount);
+
+  useEffect(() => {
+    // Update Liked state if the likes prop changes
+    setLiked(user._id? props.likes.includes(user?._id): props.likes.includes(""));
+  }, [props.likes, user?._id]);
+
+  const handleClick = () => {
+    // console.log(Liked);
+    if (!user?._id) navigate("/sign_in");
+    else{
+      setLiked(!Liked);
+      if (!Liked) {
+        dispatch({
+          type: "LIKE_POST",
+          data: { userId: user._id, postId: props._id },
+        });
+      } else {
+        dispatch({
+          type: "UNLIKE_POST",
+          data: { userId: user._id, postId: props._id },
+        });
+      }
+    } 
+  };
   return (
     <Container>
       <div className='like_container'>
         <div
           className='like'
-          onClick={() => {
-            setLiked(!Liked);
-            console.log(Liked);
-            if (!Liked) {
-              setLike(like+1);
-              axios
-                .put(`http://localhost:5010/post/liked?postid=${props._id}`)
-                .then(() => {
-                  console.log("success");
-                })
-                .catch((err) => {
-                  console.log(err);
-                });
-            } else {
-            setLike(like-1);
-              axios
-                .put(`http://localhost:5010/post/unliked?postid=${props._id}`)
-                .then(() => {
-                  console.log("success");
-                })
-                .catch((err) => {
-                  console.log(err);
-                });
-            }
-          }}
+          onClick={handleClick}
         >
           {Liked ? (
             <AiFillHeart
               size='20px'
               color='red'
-            /> 
+            />
           ) : (
             <IconHeartPlus size='20px' />
-          )}&nbsp;
+          )}
+          &nbsp;
           <div className='num'>
-            {like > 10 ? "10+" : like}
+            {props.likes.length > 10 ? "10+" : props.likes.length}
           </div>
         </div>
         <div
@@ -62,11 +65,10 @@ const Likes = (props) => {
             <FaRegCommentDots
               size='17px'
               color='black'
-            /> 
-          </Link> &nbsp;
-            <div className="num">
-              {props.commentCount}
-            </div>
+            />
+          </Link>{" "}
+          &nbsp;
+          <div className='num'>{props.comments.length}</div>
         </div>
       </div>
     </Container>
@@ -89,11 +91,10 @@ const Container = styled.div`
       align-items: center;
       transition: all 5s ease;
     }
-    .comment{
-     text-align: center;
-     display: flex;
+    .comment {
+      text-align: center;
+      display: flex;
       align-items: center;
-     }
     }
   }
 `;
