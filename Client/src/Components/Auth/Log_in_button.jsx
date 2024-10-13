@@ -7,7 +7,7 @@ import { AiOutlineMessage } from "react-icons/ai";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   openCreatePostModel,
   closeCreatePostModel,
@@ -44,15 +44,17 @@ const Log_in_button = () => {
       <Group position='center'>
         {isAuth ? (
           <Log>
-            {/* <Button
-              variant='default'
-              style={{ border: "none" }}
-            >
-              <AiOutlineMessage size={20} />
-            </Button>
             <Button
-              variant='default'
-              style={{ border: "none" }}
+              variant='outline'
+              style={{ border: "none",padding:0 }}
+            >
+            <Link to='/message'>
+              <AiOutlineMessage size={25} />
+            </Link>
+            </Button>
+            {/* <Button
+              variant='outline'
+              style={{ border: "none",padding:0 }}
             >
               <FaChalkboardTeacher size={20} />
             </Button> */}
