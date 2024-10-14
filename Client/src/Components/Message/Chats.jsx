@@ -1,29 +1,16 @@
-import { Loader, Title } from "@mantine/core";
-import React from "react";
-import styled from "styled-components";
-import Chats_user_card from "./Chats_user_card";
-import UserCardLoading from "../Loading/UserCardLoading";
-import { useSelector } from "react-redux";
+import React from 'react'
 import InfiniteScroll from "react-infinite-scroll-component";
-import Search_box from "./Search_box";
+import { Loader } from '@mantine/core';
+import styled from 'styled-components';
+import Chats_user_card from './Chats_user_card';
 
-const Chats = ({ fetchData }) => {
-  const { chats, isGettingChats } = useSelector((state) => state.message);
-
+const Chats = ({ fetchData,allUser,hasmore }) => {
   return (
-    <Container>
-      <Header>
-        <Title>CHATS</Title>
-        <Search_box/>
-      </Header>
-      <Body id='scrollableDiv'>
-        {isGettingChats ? (
-          <UserCardLoading />
-        ) : chats.data.length !== 0 ? (
+    <div  >
           <InfiniteScroll
-            dataLength={chats.data.length}
+            dataLength={allUser.length}
             next={fetchData}
-            hasMore={chats.hasmore}
+            hasMore={hasmore}
             scrollableTarget='scrollableDiv'
             loader={
               <Load>
@@ -32,38 +19,21 @@ const Chats = ({ fetchData }) => {
             }
             className='infinity_scroll'
           >
-            {chats.data.map((data) => {
+            {allUser.map((data,index) => {
               return (
                 <Chats_user_card
                   info={data}
-                  key={data.userDetails._id}
+                  key={index}
                 />
               );
             })}
           </InfiniteScroll>
-        ) : (
-          <h1>nothing</h1>
-        )}
-      </Body>
-    </Container>
-  );
-};
+        
+    </div>
+  )
+}
 
-export default Chats;
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  height: 100%;
-`;
-const Header = styled.div`
-  padding: 2%;
-`;
-const Body = styled.div`
-  flex: 1;
-  overflow-y: auto;
-`;
+export default Chats
 
 const Load = styled.div`
   display: flex;

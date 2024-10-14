@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Chats from "../Components/Message/Chats";
+import Main_chats from "../Components/Message/Main_chats";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Message_box from "../Components/Message/Message_box";
@@ -9,10 +9,11 @@ import Message_page_description from "../Components/Message/Message_page_descrip
 
 const Message_page = () => {
   const dispatch = useDispatch();
-  const { isAuth, user } = useSelector((state) => state.auth);
+  const { isAuth, user,isAuthenticating } = useSelector((state) => state.auth);
   const { totalPages, page, messageList, hasMore, chats } = useSelector(
     (state) => state.message
   );
+  const {searchUsers} = useSelector((state)=>state.search)
   const navigate = useNavigate();
   const { receiverId } = useParams();
   const [receiver, setReceiver] = useState({
@@ -23,9 +24,11 @@ const Message_page = () => {
   });
   
   useEffect(() => {
+  if(!isAuthenticating){
     if (!isAuth) navigate("/");
+  }
     dispatch(resetChats())
-  }, [isAuth]);
+  }, [isAuth,isAuthenticating]);
   
   useEffect(()=>{
   if(chats.page===1)
@@ -34,9 +37,12 @@ const Message_page = () => {
   
   useEffect(() => {
     dispatch(resetMessageList())
-    const chatsInfo = chats.data.find(
+    let chatsInfo = chats.data.find(
       (data) => data.userDetails._id === receiverId
     );
+    if(!chatsInfo) {
+      chatsInfo = searchUsers.find((data)=>data._id===receiverId)
+    }
     if(chatsInfo){
       setReceiver({...chatsInfo.userDetails});
     }
@@ -65,7 +71,7 @@ const Message_page = () => {
     <Container>
       <WrapperContainer>
         <Left>
-          <Chats fetchData={fetchChats} />
+          <Main_chats fetchData={fetchChats} />
         </Left>
         <Right>
           {receiver.userName.length !== 0 ? (
@@ -95,6 +101,7 @@ const Container = styled.div`
 `;
 const WrapperContainer = styled.div`
   display: flex;
+  background-color: white;
   border: 0.0625rem solid #dee2e6;
   box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 0.625rem 0.9375rem -0.3125rem, rgba(0, 0, 0, 0.04) 0 0.4375rem 0.4375rem -0.3125rem;
   height: 80%;
@@ -109,7 +116,6 @@ border-right: 1px solid #dee2e6;
   box-sizing: border-box;
 `;
 const Right = styled.div`
-  
   width: 60%;
   padding: 2%;
 `;

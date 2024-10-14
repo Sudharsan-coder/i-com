@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
 import {
-  ScrollArea,
   Popover,
-  Text,
-  Box,
   Input,
   CloseButton,
 } from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import UserCardLoading from "../Loading/UserCardLoading";
-import Main_user from "../Auth/Main_user";
 import { resetSearch } from "../../Redux/Slices/searchSlice";
 import styled from "styled-components";
+import Chats from "./Chats";
 const Search_box = () => {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
@@ -66,11 +63,11 @@ const Search_box = () => {
           />
         </Popover.Target>
         <Popover.Dropdown>
-          <UserBox>
+          <UserBox id='scrollableDiv'>
           {isGettingSearchUser ? (
             <UserCardLoading />
           ) : searchUsers.length !== 0 ? (
-            <Main_user
+            <Chats
               allUser={searchUsers}
               fetchData={fetchUser}
               hasmore={usermore}

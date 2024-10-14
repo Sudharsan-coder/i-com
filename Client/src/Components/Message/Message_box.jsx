@@ -18,14 +18,13 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
   const { user, onlineUsers } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     dispatch({
       type: "JOIN_MESSAGE_ROOM",
       data: { senderId: user._id, receiverId: receiver._id },
     });
-  },[])
-
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -65,74 +64,81 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
       <Header>
         <Indicator
           size={5}
-          color="teal"
+          color='teal'
           withBorder
           processing
           disabled={!isOnline && !userIsOnline}
         >
-          <Avatar src={receiver.profilePicUrl||null} radius="xl">
+          <Avatar
+            src={receiver.profilePicUrl || null}
+            radius='xl'
+          >
             {profilePicName}
           </Avatar>
         </Indicator>
-        <Text size="xl">{receiver.userName}</Text>
+        <Text size='xl'>{receiver.userName}</Text>
       </Header>
 
-      <Body id="scrollableDiv">
-        {messageList.length===0? <NoData>
-          <h1>Start your conversation</h1>
-        </NoData>:
-        
-        <InfiniteScroll
-          dataLength={messageList.length} // Total number of items
-          next={() => {
-            console.log("Fetching more messages...");
-            fetchMessage();
-          }}
-          inverse={true}
-          hasMore={hasMore}
-          scrollableTarget="scrollableDiv"
-          loader={
-            <Load>
-              <Loader color="blue" />
-            </Load>
-          }
-          className="message-container"
-        >
-          {messageList.map((data, index) => (
-            <div
-              className="message"
-              id={user._id === data.senderId ? "you" : "other"}
-              key={index}
-            >
-              <div>
-                <div className="message-content">
-                  <p>{data.message}</p>
-                </div>
-                <div className="message-meta">
-                  <p id="time">{relativeTime(data.createdAt)}</p>
-                  <p id="author">
-                    {user._id === data.senderId
-                      ? user.userName
-                      : receiver.userName}
-                  </p>
+      <Body id='scrollableDiv'>
+        {messageList.length === 0 ? (
+          <NoData>
+            <h1>Start your conversation</h1>
+          </NoData>
+        ) : (
+          <InfiniteScroll
+            dataLength={messageList.length}
+            next={() => {
+              console.log("Fetching more messages...");
+              fetchMessage();
+            }}
+            inverse={true}
+            hasMore={hasMore}
+            scrollableTarget='scrollableDiv'
+            loader={
+              <Load>
+                <Loader color='blue' />
+              </Load>
+            }
+            className='message-container'
+          >
+            {messageList.map((data, index) => (
+              <div
+                className='message'
+                id={user._id === data.senderId ? "you" : "other"}
+                key={index}
+              >
+                <div>
+                  <div className='message-content'>
+                    <p>{data.message}</p>
+                  </div>
+                  <div className='message-meta'>
+                    <p id='time'>{relativeTime(data.createdAt)}</p>
+                    <p id='author'>
+                      {user._id === data.senderId
+                        ? user.userName
+                        : receiver.userName}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          
-          <div ref={scrollRef}></div>
-        </InfiniteScroll>
-        }
+            ))}
+
+            <div ref={scrollRef}></div>
+          </InfiniteScroll>
+        )}
       </Body>
 
       <Footer>
         <Textarea
-          className="textBox"
-          placeholder="Enter Your Message"
+          className='textBox'
+          placeholder='Enter Your Message'
           onChange={(e) => setCurrentMessage(e.target.value)}
           value={currentMessage}
         />
-        <Button radius="lg" onClick={sendMessage}>
+        <Button
+          radius='lg'
+          onClick={sendMessage}
+        >
           <IoSend size={20} />
         </Button>
       </Footer>

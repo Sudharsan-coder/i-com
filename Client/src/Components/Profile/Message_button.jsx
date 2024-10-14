@@ -44,9 +44,6 @@ const Message_button = (props) => {
         // title='Message'
         withCloseButton={false}
         position='right'
-        offset={6}
-        radius="md"
-        scrollAreaComponent={ScrollArea.never}
       >
       <div style={{height:"96vh"}}>
         <Message_box receiver={props} fetchMessage={fetchMessage} messageList={messageList} hasMore={hasMore}  />

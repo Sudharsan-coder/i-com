@@ -15,7 +15,7 @@ const Chats_user_card = ({info}) => {
     userName = "",
     isOnline,
     profilePicUrl = null,
-  } = info.userDetails || {};
+  } = info.userDetails ||info|| {};
   const profilePicName =
     userName.length > 1
       ? (userName[0] + userName[userName.length - 1]).toUpperCase()
@@ -23,7 +23,7 @@ const Chats_user_card = ({info}) => {
   const userIsOnline = onlineUsers.find((info) => info === _id);
   
   const cardOnClickHandler=()=>{
-      navigate(`/message/${info.userDetails._id}`)
+      navigate(`/message/${_id}`)
   }
   
   return (
