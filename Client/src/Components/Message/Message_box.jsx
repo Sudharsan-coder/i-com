@@ -1,51 +1,64 @@
-import { Avatar, Button, Indicator, Text, Textarea } from "@mantine/core";
-import React, { useEffect, useState } from "react";
+import {
+  Avatar,
+  Button,
+  Indicator,
+  Loader,
+  Text,
+  Textarea,
+} from "@mantine/core";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { IoSend } from "react-icons/io5";
-import ScrollToBottom from "react-scroll-to-bottom";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { formatDistanceToNow } from "date-fns";
 
-const Message_box = (props) => {
+const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
   const [currentMessage, setCurrentMessage] = useState("");
   const { user, onlineUsers } = useSelector((state) => state.auth);
-  const { messageList } = useSelector((state) => state.message);
   const dispatch = useDispatch();
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     dispatch({
       type: "JOIN_MESSAGE_ROOM",
-      data: { senderId: user._id, receiverId: props._id },
+      data: { senderId: user._id, receiverId: receiver._id },
     });
-    dispatch({type:"GET_MESSAGE",data:[user._id,props._id].sort().join("_")})
   }, []);
 
-  const relativeTime =(createdAt)=>{
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messageList]);
 
-    return (createdAt
-    ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
-    : "unknown time")
-  } 
+  const relativeTime = (createdAt) => {
+    return createdAt
+      ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
+      : "unknown time";
+  };
 
-  const sendMessage = async (e) => {
+  // Function to send message
+  const sendMessage = async () => {
     if (currentMessage !== "") {
       const messageData = {
         senderId: user._id,
-        receiverId: props._id,
+        receiverId: receiver._id,
         message: currentMessage,
         createdAt: new Date().toISOString(),
       };
-
       dispatch({ type: "SEND_MESSAGE_REQUEST", data: messageData });
       setCurrentMessage("");
     }
   };
-  const { userName = "", isOnline, _id } = props || {};
+
+  const { userName = "", isOnline, _id } = receiver || {};
   const profilePicName =
     userName.length > 1
       ? (userName[0] + userName[userName.length - 1]).toUpperCase()
       : userName.toUpperCase();
   const userIsOnline = onlineUsers.find((data) => data === _id);
+
   return (
     <Container>
       <Header>
@@ -57,18 +70,38 @@ const Message_box = (props) => {
           disabled={!isOnline && !userIsOnline}
         >
           <Avatar
-            src={props.profilePicUrl}
+            src={receiver.profilePicUrl || null}
             radius='xl'
           >
             {profilePicName}
           </Avatar>
         </Indicator>
-        <Text size={"xl"}>{props.userName}</Text>
+        <Text size='xl'>{receiver.userName}</Text>
       </Header>
-      <Body className='chat-body'>
-        <ScrollToBottom className='message-container'>
-          {messageList.map((data, index) => {
-            return (
+
+      <Body id='scrollableDiv'>
+        {messageList.length === 0 ? (
+          <NoData>
+            <h1>Start your conversation</h1>
+          </NoData>
+        ) : (
+          <InfiniteScroll
+            dataLength={messageList.length}
+            next={() => {
+              console.log("Fetching more messages...");
+              fetchMessage();
+            }}
+            inverse={true}
+            hasMore={hasMore}
+            scrollableTarget='scrollableDiv'
+            loader={
+              <Load>
+                <Loader color='blue' />
+              </Load>
+            }
+            className='message-container'
+          >
+            {messageList.map((data, index) => (
               <div
                 className='message'
                 id={user._id === data.senderId ? "you" : "other"}
@@ -79,19 +112,22 @@ const Message_box = (props) => {
                     <p>{data.message}</p>
                   </div>
                   <div className='message-meta'>
-                    <p id='time'>{relativeTime(data.createdAt)}</p>  
+                    <p id='time'>{relativeTime(data.createdAt)}</p>
                     <p id='author'>
                       {user._id === data.senderId
                         ? user.userName
-                        : props.userName}
+                        : receiver.userName}
                     </p>
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </ScrollToBottom>
+            ))}
+
+            <div ref={scrollRef}></div>
+          </InfiniteScroll>
+        )}
       </Body>
+
       <Footer>
         <Textarea
           className='textBox'
@@ -100,7 +136,7 @@ const Message_box = (props) => {
           value={currentMessage}
         />
         <Button
-          radius={"lg"}
+          radius='lg'
           onClick={sendMessage}
         >
           <IoSend size={20} />
@@ -115,11 +151,10 @@ export default Message_box;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 9vh);
+  height: 100%;
 `;
 
 const Header = styled.div`
-  /* border: 1px solid black; */
   border-radius: 10px;
   padding: 10px;
   display: flex;
@@ -129,29 +164,23 @@ const Header = styled.div`
   background-color: var(--primary_color);
   color: white;
 `;
+
 const Body = styled.div`
   flex: 1;
-  /* border: 1px solid black; */
+  height: 0;
   overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  display: flex;
+  flex-direction: column-reverse;
   p {
     all: unset;
   }
   .message-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    overflow-y: auto;
-    height: 100%;
-    width: 100%;
-    padding-right: 10px; /* Avoid cutting off messages */
+    padding-right: 10px;
   }
 
   .message {
     display: flex;
-    margin: 5%;
+    margin: 2%;
     margin-bottom: 10px;
   }
 
@@ -161,7 +190,7 @@ const Body = styled.div`
     border-radius: 5px;
     padding: 10px;
     word-break: break-word;
-    max-width: 100%; /* Ensure message box fits within the container */
+    max-width: 100%;
   }
 
   .message-meta {
@@ -211,5 +240,21 @@ const Footer = styled.div`
   gap: 10px;
   .textBox {
     flex: 1;
+  }
+`;
+
+const Load = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+`;
+
+const NoData = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  h1 {
+    font-size: 2rem;
+    color: #b8b9ba;
   }
 `;

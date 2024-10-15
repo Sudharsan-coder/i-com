@@ -98,29 +98,27 @@ const Counter = (props) => {
 export default Counter;
 
 const Container = styled.div`
-  height: 100px;
+  height: fit-content;
   grid-column: 2;
   grid-row: 2;
   margin-top: 20px;
   background: white;
   border-radius: 10px;
-  padding: 20px;
   font-size: 25px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+  box-sizing: border-box;
   border: 0.0625rem solid #dee2e6;
   box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 0.625rem 0.9375rem -0.3125rem, rgba(0, 0, 0, 0.04) 0 0.4375rem 0.4375rem -0.3125rem;
   div {
+    padding: 10px;
+    width: 100%;
     display: flex;
     justify-content: start;
+    border-bottom: 1px solid #dee2e6;
   }
   .followListButton {
     cursor: pointer;
     &:hover {
-      color: blue;
-      text-decoration: underline;
+      background-color: #dee2e6;
     }
   }
 `;

@@ -4,21 +4,31 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 
-const Single_user_card = (props) => {
+const Chats_user_card = ({info}) => {
   const { onlineUsers } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const handleRightClick = (e) => {
     e.preventDefault();
   };
-  const { _id, userName = "", isOnline } = props.data || {};
+  const {
+    _id,
+    userName = "",
+    isOnline,
+    profilePicUrl = null,
+  } = info.userDetails ||info|| {};
   const profilePicName =
     userName.length > 1
       ? (userName[0] + userName[userName.length - 1]).toUpperCase()
       : userName.toUpperCase();
-  const userIsOnline = onlineUsers.find((data) => data === _id);
+  const userIsOnline = onlineUsers.find((info) => info === _id);
+  
+  const cardOnClickHandler=()=>{
+      navigate(`/message/${_id}`)
+  }
+  
   return (
-    <Container>
-      <Boxs bg={"white"}>
+    <>
+      <Boxs bg={"white"} onClick={cardOnClickHandler}>
         <Wrap>
           <Indicator
             size={10}
@@ -28,54 +38,54 @@ const Single_user_card = (props) => {
           >
             <Avatar
               onContextMenu={handleRightClick}
-              src={props.data.profilePicUrl}
+              src={profilePicUrl}
               alt="it's"
               size={"lg"}
             >
               {profilePicName}
             </Avatar>
           </Indicator>
-          <Box miw={200} maw={250}>
-
-          <Username truncate="end" onClick={() => navigate(`/profile/${props.data._id}`)}>
-            {userName}
-          </Username>
-          </Box>
+          <Right>
+            <Username>{userName}</Username>
+            <Box w={100}>
+              <Text truncate='end'>
+                {info.message}
+              </Text>
+            </Box>
+          </Right>
         </Wrap>
       </Boxs>
-    </Container>
+    </>
   );
 };
 
-export default Single_user_card;
+export default Chats_user_card;
 
-const Container = styled.div`
-  margin-top: 1rem;
-  border-radius: 0.5rem;
+const Boxs = styled(Box)`
+  display: flex;
+  align-items: center;
+  text-transform: capitalize;
   box-sizing: border-box;
   background-color: white;
-  border: 0.0625rem solid #dee2e6;
-  box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.05),
-    rgba(0, 0, 0, 0.05) 0 0.625rem 0.9375rem -0.3125rem,
-    rgba(0, 0, 0, 0.04) 0 0.4375rem 0.4375rem -0.3125rem;
+  border-bottom: 0.0625rem solid #dee2e6;
   padding: 0.5rem;
+  overflow: hidden;
+  &:hover {
+    background-color:#dee2e6;
+    cursor: pointer;
+  }
 `;
 const Wrap = styled.div`
   display: flex;
   gap: 20px;
   align-items: center;
 `;
-const Boxs = styled(Box)`
-  display: flex;
-  align-items: center;
-  text-transform: capitalize;
-`;
 const Username = styled(Text)`
   font-size: 20px;
   font-weight: 800;
-  &:hover {
-    color: blue;
-    text-decoration: underline;
-    cursor: pointer;
-  }
+  
+`;
+const Right = styled.div`
+  display: flex;
+  flex-direction: column;
 `;

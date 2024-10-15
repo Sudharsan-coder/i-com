@@ -1,9 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sofadi+One&display=swap');
 body {
   margin: 0px;
-  background-color: rgb(245, 245, 245);
+  background-color: rgb(245, 245, 245) !important;
   box-sizing: border-box;
-  
 }
 * {
   font-family: "-apple-system";
