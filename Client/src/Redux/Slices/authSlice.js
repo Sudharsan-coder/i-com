@@ -43,6 +43,7 @@ const authSlice = createSlice({
         message: "Please wait...",
         color: "green",
         loading: true,
+        autoClose:false,
         id: "auth",
       });
     },

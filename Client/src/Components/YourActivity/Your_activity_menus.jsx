@@ -85,13 +85,13 @@ const FirstCard = styled(Card)`
     border-radius: 3px;
     &:hover {
       color: var(--primary_color);
-      background-color: var(--seconday_color);
+      background-color: var(--secondary_color);
       border: 1px solid var(--primary_color);
     }
   }
   .active {
     color: var(--primary_color);
-    background-color: var(--seconday_color);
+    background-color: var(--secondary_color);
     border-bottom: 1px solid var(--primary_color);
   }
   .active-icon {

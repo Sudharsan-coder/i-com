@@ -47,9 +47,10 @@ const Log_in_button = () => {
             <Button
               variant='outline'
               style={{ border: "none",padding:0 }}
+              
             >
             <Link to='/message'>
-              <AiOutlineMessage size={25} />
+              <AiOutlineMessage size={25}  />
             </Link>
             </Button>
             {/* <Button

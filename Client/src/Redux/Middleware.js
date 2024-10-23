@@ -113,6 +113,8 @@ import {
   getChatsStarted,
   getChatsFailed,
   getNoMoreChats,
+  setIsTyping,
+  updateSeenMessage,
 } from "./Slices/messageSlice";
 
 const baseURL = import.meta.env.VITE_BASE_API_URL;
@@ -804,8 +806,22 @@ function createSocketChannel(socket) {
     socket.on("new_message", (message) => {
       emit({ type: "NEW_MESSAGE", playload: message });
     });
+
+    socket.on("userTyping", (data) => {
+      emit({ type: "TYPING", playload: data });
+    });
+
+    socket.on("userStopTyping", (data) => {
+      emit({ type: "TYPING", playload: data });
+    });
+
+    socket.on("messageSeen", (data) => {
+      emit({ type: "SEEN", playload: data });
+    });
+
     return () => {
       socket.off("new_message");
+      socket.off("user_status");
     };
   });
 }
@@ -825,6 +841,10 @@ function* initSocket() {
         yield put(setOnlineUsers(action.playload.userId));
       else if (action.type === "IS_ONLINE" && !action.playload.isOnline)
         yield put(setOfflineUsers(action.playload.userId));
+      else if (action.type === "TYPING")
+        yield put(setIsTyping(action.playload));
+      else if (action.type === "SEEN")
+        yield put(updateSeenMessage(action.playload.messages));
     }
   } catch (err) {
     console.log(err);
@@ -860,15 +880,55 @@ function* joinMessageRoom(action) {
   }
 }
 
+function* leaveMessageRoom(action) {
+  try {
+    const socket = yield call(getSocket);
+    socket.emit("leaveRoom", action.data);
+    console.log("Room leaved Successfully");
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function* messageTyping(action) {
+  try {
+    const socket = yield call(getSocket);
+    socket.emit("typing", action.data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+function* messageMarkAsSeen(action) {
+  try {
+    const socket = yield call(getSocket);
+    socket.emit("markAsSeen", action.data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function* stopMessageTyping(action) {
+  try {
+    const socket = yield call(getSocket);
+    socket.emit("stopTyping", action.data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 function* getMessage(action) {
   const { page, totalPages, roomId } = action.data;
   if (page <= totalPages) {
     try {
-      const res = yield call(axios.get, `${baseURL}/message/pagination/${roomId}`, {
-        params: {
-          page,
-        },
-      });
+      const res = yield call(
+        axios.get,
+        `${baseURL}/message/pagination/${roomId}`,
+        {
+          params: {
+            page,
+          },
+        }
+      );
       yield put(getMessageList(res.data));
     } catch (err) {
       console.log(err);
@@ -880,20 +940,28 @@ function* getMessage(action) {
 }
 
 function* getChats(action) {
-  const { page, totalPages } = yield select((state)=>state.message.chats);
-  const {user} = yield select((state)=>state.auth)  
+  const { page, totalPages, data } = yield select(
+    (state) => state.message.chats
+  );
+  const { user } = yield select((state) => state.auth);
   if (page <= totalPages) {
     try {
-    yield put(getChatsStarted())
-      const res = yield call(axios.get, `${baseURL}/message/chats/${user._id}`, {
-        params: {
-          page,
-        },
-      });
+      if (page === 1 && data.length === 0) yield put(getChatsStarted());
+      const res = yield call(
+        axios.get,
+        `${baseURL}/message/chats/${user._id}`,
+        {
+          params: {
+            page,
+          },
+        }
+      );
       yield put(getChatsSucess(res.data));
     } catch (err) {
       console.log(err);
-      yield put(getChatsFailed(err.response?.data?.message || "Please try again."))
+      yield put(
+        getChatsFailed(err.response?.data?.message || "Please try again.")
+      );
       yield put(getNoMoreChats());
     }
   } else {
@@ -940,10 +1008,14 @@ function* rootSaga() {
   yield takeLatest("VERIFY_OTP", verifyOTP);
   yield takeLatest("CHANGE_PASSWORD", changePassword);
   yield takeLatest("JOIN_MESSAGE_ROOM", joinMessageRoom);
+  yield takeLatest("LEAVE_MESSAGE_ROOM", leaveMessageRoom);
   yield takeLatest("SEND_MESSAGE_REQUEST", sendMessage);
   yield takeLatest("GET_MESSAGE", getMessage);
   yield takeLatest("GET_CHATS", getChats);
   yield takeLatest("CONNECTED_USER", connectedUser);
+  yield takeLatest("MESSAGE_TYPING", messageTyping);
+  yield takeLatest("STOP_MESSAGE_TYPING", stopMessageTyping);
+  yield takeLatest("MESSAGE_MARK_AS_SEEN", messageMarkAsSeen);
 }
 
 export default rootSaga;
