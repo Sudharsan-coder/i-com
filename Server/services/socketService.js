@@ -19,7 +19,9 @@ const socketHandler = (server) => {
       console.log(`${userId} is now online`);
       connectedUsers.set(userId, socket.id);
       try {
-        const res = await User.findByIdAndUpdate(userId, { $set:{isOnline: true} });
+        const res = await User.findByIdAndUpdate(userId, {
+          $set: { isOnline: true },
+        });
       } catch (err) {
         console.log(err);
       }
@@ -31,22 +33,64 @@ const socketHandler = (server) => {
       const roomId = [senderId, receiverId].sort().join("_");
       socket.join(roomId);
       console.log(`User joined room: ${roomId}`);
+    
     });
 
-    socket.on("privateMessage",async (messageData) => {
+    socket.on("typing", ({ senderId, receiverId }) => {
+      const receiverSocketId = connectedUsers.get(receiverId);
+      if (receiverSocketId)
+        io.to(receiverSocketId).emit("userTyping", {
+          senderId,
+          istyping: true,
+        });
+    });
+
+    socket.on("stopTyping", ({ senderId, receiverId }) => {
+      const receiverSocketId = connectedUsers.get(receiverId);
+      if (receiverSocketId)
+        io.to(receiverSocketId).emit("userStopTyping", {
+          senderId,
+          istyping: false,
+        });
+    });
+
+    socket.on("privateMessage", async (messageData) => {
       try {
-      const { senderId, receiverId,message } = messageData;
-      const roomId = [senderId, receiverId].sort().join("_");
-      console.log(messageData);
+        const { senderId, receiverId, message } = messageData;
+        const roomId = [senderId, receiverId].sort().join("_");
+        // console.log(messageData);
         const messageModel = new Message({
-          senderId,receiverId,roomId,message
-        })
-        await messageModel.save()
+          senderId,
+          receiverId,
+          roomId,
+          message,
+        });
+        await messageModel.save();
         io.to(roomId).emit("new_message", messageData);
       } catch (err) {
         console.log(err);
       }
     });
+
+    socket.on("markAsSeen", async ({ senderId, messages }) => {
+      const senderSocketId = connectedUsers.get(senderId);
+      if (senderSocketId)
+        io.to(senderSocketId).emit("messageSeen", { messages });
+      try {
+        await Message.updateMany(
+          { _id: { $in: messages.map((msg) => msg._id) } },
+          { $set: { isSeen: true } }
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    });
+    
+    socket.on("leaveRoom",({ senderId, receiverId })=>{
+      const roomId = [senderId, receiverId].sort().join("_");
+      socket.leave(roomId);
+      console.log(`User leave room: ${roomId}`);
+    })
 
     socket.on("disconnect", async () => {
       const userId = [...connectedUsers].find(
@@ -56,7 +100,7 @@ const socketHandler = (server) => {
         connectedUsers.delete(userId);
         console.log(`${userId} is now offline`);
         try {
-          await User.findByIdAndUpdate(userId, { $set:{isOnline: false} });
+          await User.findByIdAndUpdate(userId, { $set: { isOnline: false } });
         } catch (err) {
           console.log(err);
         }

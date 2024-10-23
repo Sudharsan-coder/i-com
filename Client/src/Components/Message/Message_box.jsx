@@ -12,11 +12,14 @@ import styled from "styled-components";
 import { IoSend } from "react-icons/io5";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { formatDistanceToNow } from "date-fns";
+import { updateSeenMessage } from "../../Redux/Slices/messageSlice";
 
 const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
-  const [currentMessage, setCurrentMessage] = useState("");
   const { user, onlineUsers } = useSelector((state) => state.auth);
+  const { typing } = useSelector((state) => state.message);
   const dispatch = useDispatch();
+  const [istyping, setIstyping] = useState(false);
+  const [currentMessage, setCurrentMessage] = useState("");
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -24,13 +27,39 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
       type: "JOIN_MESSAGE_ROOM",
       data: { senderId: user._id, receiverId: receiver._id },
     });
-  }, []);
+    return () => {
+      dispatch({
+        type: "LEAVE_MESSAGE_ROOM",
+        data: { senderId: user._id, receiverId: receiver._id },
+      });
+    };
+  }, [receiver._id]);
+
+  useEffect(() => {
+    setIstyping(
+      typing.find((data) => receiver._id === data.senderId)?.istyping ?? false
+    );
+  }, [typing]);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messageList]);
+    const unseen = messageList.filter(
+      (data) =>
+        data.senderId === receiver._id &&
+        data.receiverId === user._id &&
+        !data.isSeen
+    );
+
+    if (unseen.length > 0) {
+      dispatch(updateSeenMessage(unseen))
+      dispatch({
+        type: "MESSAGE_MARK_AS_SEEN",
+        data: { senderId: receiver._id, messages: unseen },
+      });
+    }
+  }, [messageList, receiver._id, user._id, dispatch]);
 
   const relativeTime = (createdAt) => {
     return createdAt
@@ -38,12 +67,26 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
       : "unknown time";
   };
 
-  // Function to send message
+  const handleOnChangeTextBox = (e) => {
+    setCurrentMessage(e.target.value);
+    dispatch({
+      type: "MESSAGE_TYPING",
+      data: { senderId: user._id, receiverId: receiver._id },
+    });
+    setTimeout(() => {
+      dispatch({
+        type: "STOP_MESSAGE_TYPING",
+        data: { senderId: user._id, receiverId: receiver._id },
+      });
+    }, 2000);
+  };
+
   const sendMessage = async () => {
     if (currentMessage !== "") {
       const messageData = {
         senderId: user._id,
         receiverId: receiver._id,
+        isSeen: false,
         message: currentMessage,
         createdAt: new Date().toISOString(),
       };
@@ -57,7 +100,7 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
     userName.length > 1
       ? (userName[0] + userName[userName.length - 1]).toUpperCase()
       : userName.toUpperCase();
-  const userIsOnline = onlineUsers.find((data) => data === _id);
+  const userIsOnline = onlineUsers.includes(_id);
 
   return (
     <Container>
@@ -76,9 +119,11 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
             {profilePicName}
           </Avatar>
         </Indicator>
-        <Text size='xl'>{receiver.userName}</Text>
+        <div>
+          <Text size='xl'>{receiver.userName}</Text>
+          {istyping && <TypingIndicator>typing...</TypingIndicator>}
+        </div>
       </Header>
-
       <Body id='scrollableDiv'>
         {messageList.length === 0 ? (
           <NoData>
@@ -87,10 +132,7 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
         ) : (
           <InfiniteScroll
             dataLength={messageList.length}
-            next={() => {
-              console.log("Fetching more messages...");
-              fetchMessage();
-            }}
+            next={fetchMessage}
             inverse={true}
             hasMore={hasMore}
             scrollableTarget='scrollableDiv'
@@ -103,7 +145,7 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
           >
             {messageList.map((data, index) => (
               <div
-                className='message'
+                className={data.isSeen ? "message" : "unreaded message"}
                 id={user._id === data.senderId ? "you" : "other"}
                 key={index}
               >
@@ -112,27 +154,28 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
                     <p>{data.message}</p>
                   </div>
                   <div className='message-meta'>
+                    {user._id === data.senderId && (
+                      <p id='isSeen'>{data.isSeen ? "seen" : "unseen"}</p>
+                    )}
                     <p id='time'>{relativeTime(data.createdAt)}</p>
-                    <p id='author'>
+                    {/* <p id='author'>
                       {user._id === data.senderId
                         ? user.userName
                         : receiver.userName}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </div>
             ))}
-
             <div ref={scrollRef}></div>
           </InfiniteScroll>
         )}
       </Body>
-
       <Footer>
         <Textarea
           className='textBox'
           placeholder='Enter Your Message'
-          onChange={(e) => setCurrentMessage(e.target.value)}
+          onChange={handleOnChangeTextBox}
           value={currentMessage}
         />
         <Button
@@ -165,15 +208,21 @@ const Header = styled.div`
   color: white;
 `;
 
+const TypingIndicator = styled(Text)`
+  font-size: 12px;
+`;
+
 const Body = styled.div`
   flex: 1;
-  height: 0;
+  height: 100%;
   overflow-y: auto;
   display: flex;
   flex-direction: column-reverse;
+
   p {
     all: unset;
   }
+
   .message-container {
     padding-right: 10px;
   }
@@ -182,6 +231,12 @@ const Body = styled.div`
     display: flex;
     margin: 2%;
     margin-bottom: 10px;
+  }
+
+  .unreaded {
+    background-color: var(--secondary_color);
+    margin: 0%;
+    padding: 2%;
   }
 
   .message-content {
@@ -196,6 +251,7 @@ const Body = styled.div`
   .message-meta {
     display: flex;
     justify-content: flex-end;
+    gap: 10px;
     font-size: 12px;
   }
 
@@ -203,6 +259,7 @@ const Body = styled.div`
     justify-content: flex-end;
     align-items: flex-end;
     align-self: flex-end;
+    background-color: white !important;
   }
 
   #you .message-content {

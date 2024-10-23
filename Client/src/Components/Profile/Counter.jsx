@@ -108,6 +108,7 @@ const Container = styled.div`
   box-sizing: border-box;
   border: 0.0625rem solid #dee2e6;
   box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 0.625rem 0.9375rem -0.3125rem, rgba(0, 0, 0, 0.04) 0 0.4375rem 0.4375rem -0.3125rem;
+  overflow: hidden;
   div {
     padding: 10px;
     width: 100%;
@@ -118,7 +119,7 @@ const Container = styled.div`
   .followListButton {
     cursor: pointer;
     &:hover {
-      background-color: #dee2e6;
+      background-color: var(--secondary_color);
     }
   }
 `;

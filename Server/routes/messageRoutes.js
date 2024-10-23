@@ -91,6 +91,20 @@ router.get("/chats/:userId", async (req, res) => {
               "$senderId", // Otherwise group by senderId
             ],
           },
+          unSeen: {
+            $sum: {
+              $cond: {
+                if: {
+                  $and: [
+                    { $eq: ["$isSeen", false] },
+                    { $eq: ["$receiverId", userObjectId] },
+                  ],
+                },
+                then: 1,
+                else: 0,
+              },
+            },
+          },
           lastMessage: { $first: "$$ROOT" }, // Get the last message in each group
         },
       },
@@ -115,6 +129,7 @@ router.get("/chats/:userId", async (req, res) => {
           roomId: "$lastMessage.roomId",
           message: "$lastMessage.message", // Include last message
           createdAt: "$lastMessage.createdAt", // Include message timestamp
+          unSeen: "$unSeen",
         },
       },
       {
@@ -128,9 +143,7 @@ router.get("/chats/:userId", async (req, res) => {
       },
     ]);
 
-    res
-      .status(200)
-      .json({ totalCount, totalPages, page, pageSize, chats });
+    res.status(200).json({ totalCount, totalPages, page, pageSize, chats });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Something went wrong" });
