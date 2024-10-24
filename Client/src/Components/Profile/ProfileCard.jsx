@@ -12,12 +12,13 @@ const ProfileCard = ({ userDetail }) => {
     e.preventDefault();
   };
 
-  const { user,onlineUsers } = useSelector((state) => state.auth);
-  const {userName="",isOnline,_id} = userDetail||{} 
-  const profilePicName = userName.length > 1 
-    ? (userName[0] + userName[userName.length - 1]).toUpperCase() 
-    : userName.toUpperCase();
-    const userIsOnline = onlineUsers.find((data) => data === _id);
+  const { user, onlineUsers } = useSelector((state) => state.auth);
+  const { userName = "", isOnline, _id } = userDetail || {};
+  const profilePicName =
+    userName.length > 1
+      ? (userName[0] + userName[userName.length - 1]).toUpperCase()
+      : userName.toUpperCase();
+  const userIsOnline = onlineUsers.find((data) => data === _id);
   return (
     <Container>
       <Card
@@ -43,21 +44,22 @@ const ProfileCard = ({ userDetail }) => {
             justifyContent: "center",
           }}
         >
-         <Indicator
-        size={10}
-        withBorder
-        processing
-        disabled={!isOnline && !userIsOnline}
-      >
-          <Avatar
-            onContextMenu={handleRightClick}
-            size={100}
-            radius='xl'
-            src={userDetail.profilePicUrl}
+          <Indicator
+            size={10}
+            withBorder
+            processing
+            disabled={!isOnline && !userIsOnline}
           >
-          {profilePicName}
-          </Avatar>
-      </Indicator>
+            <Avatar
+              color='blue'
+              onContextMenu={handleRightClick}
+              size={100}
+              radius='xl'
+              src={userDetail.profilePicUrl}
+            >
+              {profilePicName}
+            </Avatar>
+          </Indicator>
         </div>
 
         <Title
@@ -86,16 +88,13 @@ const ProfileCard = ({ userDetail }) => {
           </FollowButton>
         )}
       </Card>
-      
     </Container>
   );
 };
 
 export default ProfileCard;
 
-const Container = styled.div`
- 
-`;
+const Container = styled.div``;
 
 const FollowButton = styled.div`
   display: flex;

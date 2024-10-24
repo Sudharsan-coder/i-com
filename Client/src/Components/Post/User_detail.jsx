@@ -45,6 +45,7 @@ const UserDetail = ({ user, createdAt }) => {
           disabled={!isOnline && !userIsOnline}
         >
           <Avatar
+          color="blue"
             onContextMenu={handleRightClick}
             src={profilePicUrl}
             alt={`${userName}'s profile`}
