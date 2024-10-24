@@ -48,16 +48,16 @@ const Change_pic = () => {
     <Container>
       {pic === "" ? (
         <UploadImageBlock
-          htmlFor="input-file"
+          htmlFor='input-file'
           onDrop={handleDrop}
           onDragOver={handleDragOver}
         >
           <input
-            type="file"
-            id="input-file"
-            accept="image/*"
-            title="Drag & Drop Image or Select the Image"
-            className="uploadImageFile"
+            type='file'
+            id='input-file'
+            accept='image/*'
+            title='Drag & Drop Image or Select the Image'
+            className='uploadImageFile'
             hidden
             onChange={(e) => imagetobase64(e.target.files[0])}
           />
@@ -70,9 +70,17 @@ const Change_pic = () => {
           </IconView>
         </UploadImageBlock>
       ) : (
-        <Avatar src={pic} w={200} h={200} />
+        <Avatar
+          color='blue'
+          src={pic}
+          w={200}
+          h={200}
+        />
       )}
-      <Button onClick={handleImageFileSubmit} fullWidth>
+      <Button
+        onClick={handleImageFileSubmit}
+        fullWidth
+      >
         Upload Picture
       </Button>
     </Container>

@@ -10,6 +10,7 @@ const Pop_over_user_detail = (props) => {
   return (
     <Container>
       <Avatar
+      color="blue"
         src={profilePicUrl}
         size={50}
         radius="xl"

@@ -16,11 +16,15 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Change_pic from "../Components/Profile/Change_pic";
-import { picUpdatingModal, resetChangedPicUrl } from "../Redux/Slices/authSlice";
+import {
+  picUpdatingModal,
+  resetChangedPicUrl,
+} from "../Redux/Slices/authSlice";
 
 const EditProfile = () => {
-  const { user, isAuth, isChangingPicUrl, changedPicUrl } =
-    useSelector((state) => state.auth);
+  const { user, isAuth, isChangingPicUrl, changedPicUrl } = useSelector(
+    (state) => state.auth
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -35,11 +39,11 @@ const EditProfile = () => {
     skills: [],
     profilePicUrl: "",
   });
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     dispatch(resetChangedPicUrl());
-  },[])
-  
+  }, []);
+
   useEffect(() => {
     if (!isAuth) navigate("/sign_in");
     setProfileDetails(user);
@@ -82,7 +86,7 @@ const EditProfile = () => {
 
   return (
     <Container>
-      <Modal  
+      <Modal
         opened={isChangingPicUrl}
         onClose={closeUpdatingProfilePicModal}
         title='Change Profile Picture'
@@ -149,6 +153,7 @@ const EditProfile = () => {
           <Input.Wrapper label='Profile Image'>
             <Profile>
               <Avatar
+                color='blue'
                 src={profiledetails.profilePicUrl}
                 alt="it's me"
                 size={100}

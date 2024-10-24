@@ -107,6 +107,7 @@ const Post_create_box = () => {
           <label>Banner Picture</label>
           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             <Avatar
+            color="blue"
               src={createPost.bannerPic}
               size={80}
             />

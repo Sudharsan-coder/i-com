@@ -1,4 +1,4 @@
-import { Modal, Group, Button } from "@mantine/core";
+import { Modal, Group, Button, Tooltip } from "@mantine/core";
 import { styled } from "styled-components";
 import Post_create_box from "../Post_create/Post_create_box.jsx";
 import User from "./User";
@@ -16,14 +16,15 @@ import {
 } from "../../Redux/Slices/publicPostsSlice.js";
 const Log_in_button = () => {
   const { isAuth } = useSelector((state) => state.auth);
-  const { createPostModel,postModelType } = useSelector((state) => state.publicPosts);
+  const { createPostModel, postModelType } = useSelector(
+    (state) => state.publicPosts
+  );
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const openModel = () => {
     dispatch(openCreatePostModel());
-    dispatch(resetCreatePost())
+    dispatch(resetCreatePost());
     dispatch(setPostModelType("CREATE_POST"));
-    
   };
 
   const closeModel = () => {
@@ -35,30 +36,41 @@ const Log_in_button = () => {
         opened={createPostModel}
         onClose={closeModel}
         fullScreen
-        title={postModelType==='CREATE_POST'?'Create Post':'Edit Post'}
+        title={postModelType === "CREATE_POST" ? "Create Post" : "Edit Post"}
         centered
       >
-        <Post_create_box/>
+        <Post_create_box />
       </Modal>
 
       <Group position='center'>
         {isAuth ? (
           <Log>
-            <Button
-              variant='outline'
-              style={{ border: "none",padding:0 }}
-              
-            >
-            <Link to='/message'>
-              <AiOutlineMessage size={25}  />
-            </Link>
-            </Button>
-            {/* <Button
-              variant='outline'
-              style={{ border: "none",padding:0 }}
-            >
-              <FaChalkboardTeacher size={20} />
-            </Button> */}
+            <Tooltip label='Message'>
+              <Button
+                variant='outline'
+                style={{ border: "none", padding: 0 }}
+              >
+                <Link to='/message'>
+                  <AiOutlineMessage
+                    size={25}
+                    color='#1c7ed6'
+                  />
+                </Link>
+              </Button>
+            </Tooltip>
+            <Tooltip label='WhiteBoard'>
+              <Button
+                variant='outline'
+                style={{ border: "none", padding: 0 }}
+              >
+                <Link to='/whiteBoard'>
+                  <FaChalkboardTeacher
+                    size={20}
+                    color='#1c7ed6'
+                  />
+                </Link>
+              </Button>
+            </Tooltip>
             <User />
             <Button
               leftIcon={<IconSquareRoundedPlus />}

@@ -113,6 +113,7 @@ const Message_box = ({ receiver, fetchMessage, messageList, hasMore }) => {
           disabled={!isOnline && !userIsOnline}
         >
           <Avatar
+          color="blue"
             src={receiver.profilePicUrl || null}
             radius='xl'
           >

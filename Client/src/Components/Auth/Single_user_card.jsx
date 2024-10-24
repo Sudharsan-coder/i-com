@@ -27,6 +27,7 @@ const Single_user_card = (props) => {
             disabled={!isOnline && !userIsOnline}
           >
             <Avatar
+              color='blue'
               onContextMenu={handleRightClick}
               src={props.data.profilePicUrl}
               alt="it's"
@@ -35,11 +36,16 @@ const Single_user_card = (props) => {
               {profilePicName}
             </Avatar>
           </Indicator>
-          <Box miw={200} maw={250}>
-
-          <Username truncate="end" onClick={() => navigate(`/profile/${props.data._id}`)}>
-            {userName}
-          </Username>
+          <Box
+            miw={200}
+            maw={250}
+          >
+            <Username
+              truncate='end'
+              onClick={() => navigate(`/profile/${props.data._id}`)}
+            >
+              {userName}
+            </Username>
           </Box>
         </Wrap>
       </Boxs>

@@ -18,6 +18,7 @@ import Footer from "./Components/Footer.jsx";
 import FollowTagsModal from "./Components/Auth/FollowTagsModal.jsx";
 import Auth_google_success from "./Pages/Auth_google_success.jsx";
 import Message_page from "./Pages/Message_page.jsx";
+import White_board_page from "./Pages/White_board_page.jsx";
 
 const MainLayout = () => (
   <>
@@ -94,6 +95,10 @@ function App() {
         <Route
           path='/auth/google/success'
           element={<Auth_google_success />}
+        />
+        <Route
+          path='/whiteBoard'
+          element={<White_board_page/>}
         />
         <Route
           path='/*'

@@ -40,6 +40,7 @@ const Chats_user_card = ({ info }) => {
             disabled={!isOnline && !userIsOnline}
           >
             <Avatar
+              color='blue'
               onContextMenu={handleRightClick}
               src={profilePicUrl}
               alt="it's"
@@ -58,7 +59,7 @@ const Chats_user_card = ({ info }) => {
             {info.unSeen > 0 && (
               <Badge
                 size='sm'
-                variant="filled"
+                variant='filled'
               >
                 {info.unSeen}
               </Badge>
