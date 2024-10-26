@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import Main_post from "../Components/Post/Main_post";
 import { styled } from "styled-components";
 import MainpageLoading from "../Components/Loading/MainpageLoading";
@@ -6,14 +6,17 @@ import ProfileCard from "../Components/Profile/ProfileCard";
 import TopRecentTag from "../Components/Post/TopRecentTag";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { resetAllPosts } from "../Redux/Slices/publicPostsSlice";
 import FollowingTag from "../Components/Auth/FollowingTag";
+import Log_in_card from "../Components/Auth/Log_in_card";
+import Main_page_footer from "../Components/Main_page_footer";
+import PopularPost from "../Components/PopularPost";
+import IDS_sponsor from "../Components/Sponsor_cards/IDS_sponsor";
 const Main_page = () => {
   const dispatch = useDispatch();
   const { allPost, page, isGettingAllPost, totalPages, more } = useSelector(
     (state) => state.publicPosts
   );
-  const { isAuth } = useSelector((state) => state.auth);
+  const { isAuth, user } = useSelector((state) => state.auth);
 
   // Fetch posts when page or isAuth changes
   useEffect(() => {
@@ -21,6 +24,11 @@ const Main_page = () => {
       fetchAllPosts();
     }
   }, [page, isAuth]);
+
+  useEffect(() => {
+    dispatch({ type: "GET_POPULAR_POST" });
+    dispatch({ type: "GET_POPULAR_TAGS" });
+  }, []);
 
   const fetchAllPosts = () => {
     return isAuth
@@ -37,28 +45,39 @@ const Main_page = () => {
   return (
     <>
       <Container>
-        {/* <ProfileCard /> */}
-        {isGettingAllPost ? (
-          <MainpageLoading />
-        ) : allPost.length !== 0 ? (
-          <>
-          <FollowingTag/>
-          <Main_post
-            allPost={allPost}
-            fetchData={fetchAllPosts}
-            hasmore={more}
-          />
-          </>
-        ) : isAuth ? (
-          <NotFound>
-            <h1>No Data</h1>
-          </NotFound>
-        ) : (
-          <NotFound>
-            <h1>Follow the Peoples</h1>
-          </NotFound>
-        )}
-        <TopRecentTag />
+        <LeftColumn>
+          {isAuth ? <ProfileCard userDetail={user} /> : <Log_in_card />}
+          <IDS_sponsor />
+          <Main_page_footer />
+        </LeftColumn>
+        <MiddleColumn isfollingTagsAvailable={user.followingHashTags !== 0}>
+          {isGettingAllPost ? (
+            <MainpageLoading />
+          ) : (
+            <>
+              {isAuth && user?.followingHashTags !== 0 && <FollowingTag />}
+              {allPost.length !== 0 ? (
+                <Main_post
+                  allPost={allPost}
+                  fetchData={fetchAllPosts}
+                  hasmore={more}
+                />
+              ) : isAuth ? (
+                <NotFound>
+                  <h1>Follow the Peoples</h1>
+                </NotFound>
+              ) : (
+                <NotFound>
+                  <h1>No Data</h1>
+                </NotFound>
+              )}
+            </>
+          )}
+        </MiddleColumn>
+        <RightColumn>
+          <TopRecentTag />
+          <PopularPost />
+        </RightColumn>
       </Container>
     </>
   );
@@ -73,11 +92,26 @@ const Container = styled.div`
   /* grid-row-gap: 50px; */
 `;
 
-const NotFound = styled.div`
+const LeftColumn = styled.div`
+  grid-column: 1;
+  grid-row: 1;
+`;
+
+const MiddleColumn = styled.div`
   grid-column: 2;
+  display: ${(props) => (props.isfollingTagsAvailable ? "block" : "grid")};
+  grid-template-rows: 90px auto;
+`;
+
+const RightColumn = styled.div`
+  grid-column: 3;
+  grid-row: 1;
+`;
+
+const NotFound = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   h1 {
     font-size: 6rem;
     color: #b8b9ba;

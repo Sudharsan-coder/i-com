@@ -1,7 +1,7 @@
 import { Tabs } from "@mantine/core";
 import { IconPhoto } from "@tabler/icons-react";
 import { styled } from "styled-components";
-import { useEffect} from "react";
+import { useEffect } from "react";
 import Main_post from "../Components/Post/Main_post";
 import MainpageLoading from "../Components/Loading/MainpageLoading";
 import { IconUser } from "@tabler/icons-react";
@@ -9,12 +9,12 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Main_user from "../Components/Auth/Main_user";
 import { resetSearch } from "../Redux/Slices/searchSlice";
+import { useSearchParams } from "react-router-dom";
 const Search = () => {
   const dispatch = useDispatch();
   const {
     isGettingSearchPost,
     isGettingSearchUser,
-    search,
     searchPosts,
     searchUsers,
     searchPostPage,
@@ -24,20 +24,22 @@ const Search = () => {
     usermore,
     postmore,
   } = useSelector((state) => state.search);
-  
-  const {isAuth}  = useSelector((state)=>state.auth) 
+  const { isAuth } = useSelector((state) => state.auth);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get("search");
+  const tag = searchParams.get("tag");
 
   useEffect(() => {
-    dispatch(resetSearch())
-    dispatch({
-      type: "GET_SEARCH_USER",
-      data: { value: search, page: 1, totalPages: 1 },
-    });
-    dispatch({
-      type: "GET_SEARCH_POST",
-      data: { value: search, page: 1, totalPages: 1 },
-    });
-  }, [search,isAuth]);
+    dispatch(resetSearch());
+  }, [search,tag]);
+  
+  useEffect(() => {
+    if (searchPostPage === 1 && searchUserPage === 1) {
+      fetchPost();
+      fetchUser();
+    }
+  }, [search,searchPostPage,tag]);
 
   const fetchUser = () => {
     dispatch({
@@ -55,6 +57,7 @@ const Search = () => {
       type: "GET_SEARCH_POST",
       data: {
         value: search,
+        tag,
         page: searchPostPage,
         totalPages: searchPostTotalPages,
       },
@@ -67,12 +70,12 @@ const Search = () => {
         defaultValue='gallery'
         className='DS'
       >
-        <Tabs.List>
+        <Tabs.List grow>
           <Tabs.Tab
             value='gallery'
             icon={<IconPhoto size='0.8rem' />}
           >
-            Posts
+            Blogs
           </Tabs.Tab>
           <Tabs.Tab
             value='messages'
@@ -89,7 +92,11 @@ const Search = () => {
           {isGettingSearchPost ? (
             <MainpageLoading />
           ) : searchPosts.length !== 0 ? (
-            <Main_post allPost={searchPosts} fetchData={fetchPost} hasmore={postmore} />
+            <Main_post
+              allPost={searchPosts}
+              fetchData={fetchPost}
+              hasmore={postmore}
+            />
           ) : (
             <h1>No Result</h1>
           )}
@@ -102,7 +109,11 @@ const Search = () => {
           {isGettingSearchUser ? (
             <MainpageLoading />
           ) : searchUsers.length !== 0 ? (
-            <Main_user allUser={searchUsers} fetchData={fetchUser} hasmore={usermore} />
+            <Main_user
+              allUser={searchUsers}
+              fetchData={fetchUser}
+              hasmore={usermore}
+            />
           ) : (
             <h1>No Result</h1>
           )}

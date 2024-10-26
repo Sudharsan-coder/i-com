@@ -1,4 +1,4 @@
-import { Button, Input, Text } from "@mantine/core";
+import { Button, Input, PasswordInput, Text } from "@mantine/core";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
@@ -6,12 +6,46 @@ import styled from "styled-components";
 const ChangePassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [matchPassword, setMatchPassword] = useState(true);
+  const [errorMessage, setErrorMessage] = useState({
+    newPassord: "",
+    confirmPassword: "",
+  });
   const { isforgetPassword } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d).{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
-      setMatchPassword(false);
+    if (newPassword.length === 0) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        newPassord: "New password is required",
+      }));
+    } else if (!validatePassword(newPassword)) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        newPassord:
+          "Password must contain at least 1 uppercase letter, 1 special character, 1 number, and be at least 8 characters long.",
+      }));
+    } else if (confirmPassword.length == 0) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        confirmPassword: "New password is required",
+      }));
+    } else if (!validatePassword(confirmPassword)) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        newPassord:
+          "Password must contain at least 1 uppercase letter, 1 special character, 1 number, and be at least 8 characters long.",
+      }));
+    } else if (newPassword !== confirmPassword) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        confirmPassword: "Password not match.",
+      }));
     } else {
       dispatch({
         type: "CHANGE_PASSWORD",
@@ -29,8 +63,9 @@ const ChangePassword = () => {
       <Input.Wrapper
         label='New Password'
         mt='md'
+        error={errorMessage.newPassord}
       >
-        <Input
+        <PasswordInput
           placeholder='Enter New Password'
           type='password'
           value={newPassword}
@@ -41,8 +76,9 @@ const ChangePassword = () => {
       <Input.Wrapper
         label='Confirm New Password'
         mt='md'
+        error={errorMessage.confirmPassword}
       >
-        <Input
+        <PasswordInput
           placeholder='Confirm New Password'
           type='password'
           value={confirmPassword}
@@ -58,9 +94,6 @@ const ChangePassword = () => {
       >
         Change Password
       </Button>
-      {!matchPassword && (
-        <Text color='red'>Password not match. Please Correct it.</Text>
-      )}
       {isforgetPassword.isVerificationFailed && (
         <Text color='red'>{isforgetPassword.isVerificationFailedMessage}</Text>
       )}

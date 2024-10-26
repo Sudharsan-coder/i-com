@@ -1,10 +1,10 @@
 import io from 'socket.io-client';
 
 let socket;
-
+const baseURL = import.meta.env.VITE_BASE_API_URL;
 export const initiateSocketConnetion=()=>{
     if(!socket)
-        socket = io("http://localhost:5010");
+        socket = io(baseURL);
     return socket
 }
 

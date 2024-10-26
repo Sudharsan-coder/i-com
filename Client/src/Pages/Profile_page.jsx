@@ -21,7 +21,6 @@ const Profile_page = () => {
   const id = params.id;
 
   useEffect(() => {
-    // Reset posts first
     dispatch(resetMessageList())
     dispatch(resetMyPosts());
   }, [id, dispatch]);
@@ -41,7 +40,7 @@ const Profile_page = () => {
   const fetchMyPosts = () => {
     dispatch({
       type: "GET_MY_POST",
-      data: { page: myposts.page, totalPages: myposts.totalPages, userId: id },
+      data: { page: myposts.page, totalPages: myposts.totalPages, userId: id,type:"myPost" },
     });
   };
 

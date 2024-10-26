@@ -12,6 +12,7 @@ const Main_user = ({allUser,fetchData,hasmore}) => {
         next={fetchData}
         hasMore={hasmore}
         loader={<Load ><Loader color="blue"/></Load>}
+        className='infinity_scroll'
       >
         {allUser.map((user) => {
           return (
@@ -30,11 +31,12 @@ export default Main_user
 
 const Container = styled.div`
   grid-column: 2;
-  height: 90vh;
-  padding: 3%;
   box-sizing: border-box;
   gap: 20px;
   margin-bottom: 20px;
+  .infinity_scroll{
+    padding: 3%;
+  }
 `;
 
 const Load = styled.div`

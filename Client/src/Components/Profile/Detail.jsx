@@ -44,7 +44,7 @@ const Block = styled.div`
   position: relative;
   top: -50px;
   width: 100%;
-  padding: 0px 10%;
+  padding: 0px 1%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

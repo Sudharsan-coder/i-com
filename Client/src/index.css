@@ -1,17 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sofadi+One&display=swap');
 body {
   margin: 0px;
-  background-color: rgb(245, 245, 245);
+  background-color: rgb(245, 245, 245) !important;
   box-sizing: border-box;
 }
 * {
   font-family: "-apple-system";
 }
 :root {
-  --primary_color: #5656fc;
+  --primary_color: #1c7ed6;
+  --secondary_color: #d6e7f886;
 }
+
+/* Mantine ui */
 .mantine-16nrau2 {
   padding: 0%;
 }
+.mantine-Drawer-title {
+  font-size: 24px;
+  text-decoration: underline;
+}
+.mantine-Modal-title {
+  font-size: 24px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 800;
+}
+
+
 .fullscreen {
   position: fixed;
   top: 0px;
@@ -25,11 +40,6 @@ body {
 .noData {
   font-size: 6rem;
   color: #b8b9ba;
-}
-
-.mantine-Drawer-title {
-  font-size: 24px;
-  text-decoration: underline;
 }
 
 .center {

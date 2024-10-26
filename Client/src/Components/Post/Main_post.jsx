@@ -30,10 +30,6 @@ const Main_post = ({allPost,fetchData,hasmore}) => {
 export default Main_post;
 
 const Container = styled.div`
-  grid-column: 2;
-  height: 90vh;
-  /* padding: 3%; */
-  /* background-color: red; */
   box-sizing: border-box;
   gap: 20px;
   margin-bottom: 20px;

@@ -5,9 +5,10 @@ import { IconSend } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Avatar } from "@mantine/core";
 
 const Comments = (props) => {
-  const commentArray = [...props.commentArray].reverse();   
+  const commentArray = [...props.commentArray].reverse();
   const { user, isAuth } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,6 +42,11 @@ const Comments = (props) => {
     // Clear the comment text after submission
     setCommentText("");
   };
+  const { userName = "" } = user || {};
+  const profilePicName =
+    userName.length > 1
+      ? (userName[0] + userName[userName.length - 1]).toUpperCase()
+      : userName.toUpperCase();
 
   return (
     <Container>
@@ -51,12 +57,17 @@ const Comments = (props) => {
         Commands
       </div>
       <Comment onSubmit={handleSubmit}>
-        <img
-          src={user.profilePicUrl? user.profilePicUrl:"https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"}
+        <Avatar
+          radius={"xl"}
+          size={50}
+          src={user.profilePicUrl}
+          color='blue'
           alt='me'
-        />
-         <textarea
-          placeholder="Add your discussion"
+        >
+          {profilePicName}
+        </Avatar>
+        <textarea
+          placeholder='Add your discussion'
           value={commentText} // Bind to the simplified state
           onChange={(e) => setCommentText(e.target.value)} // Update the text state
         />
@@ -65,12 +76,13 @@ const Comments = (props) => {
         </button>
       </Comment>
       {/* Use parentheses to wrap the map function body */}
-      {commentArray && commentArray.map((data) => (
-        <Single_comment
-          key={data._id}
-          {...data}
-        />
-      ))}
+      {commentArray &&
+        commentArray.map((data) => (
+          <Single_comment
+            key={data._id}
+            {...data}
+          />
+        ))}
     </Container>
   );
 };
@@ -78,7 +90,6 @@ const Comments = (props) => {
 export default Comments;
 
 const Container = styled.div`
-
   .head {
     font-size: 1.5em;
     font-weight: bold;
@@ -90,12 +101,6 @@ const Comment = styled.form`
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  img {
-    background: black;
-    height: 45px;
-    width: 50px;
-    border-radius: 100%;
-  }
   textarea {
     width: 90%;
     height: 50px;

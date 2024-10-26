@@ -2,26 +2,15 @@ import React from "react";
 import { Carousel } from "@mantine/carousel";
 import styled from "styled-components";
 import { Badge } from "@mantine/core";
+import { useSelector } from "react-redux";
+import { useNavigate, useSearchParams } from "react-router-dom";
 const FollowingTag = () => {
-  const tag = [
-    "IOS",
-    "React",
-    "js",
-    "ML",
-    "AI",
-    "Ruby",
-    "Java",
-    "Cprogramming",
-    "Ruby",
-    "MERN",
-    "MARN",
-    "Android",
-    "visualStudio",
-    "Swift",
-    "SwiftUI",
-    "BlockChain",
-    "JQuery",
-  ];
+  const {user} = useSelector((state)=>state.auth)
+  const tag = user.followingHashTags||[];
+  const navigate = useNavigate();
+  const tagClickHandler=(tagValue)=>{
+    navigate(`/search?tag=${tagValue}`);
+  }
   return (
     <Container>
       <Carousel
@@ -36,8 +25,9 @@ const FollowingTag = () => {
           return (
             <Carousel.Slide key={index}>
               <Badge
-                component='a'
+                onClick={()=>tagClickHandler(data)}
                 size='xl'
+                style={{boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.07)"}}
               >
                 {data} +
               </Badge>
@@ -53,19 +43,16 @@ export default FollowingTag;
 
 const Container = styled.div`
   padding: 20px;
-  grid-column: 2;
   .carousel {
     cursor: grabbing;
   }
   .mantine-Badge-root {
-    border: 1px solid black;
-    color: black;
     background-color: white;
+    border: 1px solid var(--primary_color);
     &:hover {
       cursor: pointer;
-      background-color: #adabab;
+      background-color: var(--primary_color);
       color: white;
-      border: none;
     }
   }
   overflow: hidden;

@@ -12,6 +12,8 @@ import {
   setSinglePost,
 } from "../Redux/Slices/publicPostsSlice.js";
 import ProfileCard from "../Components/Profile/ProfileCard.jsx";
+import Main_page_footer from "../Components/Main_page_footer.jsx";
+import IDS_sponsor from "../Components/Sponsor_cards/IDS_sponsor.jsx";
 const Post_page_display = () => {
   const params = useParams();
   const postid = params.id;
@@ -41,8 +43,8 @@ const Post_page_display = () => {
         },
       });
     }
-    
-      dispatch({ type: "GET_POST_COMMENTS", data: { id: postid } });
+
+    dispatch({ type: "GET_POST_COMMENTS", data: { id: postid } });
   }, []);
   return (
     <Container>
@@ -50,12 +52,20 @@ const Post_page_display = () => {
         <PostdisplayLoading />
       ) : (
         <>
-          <Like_pallet {...post.data} />
-          <Post
-            post={post.data}
-            commentArray={post.comments.data}
-          />
-          <ProfileCard userDetail={post.data.user} />
+          <LeftColumn>
+            <Like_pallet {...post.data} />
+          </LeftColumn>
+          <MiddleColumn>
+            <Post
+              post={post.data}
+              commentArray={post.comments.data}
+            />
+          </MiddleColumn>
+          <RightColumn>
+            <ProfileCard userDetail={post.data.user} />
+            <IDS_sponsor />
+            <Main_page_footer />
+          </RightColumn>
         </>
       )}
     </Container>
@@ -68,5 +78,18 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: 0.3fr 3fr 1fr;
   background: rgb(245, 245, 245);
-  
+`;
+
+const LeftColumn = styled.div`
+  grid-column: 1;
+  grid-row: 1;
+`;
+
+const MiddleColumn = styled.div`
+  grid-column: 2;
+`;
+
+const RightColumn = styled.div`
+  grid-column: 3;
+  grid-row: 1;
 `;

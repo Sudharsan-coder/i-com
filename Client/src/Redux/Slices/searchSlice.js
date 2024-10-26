@@ -9,7 +9,6 @@ const initialState = {
   searchPostTotalPages: 1,
   searchUserPage: 1,
   searchUserTotalPages: 1,
-  search: "",
   usermore: true,
   postmore: true,
 };
@@ -36,9 +35,6 @@ const searchSlice = createSlice({
       state.searchUserPage += 1;
       state.searchUserTotalPages = action.payload.totalPages;
     },
-    setSearch: (state, action) => {
-      state.search = action.payload;
-    },
     setNoMoreUser: (state) => {
       state.usermore = false;
     },
@@ -48,6 +44,12 @@ const searchSlice = createSlice({
     resetSearch: (state) => {
       state.searchUsers = [];
       state.searchPosts = [];
+      state.searchPostPage = 1;
+      state.searchPostTotalPages =1;
+      state.searchUserPage = 1;
+      state.searchUserTotalPages = 1;
+      state.usermore = true;
+      state.postmore = true;
     },
     addLikeToSearchListPost: (state, action) => {
       const { userId, postId } = action.payload;
@@ -63,6 +65,26 @@ const searchSlice = createSlice({
           : post
       );
     },
+    addSaveToSearchListPost:(state,action)=>{
+      const { userId, postId } = action.payload;
+      state.searchPosts = state.searchPosts.map((post) =>
+        post._id === postId ? { ...post, savedUser: [...post.savedUser, userId] } : post
+      );
+    },
+    unSaveToSearchListPost:(state,action)=>{
+      const { userId, postId } = action.payload;
+      state.searchPosts = state.searchPosts.map((post) =>
+        post._id === postId
+          ? { ...post, savedUser: post.savedUser.filter((id) => id !== userId) }
+          : post
+      );
+    },
+    editingSearchPostSuccess:(state,action) =>{
+      const {_id} = action.payload;
+      state.searchPosts = state.searchPosts.map((post) =>
+        post._id === _id ? { ...post,...action.payload } : post
+      );
+    }
   },
 });
 
@@ -78,4 +100,7 @@ export const {
   resetSearch,
   addLikeToSearchListPost,
   unLikeToSearchListPost,
+  addSaveToSearchListPost,
+  unSaveToSearchListPost,
+  editingSearchPostSuccess,
 } = searchSlice.actions;

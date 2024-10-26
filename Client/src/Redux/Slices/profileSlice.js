@@ -30,6 +30,7 @@ const initialState = {
     totalPages: 1,
     more: true,
   },
+  isEditingPost:false,
 };
 
 const profileSlice = createSlice({
@@ -80,6 +81,26 @@ const profileSlice = createSlice({
       state.myposts.data = state.myposts.data.map((post) =>
         post._id === postId ? { ...post, likes: [...post.likes, userId] } : post
       );
+    },
+    unLikeToProfilePost:(state,action)=>{
+      const { userId, postId } = action.payload;
+      state.myposts.data = state.myposts.data.filter((post) =>
+        post._id === postId
+          ? { ...post, likes: post.likes.filter((id) => id !== userId) }
+          : post)
+    },
+    addSaveToProfilePost:(state,action)=>{
+      const { userId, postId } = action.payload;
+      state.myposts.data = state.myposts.data.map((post) =>
+        post._id === postId ? { ...post, savedUser: [...post.savedUser, userId] } : post
+      );
+    },
+    unSaveToProfilePost:(state,action)=>{
+      const { userId, postId } = action.payload;
+      state.myposts.data = state.myposts.data.filter((post) =>
+        post._id === postId
+          ? { ...post, savedUser: post.savedUser.filter((id) => id !== userId) }
+          : post)
     },
     followersStarted: (state, action) => {
       state.profile.followers.push(action.payload);
@@ -144,6 +165,12 @@ const profileSlice = createSlice({
         id: "delete post",
       });
     },
+    editingMyPostSuccess:(state,action) =>{
+      const {_id} = action.payload;
+      state.myposts.data = state.myposts.data.map((post) =>
+        post._id === _id ? { ...post,...action.payload } : post
+      );
+    }
   },
 });
 
@@ -167,4 +194,8 @@ export const {
   deletePostFailed,
   deletePostStarted,
   addLikeToProfilePost,
+  unLikeToProfilePost,
+  addSaveToProfilePost,
+  unSaveToProfilePost,
+  editingMyPostSuccess,
 } = profileSlice.actions;

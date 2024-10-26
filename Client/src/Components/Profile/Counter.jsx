@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
-import { useDisclosure } from "@mantine/hooks";
-import { Drawer, Button, Loader } from "@mantine/core";
+import { Drawer, Loader } from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import Main_user from "../Auth/Main_user";
 import { resetFollowUsers } from "../../Redux/Slices/ProfileSlice";
@@ -91,7 +90,7 @@ const Counter = (props) => {
       >
         {props.followings.length} Following
       </div>
-      <div>{props.posts.length} Post Published</div>
+      <div>{props.posts.length} Blogs Published</div>
     </Container>
   );
 };
@@ -99,30 +98,28 @@ const Counter = (props) => {
 export default Counter;
 
 const Container = styled.div`
-  height: 100px;
+  height: fit-content;
   grid-column: 2;
   grid-row: 2;
   margin-top: 20px;
   background: white;
   border-radius: 10px;
-  padding: 20px;
   font-size: 25px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  box-shadow:
-10px 10px 24px rgba(0, 0, 0, 0.07)
-;
+  box-sizing: border-box;
+  border: 0.0625rem solid #dee2e6;
+  box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 0 0.625rem 0.9375rem -0.3125rem, rgba(0, 0, 0, 0.04) 0 0.4375rem 0.4375rem -0.3125rem;
+  overflow: hidden;
   div {
+    padding: 10px;
+    width: 100%;
     display: flex;
     justify-content: start;
+    border-bottom: 1px solid #dee2e6;
   }
   .followListButton {
     cursor: pointer;
     &:hover {
-      color: blue;
-      text-decoration: underline;
+      background-color: var(--secondary_color);
     }
   }
 `;

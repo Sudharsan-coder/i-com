@@ -8,18 +8,28 @@ const initialState = {
     _id: null,
     followings: [],
     tags: [],
+    profilePicUrl: "",
+    liked: [],
+    savedPost: [],
+    followingHashTags: [],
+    isOnline: false,
   },
   isAuthenticationFailed: false,
   isSigningIn: false,
   isSigningUp: false,
   isProfileUpdating: false,
+  isChangingPicUrl: false,
+  changedPicUrl: "",
   isforgetPassword: {
-    email:"",
+    email: "",
     activeStep: 0,
     isVerifying: false,
     isVerificationFailed: false,
     isVerificationFailedMessage: "",
   },
+  checkUserNameMessage: "",
+  followTagsModal: false,
+  onlineUsers: [],
 };
 
 const authSlice = createSlice({
@@ -33,6 +43,7 @@ const authSlice = createSlice({
         message: "Please wait...",
         color: "green",
         loading: true,
+        autoClose:false,
         id: "auth",
       });
     },
@@ -92,9 +103,20 @@ const authSlice = createSlice({
         color: "red",
       });
     },
+    setCheckUserNameMessage: (state, action) => {
+      state.checkUserNameMessage = action.payload;
+    },
     signOffSuccess: (state) => {
       state.isAuth = false;
-      state.user = { _id: null };
+      state.user = {
+        _id: null,
+        followings: [],
+        tags: [],
+        profilePicUrl: "",
+        liked: [],
+        savedPost: [],
+        followingHashTags: [],
+      };
       notifications.show({
         title: "Sign Off Successfully",
         message: "You have been logged out successfully.",
@@ -132,13 +154,46 @@ const authSlice = createSlice({
         color: "green",
       });
     },
-    profileUpdatingFailed: (state) => {
+    profileUpdatingFailed: (state, action) => {
       state.isProfileUpdating = false;
       notifications.update({
         title: "Something went wrong",
-        message: "Your profile is not updated",
+        message: action.payload,
         color: "red",
         id: "load-data",
+      });
+    },
+    resetChangedPicUrl: (state) => {
+      state.changedPicUrl = "";
+    },
+    picUpdatingModal: (state, action) => {
+      state.isChangingPicUrl = action.payload;
+    },
+    picUpdatingStarted: (state) => {
+      notifications.show({
+        id: "pic-uploading",
+        loading: true,
+        title: "Image Uploading",
+        message: "Data will be loaded in 3 seconds, you cannot close this yet",
+        autoClose: false,
+        withCloseButton: false,
+      });
+    },
+    picUpdatingSuccess: (state, action) => {
+      state.isChangingPicUrl = false;
+      state.changedPicUrl = action.payload;
+      notifications.update({
+        id: "pic-uploading",
+        title: "Uploaded Successfully",
+        message: "Your Picture is uploaded",
+        color: "green",
+      });
+    },
+    picUpdatingFailed: (state, action) => {
+      notifications.update({
+        id: "pic-uploading",
+        title: "Uploading Picture Failed",
+        message: action.payload,
       });
     },
     profileDeletingStarted: (state) => {
@@ -161,23 +216,21 @@ const authSlice = createSlice({
       };
       notifications.update({
         id: "delete-account",
-        loading: true,
+        color: "green",
         title: "Deleted",
         message: "Account Deleted Successfully",
-        autoClose: false,
-        withCloseButton: false,
       });
     },
     profileDeletingFailed: (state) => {
       notifications.update({
         id: "delete-account",
-        loading: true,
+        color: "red",
         title: "Deleting Account",
         message: "Deleting Account Failed",
         autoClose: false,
       });
     },
-    setForgetPasswordVerificationEmail:(state,action)=>{
+    setForgetPasswordVerificationEmail: (state, action) => {
       state.isforgetPassword.email = action.payload;
     },
     forgetPasswordVerificationStarted: (state) => {
@@ -193,10 +246,39 @@ const authSlice = createSlice({
       state.isforgetPassword.isVerificationFailed = true;
       state.isforgetPassword.isVerificationFailedMessage = action.payload;
     },
-    resetForgetPasswordVerification:(state)=>{
+    resetForgetPasswordVerification: (state) => {
       state.isforgetPassword.activeStep = 0;
       state.isforgetPassword.email = "";
-    }
+    },
+    addLikedToUserPost: (state, action) => {
+      state.user.liked.push(action.payload);
+    },
+    unlikedToUserPost: (state, action) => {
+      const filteredLikedList = state.user.liked.filter((data) => {
+        return data._id !== action.payload;
+      });
+      state.user.liked = filteredLikedList;
+    },
+    addSavedToUserPost: (state, action) => {
+      state.user.savedPost.push(action.payload);
+    },
+    unSavedToUserPost: (state, action) => {
+      const filteredSavedPostList = state.user.savedPost.filter((data) => {
+        return data._id !== action.payload;
+      });
+      state.user.savedPost = filteredSavedPostList;
+    },
+    setFollowTagsModal: (state, action) => {
+      state.followTagsModal = action.payload;
+    },
+    setOnlineUsers: (state, action) => {
+      state.onlineUsers.push(action.payload);
+    },
+    setOfflineUsers: (state, action) => {
+      state.onlineUsers = state.onlineUsers.filter((data) => {
+        return data !== action.payload;
+      });
+    },
   },
 });
 
@@ -217,6 +299,10 @@ export const {
   profileUpdatingFailed,
   profileUpdatingStarted,
   profileUpdatingSuccess,
+  picUpdatingStarted,
+  picUpdatingModal,
+  picUpdatingSuccess,
+  picUpdatingFailed,
   profileDeletingFailed,
   profileDeletingStarted,
   profileDeletingSuccess,
@@ -224,5 +310,14 @@ export const {
   forgetPasswordVerificationSuccess,
   forgetPasswordVerificationFailed,
   setForgetPasswordVerificationEmail,
-  resetForgetPasswordVerification
+  resetForgetPasswordVerification,
+  setCheckUserNameMessage,
+  addLikedToUserPost,
+  addSavedToUserPost,
+  unSavedToUserPost,
+  unlikedToUserPost,
+  setFollowTagsModal,
+  resetChangedPicUrl,
+  setOnlineUsers,
+  setOfflineUsers,
 } = authSlice.actions;

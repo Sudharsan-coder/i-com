@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Avatar, Title, Text } from "@mantine/core";
+import { Card, Avatar, Title, Text, Indicator } from "@mantine/core";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -8,13 +8,23 @@ import Buttons from "./Buttons";
 const ProfileCard = ({ userDetail }) => {
   const navigate = useNavigate();
   // console.log(userDetail);
-  
-const {user} = useSelector((state)=>state.auth);
+  const handleRightClick = (e) => {
+    e.preventDefault();
+  };
+
+  const { user, onlineUsers } = useSelector((state) => state.auth);
+  const { userName = "", isOnline, _id } = userDetail || {};
+  const profilePicName =
+    userName.length > 1
+      ? (userName[0] + userName[userName.length - 1]).toUpperCase()
+      : userName.toUpperCase();
+  const userIsOnline = onlineUsers.find((data) => data === _id);
   return (
     <Container>
       <Card
         shadow='sm'
         display={"flex"}
+        withBorder
         style={{
           minWidth: 300,
           margin: "30px",
@@ -23,6 +33,7 @@ const {user} = useSelector((state)=>state.auth);
           flexDirection: "column",
           alignContent: "center",
           justifyContent: "center",
+          borderRadius: 15,
         }}
       >
         <div
@@ -33,19 +44,31 @@ const {user} = useSelector((state)=>state.auth);
             justifyContent: "center",
           }}
         >
-          <Avatar
-            size={80}
-            radius='xl'
-            src={userDetail.profilePicUrl}
-            alt={"pradeep"}
-          />
+          <Indicator
+            size={10}
+            withBorder
+            processing
+            disabled={!isOnline && !userIsOnline}
+          >
+            <Avatar
+              color='blue'
+              onContextMenu={handleRightClick}
+              size={100}
+              radius='xl'
+              src={userDetail.profilePicUrl}
+            >
+              {profilePicName}
+            </Avatar>
+          </Indicator>
         </div>
 
         <Title
           order={3}
           style={{ marginBottom: 5 }}
         >
-          {userDetail.userName ? userDetail.firstName + " " + userDetail.lastName : ""}
+          {userDetail.userName
+            ? userDetail.firstName + " " + userDetail.lastName
+            : ""}
         </Title>
         <Text
           size='sm'
@@ -59,9 +82,11 @@ const {user} = useSelector((state)=>state.auth);
         >
           {userDetail.userBio ? `${userDetail.userBio}` : ""}
         </Text>
-        {(user._id!==userDetail._id)&&<FollowButton>
-          <Buttons {...userDetail} />
-        </FollowButton>}
+        {user._id !== userDetail._id && (
+          <FollowButton>
+            <Buttons {...userDetail} />
+          </FollowButton>
+        )}
       </Card>
     </Container>
   );
@@ -69,9 +94,7 @@ const {user} = useSelector((state)=>state.auth);
 
 export default ProfileCard;
 
-const Container = styled.div`
-  grid-column: 3;
-`;
+const Container = styled.div``;
 
 const FollowButton = styled.div`
   display: flex;

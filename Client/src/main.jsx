@@ -4,6 +4,7 @@ import App from "./App.jsx";
 import "./index.css";
 import { Notifications } from "@mantine/notifications";
 import { MantineProvider } from "@mantine/core";
+import '@mantine/dropzone/styles.css';
 import { Provider } from "react-redux";
 import store from "./Redux/store.js";
 

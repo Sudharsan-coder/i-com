@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import sign_up_img from "../assets/sign_up.webp";
-import { Input, LoadingOverlay, PasswordInput } from "@mantine/core";
+import { Button, Divider, Input, LoadingOverlay, PasswordInput } from "@mantine/core";
 import { IconAt, IconLock, IconUserCircle } from "@tabler/icons-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { setCheckUserNameMessage } from "../Redux/Slices/authSlice";
+import { FaGoogle } from "react-icons/fa";
+import Logo from "../Components/Logo";
 const Sign_up = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [reg, setreg] = useState({
     first: "",
     last: "",
@@ -13,24 +19,113 @@ const Sign_up = () => {
     username: "",
     password: "",
   });
-  const { isSigningUp, isAuth } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [regError, setregError] = useState({
+    first: "",
+    last: "",
+    emailid: "",
+    password: "",
+  });
+
+  const { isSigningUp, isAuth, checkUserNameMessage } = useSelector(
+    (state) => state.auth
+  );
+
   useEffect(() => {
-    if (isAuth) navigate("/sign_in");
+    if (isAuth) navigate("/");
   }, [isAuth]);
+  
+  useEffect(()=>{
+    dispatch(setCheckUserNameMessage(""))
+  },[])
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
+  const validateName = (name) => {
+    const nameRegex = /^[A-Za-z\s]+$/;
+    return nameRegex.test(name);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch({ type: "SIGN_UP", data: reg });
+
+    // Start with a blank regError object
+    setregError({
+      first: "",
+      last: "",
+      emailid: "",
+      password: "",
+    });
+
+    // Using let since we'll update the errors directly in the state
+    let hasError = false;
+
+    if (reg.first.length === 0) {
+      setregError((prev) => ({ ...prev, first: "First name is required" }));
+      hasError = true;
+    } else if (!validateName(reg.first)) {
+      setregError((prev) => ({ ...prev, first: "Please use only alphabet" }));
+      hasError = true;
+    }
+
+    if (reg.last.length === 0) {
+      setregError((prev) => ({ ...prev, last: "Last name is required" }));
+      hasError = true;
+    } else if (!validateName(reg.last)) {
+      setregError((prev) => ({ ...prev, last: "Please use only alphabet" }));
+      hasError = true;
+    }
+
+    if (reg.username.length === 0) {
+      dispatch(setCheckUserNameMessage("User name is required"));
+      hasError = true;
+    }
+
+    if (reg.emailid.length === 0) {
+      setregError((prev) => ({ ...prev, emailid: "Email is required" }));
+      hasError = true;
+    } else if (!validateEmail(reg.emailid)) {
+      setregError((prev) => ({
+        ...prev,
+        emailid: "Please enter a valid email",
+      }));
+      hasError = true;
+    }
+
+    if (reg.password.length === 0) {
+      setregError((prev) => ({ ...prev, password: "Password is required" }));
+      hasError = true;
+    } else if (!validatePassword(reg.password)) {
+      setregError((prev) => ({
+        ...prev,
+        password:
+          "Password must contain at least 1 uppercase letter, 1 special character, 1 number, and be at least 8 characters long.",
+      }));
+      hasError = true;
+    }
+
+    // If no errors, dispatch the signup action
+    if (!hasError && checkUserNameMessage.length === 0) {
+      dispatch({ type: "SIGN_UP", data: reg });
+    }
   };
+  
+  const handleGoogleLogin = () => {
+    window.open(`${import.meta.env.VITE_BASE_API_URL}/auth/google`, "_self");
+  };
+
   return (
     <Container>
       <Left>
         <Heading>
-          <span className='welcome'>
-            Welcome to <span>iCom!</span>
-          </span>
+          <Logo/>
         </Heading>
         <WrapContainer onSubmit={handleSubmit}>
           <LoadingOverlay
@@ -40,10 +135,27 @@ const Sign_up = () => {
           <Heading>
             <span className='title'>Sign up</span>
           </Heading>
+        <Oauth>
+            <GoogleOauth
+              variant='outline'
+              fullWidth
+              onClick={handleGoogleLogin}
+            >
+              Sign up with Google
+              <Icon>
+                <FaGoogle size={20} />
+              </Icon>
+            </GoogleOauth>
+          </Oauth>
+          
+          <OR>
+          <Divider my="xs" label="Or" labelPosition="center" />
+          </OR>
           <Name>
             <Input.Wrapper
               label='First Name'
               withAsterisk
+              error={regError.first}
             >
               <Input
                 placeholder='Your First Name'
@@ -57,6 +169,7 @@ const Sign_up = () => {
             <Input.Wrapper
               label='Last Name'
               withAsterisk
+              error={regError.last}
             >
               <Input
                 placeholder='Your Last Name'
@@ -71,6 +184,7 @@ const Sign_up = () => {
           <Input.Wrapper
             label='UserName'
             withAsterisk
+            error={checkUserNameMessage}
           >
             <Input
               icon={<IconUserCircle />}
@@ -79,12 +193,16 @@ const Sign_up = () => {
               value={reg.username}
               onChange={(e) => {
                 setreg({ ...reg, username: e.target.value });
+                setTimeout(() => {
+                  dispatch({ type: "CHECK_USER_NAME", data: reg.username });
+                }, 2000);
               }}
             />
           </Input.Wrapper>
           <Input.Wrapper
             label='Email ID'
             withAsterisk
+            error={regError.emailid}
           >
             <Input
               icon={<IconAt />}
@@ -99,6 +217,7 @@ const Sign_up = () => {
           <Input.Wrapper
             label='Password'
             withAsterisk
+            error={regError.password}
           >
             <PasswordInput
               placeholder='Your password'
@@ -145,14 +264,7 @@ const WrapContainer = styled.form`
 `;
 const Heading = styled.div`
   text-align: center;
-  .welcome {
-      font-size: 25px;
-      span {
-          font-size: 45px;
-        
-      color: var(--primary_color);
-    }
-  }
+  font-size: 45px;
   .title {
     font-size: 28px;
   }
@@ -177,3 +289,13 @@ const Name = styled.div`
   display: flex;
   gap: 20px;
 `;
+
+const Oauth = styled.div``;
+const GoogleOauth = styled(Button)``;
+const Icon = styled.div`
+  margin-left: 10px;
+`;
+
+const OR = styled.div`
+  
+`

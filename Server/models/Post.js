@@ -54,6 +54,10 @@ const PostSchema = new mongoose.Schema(
     ],
     bannerPic: { type: String },
     comments: [commentSchema],
+    savedUser:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },]
   },
   {
     timestamps: true,

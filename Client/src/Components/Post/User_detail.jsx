@@ -2,15 +2,23 @@ import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import React from "react";
+import { Avatar, Indicator, Popover } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import Pop_over_user_detail from "./Pop_over_user_detail";
+import { useSelector } from "react-redux";
 
 const UserDetail = ({ user, createdAt }) => {
   const navigate = useNavigate();
-  
+  const [opened, { close, open }] = useDisclosure(false);
+  const { onlineUsers } = useSelector((state) => state.auth);
+
   // Ensure createdAt is valid
-  const relativeTime = createdAt ? formatDistanceToNow(new Date(createdAt), { addSuffix: true }) : "unknown time";
+  const relativeTime = createdAt
+    ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })
+    : "unknown time";
 
   // Ensure user object is valid
-  const { userName, profilePicUrl,_id } = user || {};
+  const { userName = "", profilePicUrl, _id, isOnline } = user || {};
 
   const handleProfileClick = () => {
     if (_id) {
@@ -18,19 +26,59 @@ const UserDetail = ({ user, createdAt }) => {
     }
   };
 
+  const handleRightClick = (e) => {
+    e.preventDefault();
+  };
+
+  const profilePicName =
+    userName.length > 1
+      ? (userName[0] + userName[userName.length - 1]).toUpperCase()
+      : userName.toUpperCase();
+  const userIsOnline = onlineUsers.find((data) => data === _id);
   return (
     <Container>
-      <div className="frame">
-        <img
-          src={profilePicUrl || "/path/to/default-image.jpg"} // Fallback image
-          alt={`${userName}'s profile`}
-          onClick={handleProfileClick}
-        />
-        <div className="frame_content">
-          <div className="user_name" onClick={handleProfileClick}>
-            {userName || "Unknown User"}
-          </div>
-          <div className="date">{relativeTime}</div>
+      <div className='frame'>
+        <Indicator
+          size={7}
+          withBorder
+          processing
+          disabled={!isOnline && !userIsOnline}
+        >
+          <Avatar
+          color="blue"
+            onContextMenu={handleRightClick}
+            src={profilePicUrl}
+            alt={`${userName}'s profile`}
+            onClick={handleProfileClick}
+            radius='xl'
+          >
+            {profilePicName}
+          </Avatar>
+        </Indicator>
+        <div className='frame_content'>
+          <Popover
+            width={250}
+            position='bottom'
+            withArrow
+            shadow='md'
+            opened={opened}
+          >
+            <Popover.Target>
+              <div
+                className='user_name'
+                onClick={handleProfileClick}
+                onMouseEnter={open}
+                onMouseLeave={close}
+              >
+                {userName || "Unknown User"}
+              </div>
+            </Popover.Target>
+            <Popover.Dropdown style={{ pointerEvents: "none" }}>
+              <Pop_over_user_detail user={user} />
+            </Popover.Dropdown>
+          </Popover>
+
+          <div className='date'>{relativeTime}</div>
         </div>
       </div>
     </Container>
@@ -45,9 +93,6 @@ const Container = styled.div`
     align-items: center;
 
     img {
-      height: 50px;
-      width: 50px;
-      border-radius: 50%;
       cursor: pointer;
     }
 
