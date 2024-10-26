@@ -42,7 +42,7 @@ const Comments = (props) => {
     // Clear the comment text after submission
     setCommentText("");
   };
-  const { userName } = user || {};
+  const { userName = "" } = user || {};
   const profilePicName =
     userName.length > 1
       ? (userName[0] + userName[userName.length - 1]).toUpperCase()
