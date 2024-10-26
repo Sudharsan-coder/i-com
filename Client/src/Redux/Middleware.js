@@ -107,7 +107,14 @@ import {
   newMessage,
   sendMessageFailed,
   sendMessageSuccess,
-  setMessageList,
+  getMessageList,
+  getNoMoreMessage,
+  getChatsSucess,
+  getChatsStarted,
+  getChatsFailed,
+  getNoMoreChats,
+  setIsTyping,
+  updateSeenMessage,
 } from "./Slices/messageSlice";
 
 const baseURL = import.meta.env.VITE_BASE_API_URL;
@@ -173,18 +180,16 @@ function* checkUserName(action) {
 
 function* signOff() {
   try {
-  Cookies.remove("auth_Token");
-  const params = new URLSearchParams(window.location.search);
-  params.delete('token');
-  window.history.replaceState({}, '', `${window.location.pathname}`);
-  yield put(signOffSuccess());
-  yield put(resetAllPosts());
-    const res = yield call(axios.get,`${baseURL}/auth/google/logout`)
+    Cookies.remove("auth_Token");
+    const params = new URLSearchParams(window.location.search);
+    params.delete("token");
+    window.history.replaceState({}, "", `${window.location.pathname}`);
+    yield put(signOffSuccess());
+    yield put(resetAllPosts());
+    const res = yield call(axios.get, `${baseURL}/auth/google/logout`);
     console.log(res);
-    
   } catch (err) {
     console.log(err);
-    
   }
 }
 
@@ -211,16 +216,15 @@ function* deleteAccount(action) {
 
 function* googleAuth(action) {
   try {
-    const res = yield call(axios.get,`${baseURL}/auth/google/success`,{
-     withCredentials:true, 
-     headers:{
-      Authorization:"Bearer "+action.data.token
-     }
+    const res = yield call(axios.get, `${baseURL}/auth/google/success`, {
+      withCredentials: true,
+      headers: {
+        Authorization: "Bearer " + action.data.token,
+      },
     });
     Cookies.set("auth_Token", res.data.accessToken);
     yield put(signUpSuccess(res.data._doc));
-    if(res.data.isNewUser)
-      yield put(setFollowTagsModal(true));
+    if (res.data.isNewUser) yield put(setFollowTagsModal(true));
   } catch (err) {
     console.log(err);
     yield put(signUpFailed(err.response.data.message));
@@ -290,7 +294,7 @@ function* getPopularTags(action) {
   try {
     yield put(getPopularTagsStarted());
     const res = yield call(axios.get, `${baseURL}/categoryPost/topCategory`);
-    
+
     yield put(getPopularTagsSuccess(res.data));
   } catch (err) {
     yield put(getPopularTagsFailed(err.response.data.message));
@@ -392,7 +396,7 @@ function* getSearchPost(action) {
         params: {
           search: action.data.value,
           page: page,
-          tag:action.data.tag,
+          tag: action.data.tag,
         },
       });
       yield put(setSearchPost(res.data));
@@ -795,15 +799,29 @@ function createSocketChannel(socket) {
 
   //emit is like a bridge to send data from the external event (like Socket.IO messages) to your saga, which will then handle it within Redux.
   return eventChannel((emit) => {
-    socket.on('user_status', (data) => {
-      emit({type:"IS_ONLINE",playload:data})
+    socket.on("user_status", (data) => {
+      emit({ type: "IS_ONLINE", playload: data });
     });
-    
+
     socket.on("new_message", (message) => {
       emit({ type: "NEW_MESSAGE", playload: message });
     });
+
+    socket.on("userTyping", (data) => {
+      emit({ type: "TYPING", playload: data });
+    });
+
+    socket.on("userStopTyping", (data) => {
+      emit({ type: "TYPING", playload: data });
+    });
+
+    socket.on("messageSeen", (data) => {
+      emit({ type: "SEEN", playload: data });
+    });
+
     return () => {
       socket.off("new_message");
+      socket.off("user_status");
     };
   });
 }
@@ -818,22 +836,25 @@ function* initSocket() {
       //When the server sends the newMessage, it resumes the saga by assigning the emitted value ({ type: 'NEW_MESSAGE', payload: message }) to the action variable.
       const action = yield take(socketChannel);
       console.log(action);
-      if(action.type==="NEW_MESSAGE")
-        yield put(newMessage(action.playload));
-      else if(action.type==="IS_ONLINE" && action.playload.isOnline)
+      if (action.type === "NEW_MESSAGE") yield put(newMessage(action.playload));
+      else if (action.type === "IS_ONLINE" && action.playload.isOnline)
         yield put(setOnlineUsers(action.playload.userId));
-      else if(action.type==="IS_ONLINE" && !action.playload.isOnline)
-        yield put(setOfflineUsers(action.playload.userId))
+      else if (action.type === "IS_ONLINE" && !action.playload.isOnline)
+        yield put(setOfflineUsers(action.playload.userId));
+      else if (action.type === "TYPING")
+        yield put(setIsTyping(action.playload));
+      else if (action.type === "SEEN")
+        yield put(updateSeenMessage(action.playload.messages));
     }
   } catch (err) {
     console.log(err);
   }
 }
 
-function* connectedUser(action){
+function* connectedUser(action) {
   try {
     const socket = yield call(getSocket);
-    socket.emit('user_connected', action.data.userId);
+    socket.emit("user_connected", action.data.userId);
   } catch (err) {
     console.log(err);
   }
@@ -859,13 +880,92 @@ function* joinMessageRoom(action) {
   }
 }
 
-function* getMessage(action) {
-  
+function* leaveMessageRoom(action) {
   try {
-    const res = yield call(axios.get,`${baseURL}/message/${action.data}`)
-    yield put(setMessageList(res.data))
+    const socket = yield call(getSocket);
+    socket.emit("leaveRoom", action.data);
+    console.log("Room leaved Successfully");
   } catch (err) {
     console.log(err);
+  }
+}
+
+function* messageTyping(action) {
+  try {
+    const socket = yield call(getSocket);
+    socket.emit("typing", action.data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+function* messageMarkAsSeen(action) {
+  try {
+    const socket = yield call(getSocket);
+    socket.emit("markAsSeen", action.data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function* stopMessageTyping(action) {
+  try {
+    const socket = yield call(getSocket);
+    socket.emit("stopTyping", action.data);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function* getMessage(action) {
+  const { page, totalPages, roomId } = action.data;
+  if (page <= totalPages) {
+    try {
+      const res = yield call(
+        axios.get,
+        `${baseURL}/message/pagination/${roomId}`,
+        {
+          params: {
+            page,
+          },
+        }
+      );
+      yield put(getMessageList(res.data));
+    } catch (err) {
+      console.log(err);
+      yield put(getNoMoreMessage());
+    }
+  } else {
+    yield put(getNoMoreMessage());
+  }
+}
+
+function* getChats(action) {
+  const { page, totalPages, data } = yield select(
+    (state) => state.message.chats
+  );
+  const { user } = yield select((state) => state.auth);
+  if (page <= totalPages) {
+    try {
+      if (page === 1 && data.length === 0) yield put(getChatsStarted());
+      const res = yield call(
+        axios.get,
+        `${baseURL}/message/chats/${user._id}`,
+        {
+          params: {
+            page,
+          },
+        }
+      );
+      yield put(getChatsSucess(res.data));
+    } catch (err) {
+      console.log(err);
+      yield put(
+        getChatsFailed(err.response?.data?.message || "Please try again.")
+      );
+      yield put(getNoMoreChats());
+    }
+  } else {
+    yield put(getNoMoreChats());
   }
 }
 
@@ -886,7 +986,7 @@ function* rootSaga() {
   yield takeLatest("VALIDATE_USER", validateUser);
   yield takeLatest("CHECK_USER_NAME", checkUserName);
   yield takeLatest("SIGN_OFF", signOff);
-  yield takeLatest("GOOGLE_AUTH",googleAuth);
+  yield takeLatest("GOOGLE_AUTH", googleAuth);
   yield takeLatest("COMMENT_POST", commentPost);
   yield takeLatest("LIKE_POST", likePost);
   yield takeLatest("UNLIKE_POST", unlikePost);
@@ -908,9 +1008,14 @@ function* rootSaga() {
   yield takeLatest("VERIFY_OTP", verifyOTP);
   yield takeLatest("CHANGE_PASSWORD", changePassword);
   yield takeLatest("JOIN_MESSAGE_ROOM", joinMessageRoom);
+  yield takeLatest("LEAVE_MESSAGE_ROOM", leaveMessageRoom);
   yield takeLatest("SEND_MESSAGE_REQUEST", sendMessage);
-  yield takeLatest("GET_MESSAGE",getMessage);
-  yield takeLatest("CONNECTED_USER",connectedUser);
+  yield takeLatest("GET_MESSAGE", getMessage);
+  yield takeLatest("GET_CHATS", getChats);
+  yield takeLatest("CONNECTED_USER", connectedUser);
+  yield takeLatest("MESSAGE_TYPING", messageTyping);
+  yield takeLatest("STOP_MESSAGE_TYPING", stopMessageTyping);
+  yield takeLatest("MESSAGE_MARK_AS_SEEN", messageMarkAsSeen);
 }
 
 export default rootSaga;

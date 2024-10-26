@@ -1,16 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sofadi+One&display=swap');
 body {
   margin: 0px;
-  background-color: rgb(245, 245, 245);
+  background-color: rgb(245, 245, 245) !important;
   box-sizing: border-box;
-  
 }
 * {
   font-family: "-apple-system";
 }
 :root {
   --primary_color: #1c7ed6;
-  --seconday_color: #d6e7f886;
+  --secondary_color: #d6e7f886;
 }
 
 /* Mantine ui */

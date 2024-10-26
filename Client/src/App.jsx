@@ -17,10 +17,12 @@ import Your_activity from "./Pages/Your_activity.jsx";
 import Footer from "./Components/Footer.jsx";
 import FollowTagsModal from "./Components/Auth/FollowTagsModal.jsx";
 import Auth_google_success from "./Pages/Auth_google_success.jsx";
+import Message_page from "./Pages/Message_page.jsx";
+import White_board_page from "./Pages/White_board_page.jsx";
 
 const MainLayout = () => (
   <>
-    <FollowTagsModal/>
+    <FollowTagsModal />
     <Nav_bar />
     <Routes>
       <Route
@@ -48,6 +50,10 @@ const MainLayout = () => (
         element={<Your_activity />}
       />
       <Route
+        path='/message/:receiverId?'
+        element={<Message_page />}
+      />
+      <Route
         path='*'
         element={<NothingFoundBackground />}
       />
@@ -56,7 +62,7 @@ const MainLayout = () => (
   </>
 );
 function App() {
-  const { isAuth,user } = useSelector((state) => state.auth);
+  const { isAuth, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   useEffect(() => {
     if (!isAuth) {
@@ -66,11 +72,11 @@ function App() {
       }
     }
   }, [isAuth]);
-  
-  useEffect(()=>{
-    if(isAuth)
-      dispatch({type:"CONNECTED_USER",data:{userId:user._id}})
-  },[isAuth])
+
+  useEffect(() => {
+    if (isAuth)
+      dispatch({ type: "CONNECTED_USER", data: { userId: user._id } });
+  }, [isAuth]);
   return (
     <BrowserRouter>
       <Routes>
@@ -90,7 +96,10 @@ function App() {
           path='/auth/google/success'
           element={<Auth_google_success />}
         />
-        
+        <Route
+          path='/whiteBoard'
+          element={<White_board_page/>}
+        />
         <Route
           path='/*'
           element={<MainLayout />}
